@@ -18,7 +18,9 @@
 // icons, etc.) only one GL texture (atlas) is used. This means texture
 // coordinates have to be offset. The upside of this is that there is no
 // batching required as all primitives are the same and so can be rendered in
-// one draw call.
+// one draw call. And then.. amusingly I just used silly glBegin() so there's
+// no batching to worry about anyway. Oh well, maybe I'll switch to arrays at
+// some point and want to do only one kick.
 
 #include "core/rect_pack.h"
 #include "core/zevv-peep.h"
@@ -61,11 +63,11 @@ const char* GlEnumName(GLenum en) {
 #define GL_CHECK(_call) _call
 #endif  // CORE_CONFIG_DEBUG
 
-inline void glColorRGBA(uint32_t rgba) {
-  GL_CHECK(glColor4f(((rgba & 0xff000000) >> 24) / 255.f,
-                     ((rgba & 0xff0000) >> 16) / 255.f,
-                     ((rgba & 0xff00) >> 8) / 255.f,
-                     ((rgba & 0xff) >> 0) / 255.f));
+inline void glColorABGR(uint32_t abgr) {
+  GL_CHECK(glColor4f(((abgr & 0xff) >> 0) / 255.f,
+                     ((abgr & 0xff00) >> 8) / 255.f,
+                     ((abgr & 0xff0000) >> 16) / 255.f,
+                     ((abgr & 0xff000000) >> 24) / 255.f));
 }
 
 }  // namespace
@@ -162,6 +164,21 @@ void GlContext::Swap() {
 
 const int kAtlasSize = 2<<10;
 
+struct TextureInAtlas {
+  // All in pixels, not normalized.
+  float tx;
+  float ty;
+  float width;
+  float height;
+  TextureInAtlas(float tx, float ty, float width, float height)
+      : tx(tx), ty(ty), width(width), height(height) {}
+  TextureInAtlas(int tx, int ty, int width, int height)
+      : tx(static_cast<float>(tx)),
+        ty(static_cast<float>(ty)),
+        width(static_cast<float>(width)),
+        height(static_cast<float>(height)) {}
+};
+
 class Renderer {
 public:
   Renderer() : rect_pack_(kAtlasSize, kAtlasSize) {}
@@ -170,6 +187,9 @@ public:
   void Swap();
 
   TextureId LoadTexture(uint32_t* texture_data, int width, int height);
+  const TextureInAtlas& GetTextureInAtlas(TextureId texid) const {
+    return textures_[texid];
+  }
 
   const char* vendor;
   const char* renderer;
@@ -185,20 +205,6 @@ public:
   uint32_t* tex_atlas_backing_;
   GLuint tex_atlas_id_;
   RectPack rect_pack_;
-  struct TextureInAtlas {
-    // All in pixels, not normalized.
-    float tx;
-    float ty;
-    float width;
-    float height;
-    TextureInAtlas(float tx, float ty, float width, float height)
-        : tx(tx), ty(ty), width(width), height(height) {}
-    TextureInAtlas(int tx, int ty, int width, int height)
-        : tx(static_cast<float>(tx)),
-          ty(static_cast<float>(ty)),
-          width(static_cast<float>(width)),
-          height(static_cast<float>(height)) {}
-  };
   std::vector<TextureInAtlas> textures_;
 
   CORE_DISALLOW_COPY_AND_ASSIGN(Renderer);
@@ -293,7 +299,8 @@ void Renderer::ReloadAtlas() {
                         GL_RGBA,
                         GL_UNSIGNED_BYTE,
                         tex_atlas_backing_));
-  GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+  GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+  GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
 }
 
 static Renderer s_ctx;
@@ -307,10 +314,6 @@ void Shutdown() {
 }
 
 void Frame() {
-  GL_CHECK(glClearColor(.3f, .3f, .3f, 1.f));
-  GL_CHECK(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
-                   GL_STENCIL_BUFFER_BIT));
-
   int64_t now = core::GetHPCounter();
   static int64_t last = now;
   int64_t frame_time = now - last;
@@ -323,34 +326,37 @@ void Frame() {
   double freq = double(core::GetHPFrequency());
   double to_ms = 1000.0 / freq;
   float pos = 1;
-  DrawRect(0, 0, 100, 100, 0x00000080);
   DrawTextf(10,
             16 * pos++,
             TextAlignmentLeft,
-            0x00a000ff,
+            0xff00a000,
             "      Frame: %7.3f, % 7.3f \x1f, % 7.3f \x1e [ms] / % 6.2f FPS ",
             double(frame_time) * to_ms,
             double(min) * to_ms,
             double(max) * to_ms,
             freq / frame_time);
-  DrawTextf(10, 16 * pos++, TextAlignmentLeft, 0x008000ff, "  GL_VENDOR: %s", s_ctx.vendor);
-  DrawTextf(10, 16 * pos++, TextAlignmentLeft, 0x008000ff, "GL_RENDERER: %s", s_ctx.renderer);
-  DrawTextf(10, 16 * pos++, TextAlignmentLeft, 0x008000ff, " GL_VERSION: %s", s_ctx.version);
+  DrawTextf(10, 16 * pos++, TextAlignmentLeft, 0xff008000, "  GL_VENDOR: %s", s_ctx.vendor);
+  DrawTextf(10, 16 * pos++, TextAlignmentLeft, 0xff008000, "GL_RENDERER: %s", s_ctx.renderer);
+  DrawTextf(10, 16 * pos++, TextAlignmentLeft, 0xff008000, " GL_VERSION: %s", s_ctx.version);
 
   s_ctx.Swap();
+
+  GL_CHECK(glClearColor(.3f, .3f, .3f, 1.f));
+  GL_CHECK(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
+    GL_STENCIL_BUFFER_BIT));
 }
 
 void DrawText(float x,
               float y,
               TextAlignment align,
-              uint32_t rgba,
+              uint32_t abgr,
               const char* text) {
   CORE_UNUSED(align);
   glPushMatrix();
   glTranslatef(x, y, 0.f);
   const float char_tex_width = 8.f / static_cast<float>(kAtlasSize);
   const float char_tex_height = 16.f / static_cast<float>(kAtlasSize);
-  glColorRGBA(rgba);
+  glColorABGR(abgr);
 
   glBegin(GL_QUADS);
   float dx = 0.0;
@@ -378,7 +384,7 @@ void DrawText(float x,
 void DrawTextf(float x,
                float y,
                TextAlignment align,
-               uint32_t rgba,
+               uint32_t abgr,
                const char* format,
                ...) {
   va_list arg_list;
@@ -393,12 +399,12 @@ void DrawTextf(float x,
   }
   out[len] = '\0';
 
-  DrawText(x, y, align, rgba, out);
+  DrawText(x, y, align, abgr, out);
   va_end(arg_list);
 }
 
-void DrawRect(float x, float y, float w, float h, uint32_t rgba) {
-  glColorRGBA(rgba);
+void DrawRect(float x, float y, float w, float h, uint32_t abgr) {
+  glColorABGR(abgr);
   glBegin(GL_QUADS);
   const float inset = 1.f / kAtlasSize;
   glTexCoord2f(inset, inset);
@@ -416,12 +422,32 @@ TextureId LoadTexture(uint32_t* texture_data, int width, int height) {
   return s_ctx.LoadTexture(texture_data, width, height);
 }
 
+void DrawSprite(float x, float y, uint32_t abgr, TextureId texid) {
+  const TextureInAtlas& tia = s_ctx.GetTextureInAtlas(texid);
+  DrawTexturedRect(x, y, tia.width, tia.height, abgr, texid);
+}
+
 void DrawTexturedRect(float x,
                       float y,
                       float w,
                       float h,
-                      uint32_t argb,
-                      TextureId texid);
+                      uint32_t abgr,
+                      TextureId texid) {
+  glColorABGR(abgr);
+  glBegin(GL_QUADS);
+  const TextureInAtlas& tia = s_ctx.GetTextureInAtlas(texid);
+  glTexCoord2f(tia.tx / kAtlasSize, tia.ty / kAtlasSize);
+  glVertex2f(x, y);
+  glTexCoord2f((tia.tx + tia.width) / kAtlasSize, tia.ty / kAtlasSize);
+  glVertex2f(x + w, y);
+  glTexCoord2f((tia.tx + tia.width) / kAtlasSize,
+               (tia.ty + tia.height) / kAtlasSize);
+  glVertex2f(x + w, y + h);
+  glTexCoord2f(tia.tx / kAtlasSize,
+               (tia.ty + tia.height) / kAtlasSize);
+  glVertex2f(x, y + h);
+  glEnd();
+}
 
 }  // namespace gfx
 }  // namespace core

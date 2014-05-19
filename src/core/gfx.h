@@ -26,25 +26,25 @@ void Frame();
 void DrawText(float x,
               float y,
               TextAlignment align,
-              uint32_t argb,
+              uint32_t abgr,
               const char* text);
 void DrawTextf(float x,
                float y,
                TextAlignment align,
-               uint32_t argb,
+               uint32_t abgr,
                const char* format,
                ...);
-void DrawRect(float x, float y, float w, float h, uint32_t argb);
-void DrawLine(float x0, float y0, float x1, float y1, uint32_t argb);
+void DrawRect(float x, float y, float w, float h, uint32_t abgr);
+void DrawLine(float x0, float y0, float x1, float y1, uint32_t abgr);
 
 TextureId LoadTexture(uint32_t* texture_data, int width, int height);
 
-// Always 1:1 and the full size of the texture at the moment.
+void DrawSprite(float x, float y, uint32_t abgr, TextureId texid);
 void DrawTexturedRect(float x,
                       float y,
                       float w,
                       float h,
-                      uint32_t argb,
+                      uint32_t abgr,
                       TextureId texid);
 
 }  // namespace gfx
