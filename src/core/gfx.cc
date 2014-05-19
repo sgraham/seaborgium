@@ -160,7 +160,7 @@ void GlContext::Swap() {
 #error "GL context not implemented"
 #endif
 
-const size_t kAtlasSize = 2<<10;
+const int kAtlasSize = 2<<10;
 
 class Renderer {
 public:
@@ -169,19 +169,37 @@ public:
   void Shutdown();
   void Swap();
 
+  TextureId LoadTexture(uint32_t* texture_data, int width, int height);
+
   const char* vendor;
   const char* renderer;
   const char* version;
 
-private:
+ private:
   // Draws the 'peep' font into the top row of the texture atlas in white.
   void DrawDebugFontIntoAtlas();
+  void BlitToAtlas(uint32_t* texture_data, int x, int y, int width, int height);
   void ReloadAtlas();
 
   GlContext glctx_;
   uint32_t* tex_atlas_backing_;
   GLuint tex_atlas_id_;
   RectPack rect_pack_;
+  struct TextureInAtlas {
+    // All in pixels, not normalized.
+    float tx;
+    float ty;
+    float width;
+    float height;
+    TextureInAtlas(float tx, float ty, float width, float height)
+        : tx(tx), ty(ty), width(width), height(height) {}
+    TextureInAtlas(int tx, int ty, int width, int height)
+        : tx(static_cast<float>(tx)),
+          ty(static_cast<float>(ty)),
+          width(static_cast<float>(width)),
+          height(static_cast<float>(height)) {}
+  };
+  std::vector<TextureInAtlas> textures_;
 
   CORE_DISALLOW_COPY_AND_ASSIGN(Renderer);
 };
@@ -220,6 +238,16 @@ void Renderer::Swap() {
   glctx_.Swap();
 }
 
+TextureId Renderer::LoadTexture(uint32_t* texture_data, int width, int height) {
+  int x, y;
+  CORE_CHECK(rect_pack_.Insert(width, height, &x, &y),
+             "Couldn't insert %dx%d texture into atlas", width, height);
+  BlitToAtlas(texture_data, x, y, width, height);
+  textures_.push_back(TextureInAtlas(x, y, width, height));
+  ReloadAtlas();
+  return static_cast<TextureId>(textures_.size() - 1);
+}
+
 void Renderer::DrawDebugFontIntoAtlas() {
   // Debug font is bit packed 8x16, target is RGBA, top row.
   // Char 0 is solid white, so we can use it to module for "untextured" draws.
@@ -227,6 +255,7 @@ void Renderer::DrawDebugFontIntoAtlas() {
   CORE_CHECK(rect_pack_.Insert(kAtlasSize, 16, &out_x, &out_y),
              "Couldn't insert font");
   CORE_CHECK(out_x == 0 && out_y == 0, "Font wasn't assigned top left");
+  textures_.push_back(TextureInAtlas(out_x, out_y, kAtlasSize, 16));
   for (int ch = 0; ch < 256; ++ch) {
     const unsigned char* char_data = &ZEVV_PEEP_FONT[ch * 16];
     uint32_t* in_texture = &tex_atlas_backing_[ch * 8];
@@ -235,6 +264,21 @@ void Renderer::DrawDebugFontIntoAtlas() {
         in_texture[7 - bit] = *char_data & (1 << bit) ? 0xffffffffu : 0u;
       }
     }
+  }
+}
+
+void Renderer::BlitToAtlas(uint32_t* texture_data,
+                           int x,
+                           int y,
+                           int width,
+                           int height) {
+  CORE_DCHECK(
+      x >= 0 && y >= 0 && x + width < kAtlasSize && y + height < kAtlasSize,
+      "bad pos/size blitting into atlas");
+  for (int row = 0; row < height; ++row) {
+    memcpy(&tex_atlas_backing_[(y + row) * kAtlasSize + x],
+           &texture_data[row * width],
+           width * sizeof(uint32_t));
   }
 }
 
@@ -369,11 +413,7 @@ void DrawRect(float x, float y, float w, float h, uint32_t rgba) {
 }
 
 TextureId LoadTexture(uint32_t* texture_data, int width, int height) {
-  // Repack
-  CORE_UNUSED(texture_data);
-  CORE_UNUSED(width);
-  CORE_UNUSED(height);
-  return -1;
+  return s_ctx.LoadTexture(texture_data, width, height);
 }
 
 void DrawTexturedRect(float x,
