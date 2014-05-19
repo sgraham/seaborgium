@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef SG_UI_DRAG_SETUP_H_
-#define SG_UI_DRAG_SETUP_H_
+#ifndef UI_DRAG_SETUP_H_
+#define UI_DRAG_SETUP_H_
 
 #include "core/geometric_types.h"
 #include "ui/drag_direction.h"
@@ -31,4 +31,4 @@ class DragSetup {
   std::unique_ptr<Draggable>* draggable;
 };
 
-#endif  // SG_UI_DRAG_SETUP_H_
+#endif  // UI_DRAG_SETUP_H_

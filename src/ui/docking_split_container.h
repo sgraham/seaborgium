@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef SG_UI_DOCKING_SPLIT_CONTAINER_H_
-#define SG_UI_DOCKING_SPLIT_CONTAINER_H_
+#ifndef UI_DOCKING_SPLIT_CONTAINER_H_
+#define UI_DOCKING_SPLIT_CONTAINER_H_
 
 #include <memory>
 #include "ui/dockable.h"
@@ -71,4 +71,4 @@ class DockingSplitContainer : public Dockable {
   std::unique_ptr<Dockable> right_;
 };
 
-#endif  // SG_UI_DOCKING_SPLIT_CONTAINER_H_
+#endif  // UI_DOCKING_SPLIT_CONTAINER_H_

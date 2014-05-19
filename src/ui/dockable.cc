@@ -6,7 +6,6 @@
 
 #include "core/core.h"
 #include "ui/docking_split_container.h"
-#pragma message("todo!")
 //#include "sg/workspace.h"
 
 Dockable::Dockable() : parent_(NULL) {

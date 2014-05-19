@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef SG_UI_DRAG_DIRECTION_H_
-#define SG_UI_DRAG_DIRECTION_H_
+#ifndef UI_DRAG_DIRECTION_H_
+#define UI_DRAG_DIRECTION_H_
 
 enum DragDirection {
   kDragDirectionNone,
@@ -12,4 +12,4 @@ enum DragDirection {
   kDragDirectionAll,
 };
 
-#endif  // SG_UI_DRAG_DIRECTION_H_
+#endif  // UI_DRAG_DIRECTION_H_

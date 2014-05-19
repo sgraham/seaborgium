@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef SG_UI_DOCKABLE_H_
-#define SG_UI_DOCKABLE_H_
+#ifndef UI_DOCKABLE_H_
+#define UI_DOCKABLE_H_
 
 #include "core/core.h"
 #include "core/geometric_types.h"
@@ -82,4 +82,4 @@ class Dockable /*: public InputHandler*/ {
   CORE_DISALLOW_COPY_AND_ASSIGN(Dockable);
 };
 
-#endif  // SG_UI_DOCKABLE_H_
+#endif  // UI_DOCKABLE_H_

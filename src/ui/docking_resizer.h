@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef SG_UI_DOCKING_RESIZER_H_
-#define SG_UI_DOCKING_RESIZER_H_
+#ifndef UI_DOCKING_RESIZER_H_
+#define UI_DOCKING_RESIZER_H_
 
 #include "core/core.h"
 #include "core/geometric_types.h"
@@ -31,4 +31,4 @@ class DockingResizer : public Draggable {
   Point initial_location_;
 };
 
-#endif  // SG_UI_DOCKING_RESIZER_H_
+#endif  // UI_DOCKING_RESIZER_H_
