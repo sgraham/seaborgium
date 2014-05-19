@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 #include "core/rect_pack.h"
- 
+
 #include "gtest/gtest.h"
 
 namespace core {

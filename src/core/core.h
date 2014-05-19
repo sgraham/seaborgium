@@ -9,9 +9,10 @@
 #ifndef CORE_CORE_H_
 #define CORE_CORE_H_
 
+#include <stdarg.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
-
 
 // --------------------------------------------------------------------------
 //
@@ -141,7 +142,7 @@ namespace core {
 template <typename T, size_t N>
 char (&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T (&)[N]))[N];
 #define CORE_COUNTOF(_x) sizeof(::core::COUNTOF_REQUIRES_ARRAY_ARGUMENT(_x))
-}  // namespace
+}  // namespace core
 
 #if CORE_COMPILER_GCC || CORE_COMPILER_CLANG
 #define CORE_ALIGN_STRUCT(_align, struct) \
@@ -209,7 +210,7 @@ char (&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T (&)[N]))[N];
     }                                              \
   } while (0)
 #else  // CORE_CONFIG_DEBUG
-#define CORE_DCHECK(condition, format, ...) do {} while(0)
+#define CORE_DCHECK(condition, format, ...) do {} while (0)
 #endif  // CORE_CONFIG_DEBUG
 #endif  // CORE_DCHECK
 
@@ -220,7 +221,7 @@ char (&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T (&)[N]))[N];
     ::core::DebugPrintf(CORE_FILE_LINE_LITERAL format "\n", ##__VA_ARGS__); \
   } while (0)
 #else  // CORE_CONFIG_DEBUG
-#define CORE_TRACE(...) do {} while(0)
+#define CORE_TRACE(...) do {} while (0)
 #endif  // CORE_CONFIG_DEBUG
 #endif  // CORE_TRACE
 
@@ -290,7 +291,6 @@ inline void MemoryBarrier() {
   _mm_mfence();
 #else
   __sync_synchronize();
-//		asm volatile("mfence":::"memory");
 #endif  // CORE_COMPILER
 }
 
@@ -328,9 +328,9 @@ inline void* AtomicExchangePtr(void** _target, void* ptr) {
 // --------------------------------------------------------------------------
 
 #if CORE_PLATFORM_LINUX || CORE_PLATFORM_OSX
-#	include <sys/time.h> // gettimeofday
+#include <sys/time.h>  // gettimeofday
 #elif CORE_PLATFORM_WINDOWS
-#	include <windows.h>
+#include <windows.h>  // NOLINT(build/include)
 #endif
 
 namespace core {
@@ -360,7 +360,7 @@ inline int64_t GetHPFrequency() {
 #endif  // CORE_PLATFORM_
 }
 
-} // namespace core
+}  // namespace core
 
 
 // --------------------------------------------------------------------------
@@ -379,12 +379,7 @@ extern "C" __declspec(dllimport) void __stdcall OutputDebugStringA(
 #include <CoreFoundation/CFString.h>
 extern "C" void NSLog(CFStringRef format, ...);
 #endif  // defined(__OBJC__)
-#else
-#include <stdio.h>
 #endif
-
-#include <stdio.h>  // vsnprintf, vsnwprintf
-#include <stdarg.h>
 
 namespace core {
 
@@ -442,7 +437,7 @@ inline void DebugPrintfVargs(const char* format, va_list arg_list) {
   char* out = temp;
   int32_t len = core::vsnprintf(out, sizeof(temp), format, arg_list);
   if ((int32_t)sizeof(temp) < len) {
-    out = (char*)alloca(len + 1);
+    out = reinterpret_cast<char*>(alloca(len + 1));
     len = core::vsnprintf(out, len, format, arg_list);
   }
   out[len] = '\0';
@@ -456,7 +451,7 @@ inline void DebugPrintf(const char* format, ...) {
   va_end(arg_list);
 }
 
-} // namespace core
+}  // namespace core
 
 
 // --------------------------------------------------------------------------
@@ -500,15 +495,15 @@ class Futex {
 
 class ScopedFutex {
  public:
-  ScopedFutex(Futex& futex) : futex_(futex) { futex_.Lock(); }
-  ~ScopedFutex() { futex_.Unlock(); }
+  explicit ScopedFutex(Futex* futex) : futex_(futex) { futex_->Lock(); }
+  ~ScopedFutex() { futex_->Unlock(); }
 
  private:
   ScopedFutex();                              // no default constructor
   ScopedFutex(const ScopedFutex&);             // no copy constructor
   ScopedFutex& operator=(const ScopedFutex&);  // no assignment operator
 
-  Futex& futex_;
+  Futex* futex_;
 };
 
 }  // namespace core
@@ -521,12 +516,12 @@ class ScopedFutex {
 // --------------------------------------------------------------------------
 
 #if CORE_PLATFORM_POSIX
-#include <errno.h>
+#include <errno.h>  // NOLINT(build/include)
 #include <semaphore.h>
 #include <time.h>
-#include <pthread.h>
+#include <pthread.h>  // NOLINT(build/include)
 #elif CORE_PLATFORM_WINDOWS
-#include <windows.h>
+#include <windows.h>  // NOLINT(build/include)
 #include <limits.h>
 #endif
 
@@ -566,8 +561,8 @@ class Semaphore {
       int32_t result;
       do {
         result = sem_wait(&handle_);
-      }  // Keep waiting when interrupted by a signal handler...
-      while (-1 == result && EINTR == errno);
+        // Keep waiting when interrupted by a signal handler...
+      } while (-1 == result && EINTR == errno);
       CORE_CHECK(0 == result, "sem_wait failed. errno %d", errno);
       return 0 == result;
     }
@@ -615,7 +610,7 @@ class Semaphore {
 
 #endif  // CORE_PLATFORM_
 
-} // namespace core
+}  // namespace core
 
 
 // --------------------------------------------------------------------------
@@ -625,8 +620,8 @@ class Semaphore {
 // --------------------------------------------------------------------------
 
 #if CORE_PLATFORM_POSIX
-#	include <pthread.h>
-#endif // CORE_PLATFORM_POSIX
+#include <pthread.h>  // NOLINT(build/include)
+#endif  // CORE_PLATFORM_POSIX
 
 namespace core {
 
@@ -804,7 +799,7 @@ class SpScQueue {
 
  private:
   struct Node {
-    Node(void* ptr) : ptr_(ptr), next_(NULL) {}
+    explicit Node(void* ptr) : ptr_(ptr), next_(NULL) {}
 
     void* ptr_;
     Node* next_;

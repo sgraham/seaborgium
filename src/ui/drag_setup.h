@@ -5,10 +5,10 @@
 #ifndef UI_DRAG_SETUP_H_
 #define UI_DRAG_SETUP_H_
 
+#include <memory>
+
 #include "core/geometric_types.h"
 #include "ui/drag_direction.h"
-
-#include <memory>
 
 class DockingWorkspace;
 class Draggable;

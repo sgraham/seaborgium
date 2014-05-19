@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef RECT_PACK_H_
-#define RECT_PACK_H_
+#ifndef CORE_RECT_PACK_H_
+#define CORE_RECT_PACK_H_
 
 // "A Thousand Ways to Pack the Bin - A Practical Approach to Two-Dimensional
 // Rectangle Bin Packing", Jukka Jylänki, February 27, 2010.
@@ -138,4 +138,4 @@ inline void RectPack::Merge() {
 
 }  // namespace core
 
-#endif  // RECT_PACK_H_
+#endif  // CORE_RECT_PACK_H_

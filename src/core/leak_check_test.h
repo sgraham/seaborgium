@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef SG_TEST_H_
-#define SG_TEST_H_
+#ifndef CORE_LEAK_CHECK_TEST_H_
+#define CORE_LEAK_CHECK_TEST_H_
 
 #include "gtest/gtest.h"
 
@@ -46,4 +46,4 @@ class LeakCheckTest : public testing::Test {
   }
 };
 
-#endif  // SG_TEST_H_
+#endif  // CORE_LEAK_CHECK_TEST_H_

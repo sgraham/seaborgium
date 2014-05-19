@@ -6,7 +6,7 @@
 
 #include "core/core.h"
 #include "ui/docking_split_container.h"
-//#include "sg/workspace.h"
+// #include "sg/workspace.h"
 
 Dockable::Dockable() : parent_(NULL) {
 }
@@ -29,7 +29,7 @@ const Rect& Dockable::GetScreenRect() const {
 
 void Dockable::Invalidate() {
 #pragma message("todo!")
-  //Workspace::Invalidate();
+  // Workspace::Invalidate();
 }
 
 Dockable* Dockable::FindTopMostUnderPoint(const Point& point) {

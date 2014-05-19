@@ -5,12 +5,11 @@
 #ifndef UI_DOCKING_WORKSPACE_H_
 #define UI_DOCKING_WORKSPACE_H_
 
+#include <memory>
+#include <vector>
 
 #include "ui/dockable.h"
 #include "ui/drag_direction.h"
-
-#include <memory>
-#include <vector>
 
 class DockingSplitContainer;
 

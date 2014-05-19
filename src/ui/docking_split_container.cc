@@ -6,10 +6,10 @@
 
 #include "core/core.h"
 #pragma message("todo!")
-//#include "sg/render/renderer.h"
-//#include "sg/render/scoped_render_offset.h"
+// #include "sg/render/renderer.h"
+// #include "sg/render/scoped_render_offset.h"
 #include "ui/docking_resizer.h"
-//#include "ui/skin.h"
+// #include "ui/skin.h"
 
 namespace {
 

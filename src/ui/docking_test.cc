@@ -2,13 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include <string>
+
+#include "core/leak_check_test.h"
 #include "ui/docking_resizer.h"
 #include "ui/docking_split_container.h"
 #include "ui/docking_workspace.h"
-
-#include "core/leak_check_test.h"
-
-#include <string>
 
 namespace {
 
