@@ -1,5 +1,5 @@
 @echo off
-rmdir /s/q out &&^
+rmdir /s/q out &^
 mkdir out &&^
 mkdir out\Debug &&^
 mkdir out\Release &&^
