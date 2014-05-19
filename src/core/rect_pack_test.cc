@@ -2,8 +2,26 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "gtest/gtest.h"
+#include "core/rect_pack.h"
  
-TEST(SampleTest, AssertionTrue) {
-    ASSERT_EQ(1, 1);
+#include "gtest/gtest.h"
+
+namespace core {
+
+TEST(RectPackTest, Basic) {
+  RectPack rp(128, 128);
+  int x, y;
+  EXPECT_TRUE(rp.Insert(16, 16, &x, &y));
+  EXPECT_EQ(0, x);
+  EXPECT_EQ(0, y);
+
+  EXPECT_TRUE(rp.Insert(16, 16, &x, &y));
+  EXPECT_EQ(16, x);
+  EXPECT_EQ(0, y);
+
+  EXPECT_TRUE(rp.Insert(128, 32, &x, &y));
+  EXPECT_EQ(0, x);
+  EXPECT_EQ(32, y);
 }
+
+}  // namespace core
