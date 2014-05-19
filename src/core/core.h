@@ -144,8 +144,8 @@ char (&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T (&)[N]))[N];
 }  // namespace
 
 #if CORE_COMPILER_GCC || CORE_COMPILER_CLANG
-#define CORE_ALIGN_STRUCT(_align, _struct) \
-  _struct __attribute__((aligned(_align)))
+#define CORE_ALIGN_STRUCT(_align, struct) \
+  struct __attribute__((aligned(_align)))
 #define CORE_ALLOW_UNUSED __attribute__((unused))
 #define CORE_FORCE_INLINE \
   __extension__ static __inline __attribute__((__always_inline__))
@@ -153,16 +153,14 @@ char (&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T (&)[N]))[N];
 #define CORE_NO_INLINE __attribute__((noinline))
 #define CORE_NO_RETURN __attribute__((noreturn))
 #define CORE_NO_VTABLE
-#define CORE_OVERRIDE
 #elif CORE_COMPILER_MSVC
-#define CORE_ALIGN_STRUCT(_align, _struct) __declspec(align(_align)) _struct
+#define CORE_ALIGN_STRUCT(_align, struct) __declspec(align(_align)) struct
 #define CORE_ALLOW_UNUSED
 #define CORE_FORCE_INLINE __forceinline
 #define CORE_FUNCTION __FUNCTION__
 #define CORE_NO_INLINE __declspec(noinline)
 #define CORE_NO_RETURN
 #define CORE_NO_VTABLE __declspec(novtable)
-#define CORE_OVERRIDE override
 #define CORE_THREAD __declspec(thread)
 #else
 #error "Unknown CORE_COMPILER_"
@@ -175,8 +173,8 @@ char (&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T (&)[N]))[N];
   _def;                             \
   CORE_CACHE_LINE_ALIGN_MARKER()
 
-#define CORE_ALIGN_STRUCT_16(_struct) CORE_ALIGN_STRUCT(16, _struct)
-#define CORE_ALIGN_STRUCT_256(_struct) CORE_ALIGN_STRUCT(256, _struct)
+#define CORE_ALIGN_STRUCT_16(struct) CORE_ALIGN_STRUCT(16, struct)
+#define CORE_ALIGN_STRUCT_256(struct) CORE_ALIGN_STRUCT(256, struct)
 
 #define CORE_UNUSED(a1)                    \
   do {                                     \
@@ -225,6 +223,10 @@ char (&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T (&)[N]))[N];
 #define CORE_TRACE(...) do {} while(0)
 #endif  // CORE_CONFIG_DEBUG
 #endif  // CORE_TRACE
+
+#ifndef CORE_NOTREACHED
+#define CORE_NOTREACHED() CORE_TRACE("Not reached!")
+#endif
 
 #define CORE_DISALLOW_COPY(TypeName) TypeName(const TypeName&)
 #define CORE_DISALLOW_ASSIGN(TypeName) void operator=(const TypeName&)
@@ -425,6 +427,14 @@ inline int32_t vsnprintf(char* str,
 #else
   return ::vsnprintf(str, count, format, arg_list);
 #endif  // CORE_COMPILER_MSVC
+}
+
+inline int32_t snprintf(char* str, size_t count, const char* format, ...) {
+  va_list arg_list;
+  va_start(arg_list, format);
+  int32_t len = vsnprintf(str, count, format, arg_list);
+  va_end(arg_list);
+  return len;
 }
 
 inline void DebugPrintfVargs(const char* format, va_list arg_list) {

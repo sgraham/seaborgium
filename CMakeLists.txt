@@ -23,6 +23,8 @@ macro(fix_default_compiler_settings)
 
     # Full path in error messages.
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FC")
+
+    add_definitions(-DNOMINMAX)
   endif()
 endmacro()
 
@@ -31,21 +33,32 @@ fix_default_compiler_settings()
 
 add_subdirectory(third_party/gtest-1.7.0)
 
-# Main binary
 include_directories(src)
+
+# Main code library.
 set(main_sources
-  src/core/entry.cc
   src/core/gfx.cc
-  src/main.cc
+  src/ui/dockable.cc
+  src/ui/docking_resizer.cc
+  src/ui/docking_split_container.cc
+  src/ui/docking_workspace.cc
 )
-add_executable(sg ${main_sources})
+add_library(sglib ${main_sources})
+
+
+# Main binary.
+add_executable(sg
+  src/core/entry.cc
+  src/main.cc)
+target_link_libraries(sg sglib)
 
 
 # Test binary
 include_directories(${gtest_SOURCE_DIR}/include)
 set(test_sources
   src/core/rect_pack_test.cc
+  src/ui/docking_test.cc
 )
 add_executable(sg_test ${test_sources})
-target_link_libraries(sg_test gtest_main)
+target_link_libraries(sg_test sglib gtest_main)
 
