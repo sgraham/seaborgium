@@ -1,0 +1,48 @@
+bx is great except for the casing of function names, want a bunch of it:
+- platform macros
+- simple os functionality (dlopen, etc.)
+- thread, mutex, semaphore, spscqueue
+
+entry point gunk: ~1w
+- create a window
+- spin up main thread and call int Main(argc, argv).
+- handle/post system events to messageloop
+
+messageloop: ~1w
+- blocking processor
+- post into it from anywhere
+
+simple 2d renderer, look at what gwen does for basic abstraction ~2w
+- opengl everywhere is probably simplest: rect, line, texture, etc.
+- font rendering: simple monospace bitmap font, maybe a few sizes
+
+ui widgets:
+- docking panes ~1w
+- scrollable window ~1w
+- source viewer ~1w
+  - syntax highlighting ~1w
+  - selection for copy paste ~1w
+  - gutter indicators
+- scrolling output text window ~1w
+- single line text edit (command line, value edit) ~2w
+- tree grid view (locals, watch, breakpoints, etc.) modelled on win32-style ~2w
+  - resizable columns with contents clip/ellipsis
+  - custom renderer/formatting per cell
+  - inline edit to modify locals ~1w
+- color theming ~1w
+
+actual ui
+- command line equivalent for all view windows
+  - it'd be nice if it called through the same way
+  - (view "xyz"
+- create process
+- attach to process
+- set, edit, update breakpoints
+- step in, out, over
+
+
+thread 0: SYSTEM: window create, post system events to MAIN
+thread 1: UI: handles events, draws UI, sends control events to DEBUGGER
+thread 2: RENDER: double buffered renderer processing UI draws
+thread 3: DEBUGGER: interacts with debugger engine and target process
+                    posts updates back to UI
