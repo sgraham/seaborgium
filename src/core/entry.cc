@@ -468,15 +468,15 @@ bool ProcessEvents(uint32_t* width, uint32_t* height, MouseState* mouse) {
           return true;
 
         case Event::Mouse:
-          // TODO:
+          // TODO(scottmg): Something.
           break;
 
         case Event::Key:
-          // TODO:
+          // TODO(scottmg): Something.
           break;
 
         case Event::Size:
-          // TODO:
+          // TODO(scottmg): Something.
           break;
 
         default:
@@ -491,6 +491,5 @@ bool ProcessEvents(uint32_t* width, uint32_t* height, MouseState* mouse) {
 }  // namespace core
 
 int main(int argc, char** argv) {
-  using namespace core;
-  return s_ctx.Run(argc, argv);
+  return core::s_ctx.Run(argc, argv);
 }
