@@ -235,10 +235,9 @@ struct Context {
 
     HINSTANCE instance = reinterpret_cast<HINSTANCE>(::GetModuleHandle(NULL));
 
-    WNDCLASSEX wnd;
-    memset(&wnd, 0, sizeof(wnd));
+    WNDCLASSEX wnd = {0};
     wnd.cbSize = sizeof(wnd);
-    wnd.style = CS_HREDRAW | CS_VREDRAW;
+    wnd.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
     wnd.lpfnWndProc = WndProc;
     wnd.hInstance = instance;
     wnd.hIcon = ::LoadIcon(NULL, IDI_APPLICATION);
@@ -250,7 +249,7 @@ struct Context {
     hwnd_ = ::CreateWindowA("seaborgium",
                             "Seaborgium",
                             WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-                            200,
+                            50,
                             50,
                             CORE_DEFAULT_WIDTH,
                             CORE_DEFAULT_HEIGHT,
@@ -369,6 +368,16 @@ struct Context {
           event_queue_.PostKeyEvent(
               key, modifiers, id == WM_KEYDOWN || id == WM_SYSKEYDOWN);
         } break;
+
+        // These don't appear sufficient to avoid flicker during drag resizing
+        // with GL rendering. I don't know why.
+        case WM_ERASEBKGND:
+          return TRUE;
+
+        case WM_PAINT: {
+          ::ValidateRect(hwnd, NULL);
+          return TRUE;
+        }
 
         default:
           break;

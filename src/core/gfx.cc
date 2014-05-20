@@ -104,32 +104,17 @@ class GlContext {
 
 void GlContext::Create(uint32_t /*width*/, uint32_t /*height*/) {
   PIXELFORMATDESCRIPTOR pfd = {
-      sizeof(PIXELFORMATDESCRIPTOR),
-      1,
-      PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,  // Flags
+      sizeof(PIXELFORMATDESCRIPTOR), 1,
+      PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER |
+          PFD_SUPPORT_COMPOSITION | PFD_GENERIC_ACCELERATED,  // Flags
       PFD_TYPE_RGBA,  // The kind of framebuffer. RGBA or palette.
-      32,  // Colordepth of the framebuffer.
+      32,             // Color depth of the framebuffer.
       0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       24,  // Number of bits for the depthbuffer
-      8,  // Number of bits for the stencilbuffer
-      0,  // Number of Aux buffers in the framebuffer.
-      PFD_MAIN_PLANE,
-      0,
-      0,
-      0,
-      0};
+      8,   // Number of bits for the stencilbuffer
+      0,   // Number of Aux buffers in the framebuffer.
+      PFD_MAIN_PLANE, 0, 0, 0, 0};
 
   hdc_ = ::GetDC(s_hwnd);
   CORE_CHECK(hdc_, "GetDC failed");
