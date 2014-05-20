@@ -6,6 +6,11 @@
 #include "core/entry.h"
 #include "core/gfx.h"
 
+#if 0
+#include "clang-c/Index.h"
+#endif
+
+
 int Main(int argc, char** argv) {
   core::gfx::Init();
   CORE_UNUSED(argc);
@@ -17,6 +22,50 @@ int Main(int argc, char** argv) {
   };
   core::gfx::TextureId test_texture =
       core::gfx::LoadTexture(test_texture_data, 2, 2);
+
+#if 0  // Works fine, but tokenizing at this level isn't really enough for
+       // syntax highlighting.
+  const char* args[] = {"-Isrc", "-D_CRT_SECURE_NO_WARNINGS"};
+  int numArgs = sizeof(args) / sizeof(*args);
+  CXIndex index = clang_createIndex(0, 0);
+  CXTranslationUnit tu = clang_parseTranslationUnit(
+      index, "src/main.cc", args, numArgs, NULL, 0, CXTranslationUnit_None);
+
+  CXSourceRange range =
+      clang_getCursorExtent(clang_getTranslationUnitCursor(tu));
+  CXToken* tokens;
+  unsigned num_tokens;
+  clang_tokenize(tu, range, &tokens, &num_tokens);
+
+  for (unsigned i = 0; i < num_tokens; ++i) {
+    CXTokenKind token_kind = clang_getTokenKind(tokens[i]);
+    const char* kind_str = "???";
+    switch (token_kind) {
+      case CXToken_Punctuation:
+        kind_str = "Punctuation";
+        break;
+      case CXToken_Keyword:
+        kind_str = "Keyword";
+        break;
+      case CXToken_Identifier:
+        kind_str = "Identifier";
+        break;
+      case CXToken_Literal:
+        kind_str = "Literal";
+        break;
+      case CXToken_Comment:
+        kind_str = "Comment";
+        break;
+    }
+    CXString text = clang_getTokenSpelling(tu, tokens[i]);
+    //fprintf(stderr, "%s: %s\n", clang_getCString(text), kind_str);
+    clang_disposeString(text);
+  }
+
+  clang_disposeTokens(tu, tokens, num_tokens);
+  clang_disposeTranslationUnit(tu);
+  clang_disposeIndex(index);
+#endif
 
   uint32_t width, height;
   while (!core::ProcessEvents(&width, &height)) {

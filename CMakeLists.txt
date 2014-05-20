@@ -34,6 +34,8 @@ fix_default_compiler_settings()
 add_subdirectory(third_party/gtest-1.7.0)
 
 include_directories(src)
+# TODO
+#include_directories(../llvm/llvm/tools/clang/include)
 
 # Main code library.
 set(main_sources
@@ -50,7 +52,10 @@ add_library(sglib ${main_sources})
 add_executable(sg
   src/core/entry.cc
   src/main.cc)
-target_link_libraries(sg sglib)
+target_link_libraries(sg
+                      sglib
+                      #d:/src/llvm/build/lib/libclang.imp
+                      )
 
 
 # Test binary
