@@ -46,3 +46,13 @@ thread 1: UI: handles events, draws UI, sends control events to DEBUGGER
 thread 2: RENDER: double buffered renderer processing UI draws
 thread 3: DEBUGGER: interacts with debugger engine and target process
                     posts updates back to UI
+
+don't really need RENDER thread, GL drivers are just shims to another thread
+these days anyway.
+
+workspace:
+- get default windows up/draggable
+- figure out non-gamey-render loop (invalidates as nececessary, probably only
+  full repaint w/o dirty rects)
+- command line via esc or ` with text editor widget
+- theming
