@@ -52,6 +52,8 @@ these days anyway.
 
 workspace:
 - get default windows up/draggable
+- source view as main
+- command (output+command line)
 - figure out non-gamey-render loop (invalidates as nececessary, probably only
   full repaint w/o dirty rects)
 - command line via esc or ` with text editor widget
