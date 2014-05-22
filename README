@@ -53,8 +53,13 @@ these days anyway.
 workspace:
 - get default windows up/draggable
 - source view as main
-- command (output+command line)
 - figure out non-gamey-render loop (invalidates as nececessary, probably only
   full repaint w/o dirty rects)
 - command line via esc or ` with text editor widget
 - theming
+
+widgets:
+- source view (with mixed disasm)
+- single line text edit (command line, watch edit)
+- tree grid view (stack, breakpoints, threads, watch, locals)
+- scrolling text output (command, process output)
