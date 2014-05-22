@@ -9,6 +9,7 @@
 #ifndef CORE_CORE_H_
 #define CORE_CORE_H_
 
+#include <errno.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -110,6 +111,26 @@
 #elif CORE_ARCH_64BIT
 #define CORE_ARCH_NAME "64-bit"
 #endif
+
+// Includes, now that we know what we're targetting.
+#if CORE_COMPILER_MSVC
+#include <math.h>
+#include <intrin.h>
+#include <windows.h>
+#endif
+
+#if CORE_PLATFORM_POSIX
+#include <pthread.h>
+#include <semaphore.h>
+#include <sys/time.h>
+#include <time.h>
+#elif CORE_PLATFORM_WINDOWS
+#include <limits.h>
+#include <windows.h>
+#endif
+
+#undef DrawText
+#undef GetObject
 
 
 // --------------------------------------------------------------------------
@@ -247,9 +268,6 @@ char (&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T (&)[N]))[N];
 // --------------------------------------------------------------------------
 
 #if CORE_COMPILER_MSVC
-#include <math.h>
-#include <intrin.h>
-#include <windows.h>
 extern "C" void _ReadBarrier();
 extern "C" void _WriteBarrier();
 extern "C" void _ReadWriteBarrier();
@@ -326,12 +344,6 @@ inline void* AtomicExchangePtr(void** _target, void* ptr) {
 // Timer.
 //
 // --------------------------------------------------------------------------
-
-#if CORE_PLATFORM_LINUX || CORE_PLATFORM_OSX
-#include <sys/time.h>  // gettimeofday
-#elif CORE_PLATFORM_WINDOWS
-#include <windows.h>  // NOLINT(build/include)
-#endif
 
 namespace core {
 
@@ -460,12 +472,6 @@ inline void DebugPrintf(const char* format, ...) {
 //
 // --------------------------------------------------------------------------
 
-#if CORE_PLATFORM_LINUX || CORE_PLATFORM_OSX
-#include <pthread.h>
-#elif CORE_PLATFORM_WINDOWS
-#include <errno.h>
-#endif
-
 namespace core {
 
 class Futex {
@@ -514,16 +520,6 @@ class ScopedFutex {
 // Semaphore.
 //
 // --------------------------------------------------------------------------
-
-#if CORE_PLATFORM_POSIX
-#include <errno.h>  // NOLINT(build/include)
-#include <semaphore.h>
-#include <time.h>
-#include <pthread.h>  // NOLINT(build/include)
-#elif CORE_PLATFORM_WINDOWS
-#include <windows.h>  // NOLINT(build/include)
-#include <limits.h>
-#endif
 
 namespace core {
 
@@ -618,10 +614,6 @@ class Semaphore {
 // Thread.
 //
 // --------------------------------------------------------------------------
-
-#if CORE_PLATFORM_POSIX
-#include <pthread.h>  // NOLINT(build/include)
-#endif  // CORE_PLATFORM_POSIX
 
 namespace core {
 
