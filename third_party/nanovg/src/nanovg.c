@@ -24,6 +24,14 @@
 #define STBI_HEADER_FILE_ONLY
 #include "stb_image.c"
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4204)  // nonstandard extension used : non-constant aggregate initializer
+#pragma warning(disable : 4127)  // conditional expression is constant
+#pragma warning(disable : 4100)  // unreferenced formal parameter
+#pragma warning(disable : 4244)  // conversion from int to unsigned char
+#pragma warning(disable : 4706)  // assignment within conditional expression
+#endif
 
 #define NVG_INIT_COMMANDS_SIZE 256
 #define NVG_INIT_POINTS_SIZE 128
