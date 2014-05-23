@@ -54,6 +54,7 @@ set(main_sources
   src/ui/docking_split_container.cc
   src/ui/docking_tool_window.cc
   src/ui/docking_workspace.cc
+  src/ui/drawing_common.cc
   src/ui/focus.cc
   src/ui/skin.cc
   src/ui/tool_window_dragger.cc

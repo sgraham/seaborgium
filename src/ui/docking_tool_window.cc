@@ -23,7 +23,7 @@ DockingToolWindow::~DockingToolWindow() {
 }
 
 Rect DockingToolWindow::RectForTitleBar() {
-  return Rect(0, 0, Width(), Skin::current().title_bar_size());
+  return Rect(0, 0, Width(), (int)Skin::current().title_bar_size());
 }
 
 void DockingToolWindow::Render() {
@@ -52,8 +52,8 @@ void DockingToolWindow::SetScreenRect(const Rect& rect) {
   Dockable::SetScreenRect(rect);
   Rect contents_rect = rect;
   const Skin& skin = Skin::current();
-  contents_rect.y += skin.title_bar_size();
-  contents_rect.h -= skin.title_bar_size();
+  contents_rect.y += (int)skin.title_bar_size();
+  contents_rect.h -= (int)skin.title_bar_size();
   contents_->SetScreenRect(contents_rect);
 }
 

@@ -33,13 +33,18 @@ Skin g_skin;
 }  // namespace
 
 ColorScheme::ColorScheme()
-  : border_(nvgRGB(0, 12, 16)),
+  : border_(nvgRGBA(0, 0, 0, 32)),
     background_(kBase03),
     text_(kBase0),
-    title_bar_active_(kBase00),
-    title_bar_text_active_(kBase3),
-    title_bar_inactive_(kBase02),
-    title_bar_text_inactive_(kBase1),
+    title_bar_active_inner_(nvgRGBA(255, 255, 255, 32)),
+    title_bar_active_outer_(nvgRGBA(0, 0, 0, 32)),
+    title_bar_inactive_inner_(nvgRGBA(128, 128, 128, 8)),
+    title_bar_inactive_outer_(nvgRGBA(0, 0, 0, 16)),
+    title_bar_text_active_(kBase2),
+    title_bar_text_inactive_(kBase00),
+    title_bar_text_drop_shadow_(nvgRGBA(0, 0, 0, 128)),
+    drop_shadow_inner_(nvgRGBA(0, 0, 0, 128)),
+    drop_shadow_outer_(nvgRGBA(0, 0, 0, 0)),
     comment_(kBase01),
     comment_preprocessor_(kOrange),
     error_(kRed),
@@ -55,10 +60,11 @@ ColorScheme::ColorScheme()
 }
 
 Skin::Skin()
-    : title_bar_size_(19),
-      border_size_(3),
-      status_bar_size_(26),
-      text_line_height_(17) {
+    : title_bar_size_(30.f),
+      title_bar_text_size_(15.f),
+      border_size_(3.f),
+      status_bar_size_(26.f),
+      text_line_height_(17.f) {
 }
 
 void Skin::Init() {

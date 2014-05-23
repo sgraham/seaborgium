@@ -14,12 +14,29 @@ class ColorScheme {
   const NVGcolor& border() const { return border_; }
   const NVGcolor& background() const { return background_; }
   const NVGcolor& text() const { return text_; }
-  const NVGcolor& title_bar_active() const { return title_bar_active_; }
-  const NVGcolor& title_bar_text_active() const { return title_bar_text_active_; }
-  const NVGcolor& title_bar_inactive() const { return title_bar_inactive_; }
+  const NVGcolor& title_bar_active_inner() const {
+    return title_bar_active_inner_;
+  }
+  const NVGcolor& title_bar_active_outer() const {
+    return title_bar_active_outer_;
+  }
+  const NVGcolor& title_bar_inactive_inner() const {
+    return title_bar_inactive_inner_;
+  }
+  const NVGcolor& title_bar_inactive_outer() const {
+    return title_bar_inactive_outer_;
+  }
+  const NVGcolor& title_bar_text_active() const {
+    return title_bar_text_active_;
+  }
   const NVGcolor& title_bar_text_inactive() const {
     return title_bar_text_inactive_;
   }
+  const NVGcolor& title_bar_text_drop_shadow() const {
+    return title_bar_text_drop_shadow_;
+  }
+  const NVGcolor& drop_shadow_inner() const { return drop_shadow_inner_; }
+  const NVGcolor& drop_shadow_outer() const { return drop_shadow_outer_; }
 
   const NVGcolor& comment() const { return comment_; }
   const NVGcolor& comment_preprocessor() const { return comment_preprocessor_; }
@@ -40,10 +57,16 @@ class ColorScheme {
   NVGcolor border_;
   NVGcolor background_;
   NVGcolor text_;
-  NVGcolor title_bar_active_;
+  NVGcolor title_bar_active_inner_;
+  NVGcolor title_bar_active_outer_;
+  NVGcolor title_bar_inactive_inner_;
+  NVGcolor title_bar_inactive_outer_;
   NVGcolor title_bar_text_active_;
   NVGcolor title_bar_inactive_;
   NVGcolor title_bar_text_inactive_;
+  NVGcolor title_bar_text_drop_shadow_;
+  NVGcolor drop_shadow_inner_;
+  NVGcolor drop_shadow_outer_;
 
   NVGcolor comment_;
   NVGcolor comment_preprocessor_;
@@ -68,10 +91,11 @@ class Skin {
 
   const ColorScheme& GetColorScheme() const { return color_scheme_; }
 
-  int title_bar_size() const { return title_bar_size_; }
-  int border_size() const { return border_size_; }
-  int status_bar_size() const { return status_bar_size_; }
-  int text_line_height() const { return text_line_height_; }
+  float title_bar_size() const { return title_bar_size_; }
+  float title_bar_text_size() const { return title_bar_text_size_; }
+  float border_size() const { return border_size_; }
+  float status_bar_size() const { return status_bar_size_; }
+  float text_line_height() const { return text_line_height_; }
 
   // TODO: These will all be chars from icons font.
 #if 0
@@ -104,10 +128,11 @@ class Skin {
  private:
   ColorScheme color_scheme_;
 
-  int title_bar_size_;
-  int border_size_;
-  int status_bar_size_;
-  int text_line_height_;
+  float title_bar_size_;
+  float title_bar_text_size_;
+  float border_size_;
+  float status_bar_size_;
+  float text_line_height_;
 
 #if 0
   Texture pc_indicator_texture_;
