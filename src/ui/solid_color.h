@@ -1,7 +1,7 @@
 // Copyright 2012 The Chromium Authors.
 
-#ifndef SG_UI_SOLID_COLOR_H_
-#define SG_UI_SOLID_COLOR_H_
+#ifndef UI_SOLID_COLOR_H_
+#define UI_SOLID_COLOR_H_
 
 #include "core/gfx.h"
 #include "nanovg.h"
@@ -32,4 +32,4 @@ class SolidColor : public Dockable {
   CORE_DISALLOW_COPY_AND_ASSIGN(SolidColor);
 };
 
-#endif  // SG_UI_SOLID_COLOR_H_
+#endif  // UI_SOLID_COLOR_H_

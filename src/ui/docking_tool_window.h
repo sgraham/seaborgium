@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef SG_UI_DOCKING_TOOL_WINDOW_H_
-#define SG_UI_DOCKING_TOOL_WINDOW_H_
+#ifndef UI_DOCKING_TOOL_WINDOW_H_
+#define UI_DOCKING_TOOL_WINDOW_H_
 
 #include <string>
 
@@ -28,4 +28,4 @@ class DockingToolWindow : public Dockable {
   std::string title_;
 };
 
-#endif  // SG_UI_DOCKING_TOOL_WINDOW_H_
+#endif  // UI_DOCKING_TOOL_WINDOW_H_

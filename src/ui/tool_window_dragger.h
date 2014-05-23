@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef SG_UI_TOOL_WINDOW_DRAGGER_H_
-#define SG_UI_TOOL_WINDOW_DRAGGER_H_
+#ifndef UI_TOOL_WINDOW_DRAGGER_H_
+#define UI_TOOL_WINDOW_DRAGGER_H_
 
 #include <memory>
 #include <vector>
@@ -55,4 +55,4 @@ class ToolWindowDragger : public Draggable {
   bool cancel_was_primary_;
 };
 
-#endif  // SG_UI_TOOL_WINDOW_DRAGGER_H_
+#endif  // UI_TOOL_WINDOW_DRAGGER_H_

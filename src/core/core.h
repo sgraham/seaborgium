@@ -126,7 +126,7 @@
 #include <time.h>
 #elif CORE_PLATFORM_WINDOWS
 #include <limits.h>
-#include <windows.h>
+#include <windows.h>  // NOLINT(build/include)
 #endif
 
 #undef DrawText

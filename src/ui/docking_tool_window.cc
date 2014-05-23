@@ -24,7 +24,8 @@ DockingToolWindow::~DockingToolWindow() {
 }
 
 Rect DockingToolWindow::RectForTitleBar() {
-  return Rect(0, 0, Width(), (int)Skin::current().title_bar_size());
+  return Rect(
+      0, 0, Width(), static_cast<int>(Skin::current().title_bar_size()));
 }
 
 void DockingToolWindow::Render() {

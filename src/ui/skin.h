@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef SG_UI_SKIN_H_
-#define SG_UI_SKIN_H_
+#ifndef UI_SKIN_H_
+#define UI_SKIN_H_
 
 #include "nanovg.h"
 
@@ -97,7 +97,7 @@ class Skin {
   float status_bar_size() const { return status_bar_size_; }
   float text_line_height() const { return text_line_height_; }
 
-  // TODO: These will all be chars from icons font.
+  // TODO(icons): These will all be chars from icons font.
 #if 0
   const Texture* pc_indicator_texture() const { return &pc_indicator_texture_; }
   const Texture* breakpoint_texture() const { return &breakpoint_texture_; }
@@ -149,4 +149,4 @@ class Skin {
 #endif
 };
 
-#endif  // SG_UI_SKIN_H_
+#endif  // UI_SKIN_H_

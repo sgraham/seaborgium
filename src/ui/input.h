@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef SG_UI_INPUT_H_
-#define SG_UI_INPUT_H_
+#ifndef UI_INPUT_H_
+#define UI_INPUT_H_
 
 enum InputKey {
   kNone = -1,
@@ -82,4 +82,4 @@ class InputHandler {
       InputKey key, bool down, const InputModifiers& modifiers) = 0;
 };
 
-#endif  // SG_UI_INPUT_H_
+#endif  // UI_INPUT_H_

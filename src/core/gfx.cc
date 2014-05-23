@@ -9,7 +9,6 @@
 #include "nanovg_gl.h"
 
 #if CORE_PLATFORM_WINDOWS
-#include <GL/glew.h>
 #pragma comment(lib, "gdi32.lib")
 #pragma comment(lib, "opengl32.lib")
 #endif  // CORE_PLATFORM_WINDOWS

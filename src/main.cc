@@ -67,7 +67,7 @@ int Main(int argc, char** argv) {
         break;
     }
     CXString text = clang_getTokenSpelling(tu, tokens[i]);
-    //fprintf(stderr, "%s: %s\n", clang_getCString(text), kind_str);
+    // fprintf(stderr, "%s: %s\n", clang_getCString(text), kind_str);
     clang_disposeString(text);
   }
 
