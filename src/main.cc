@@ -7,6 +7,10 @@
 #include "core/gfx.h"
 #include "ui/drawing_common.h"
 #include "ui/skin.h"
+#include "ui/solid_color.h"
+#include "ui/docking_split_container.h"
+#include "ui/docking_tool_window.h"
+#include "ui/docking_workspace.h"
 
 #include "nanovg.h"
 
@@ -72,10 +76,29 @@ int Main(int argc, char** argv) {
   clang_disposeIndex(index);
 #endif
 
+  DockingWorkspace main_area;
+  SolidColor* source_view =
+      new SolidColor(Skin::current().GetColorScheme().background());
+  DockingToolWindow* stack = new DockingToolWindow(
+      new SolidColor(Skin::current().GetColorScheme().background()), "Stack");
+  DockingToolWindow* output = new DockingToolWindow(
+      new SolidColor(Skin::current().GetColorScheme().background()), "Output");
+
+  main_area.SetRoot(source_view);
+  source_view->parent()->SplitChild(kSplitHorizontal, source_view, output);
+  source_view->parent()->SetFraction(0.7);
+
+  source_view->parent()->SplitChild(kSplitVertical, source_view, stack);
+  source_view->parent()->SetFraction(0.5);
+
+  main_area.SetScreenRect(Rect(4, 4, 1024-8, 768-8));
+
   uint32_t width, height;
   while (!core::ProcessEvents(&width, &height)) {
     nvgBeginFrame(core::VG, 1024, 768, 1024.f / 768.f, NVG_STRAIGHT_ALPHA);
 
+    main_area.Render();
+#if 0
     UiDrawWindow("Call stack", true, 100, 100, 300, 200);
     UiDrawWindow("Breakpoints", false, 500, 100, 200, 400);
 
@@ -83,6 +106,7 @@ int Main(int argc, char** argv) {
     nvgFontFace(core::VG, "mono");
     nvgFillColor(core::VG, Skin::current().GetColorScheme().text());
     nvgText(core::VG, 100, 200, "int main(int argc, char** argv) {", NULL);
+#endif
 
     nvgEndFrame(core::VG);
     core::GfxFrame();

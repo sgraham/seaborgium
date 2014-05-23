@@ -187,7 +187,7 @@ void GfxFrame() {
 
   glctx_.Swap();
 
-  GL_CHECK(glClearColor(.3f, .3f, .3f, 1.f));
+  GL_CHECK(glClearColor(.3f, .3f, .32f, 1.f));
   GL_CHECK(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
     GL_STENCIL_BUFFER_BIT));
 }

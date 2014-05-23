@@ -60,8 +60,8 @@ ColorScheme::ColorScheme()
 }
 
 Skin::Skin()
-    : title_bar_size_(30.f),
-      title_bar_text_size_(15.f),
+    : title_bar_size_(20.f),
+      title_bar_text_size_(13.f),
       border_size_(3.f),
       status_bar_size_(26.f),
       text_line_height_(17.f) {

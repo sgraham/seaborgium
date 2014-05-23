@@ -7,6 +7,7 @@
 
 #include "core/core.h"
 struct NVGcontext;
+struct NVGcolor;
 
 namespace core {
 

@@ -5,9 +5,8 @@
 #include "ui/docking_split_container.h"
 
 #include "core/core.h"
-#pragma message("todo!")
-// #include "sg/render/renderer.h"
-// #include "sg/render/scoped_render_offset.h"
+#include "core/gfx.h"
+#include "ui/drawing_common.h"
 #include "ui/docking_resizer.h"
 // #include "ui/skin.h"
 
@@ -140,26 +139,24 @@ Rect DockingSplitContainer::GetRectForSplitter() {
 }
 
 void DockingSplitContainer::Render() {
-#if 0
-  Point old_offset = renderer->GetRenderOffset();
-
   {
-    ScopedRenderOffset left_offset(renderer, this, left_.get());
-    left_->Render(renderer);
+    ScopedRenderOffset left_offset(this, left_.get(), true);
+    left_->Render();
   }
 
   if (right_.get()) {
-    ScopedRenderOffset right_offset(renderer, this, right_.get());
-    right_->Render(renderer);
+    ScopedRenderOffset right_offset(this, right_.get(), true);
+    right_->Render();
   } else {
-    CHECK(direction_ == kSplitNoneRoot);
+    CORE_DCHECK(direction_ == kSplitNoneRoot, "split direction error");
   }
 
   if (direction_ == kSplitVertical || direction_ == kSplitHorizontal) {
+#if 0
     renderer->SetDrawColor(Skin::current().GetColorScheme().border());
     renderer->DrawFilledRect(GetRectForSplitter());
-  }
 #endif
+  }
 }
 
 bool DockingSplitContainer::CouldStartDrag(DragSetup* drag_setup) {

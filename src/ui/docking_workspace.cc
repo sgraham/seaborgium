@@ -6,6 +6,7 @@
 
 #include <algorithm>
 
+#include "ui/drawing_common.h"
 #include "ui/docking_split_container.h"
 
 // TODO(scottmg):
@@ -19,8 +20,11 @@ DockingWorkspace::~DockingWorkspace() {
 }
 
 void DockingWorkspace::Render() {
-  if (root_->left())
+  if (root_->left()) {
+    const Rect& rect = GetScreenRect();
+    ScopedRenderOffset offset(rect.x, rect.y);
     root_->left()->Render();
+  }
 }
 
 void DockingWorkspace::SetRoot(Dockable* root) {
