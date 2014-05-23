@@ -147,9 +147,7 @@ static Key::Enum TranslateKey(WPARAM wparam) {
   return static_cast<Key::Enum>(s_translateKey[wparam & 0xff]);
 }
 
-namespace gfx {
-extern void WinSetHwnd(HWND hwnd);
-}
+extern void WinGfxSetHwnd(HWND hwnd);
 
 struct Context {
   Context() : init_(false), exit_(false) {
@@ -258,7 +256,7 @@ struct Context {
                             instance,
                             0);
 
-    gfx::WinSetHwnd(hwnd_);
+    WinGfxSetHwnd(hwnd_);
 
     Adjust(CORE_DEFAULT_WIDTH, CORE_DEFAULT_HEIGHT);
 

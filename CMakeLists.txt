@@ -1,11 +1,13 @@
-project(sg CXX)
+project(sg CXX C)
 cmake_minimum_required(VERSION 2.8)
 
 macro(fix_default_compiler_settings)
   if (MSVC)
     foreach (flag_var
              CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-             CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+             CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO
+             CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE
+             CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO)
       if (NOT BUILD_SHARED_LIBS AND NOT gtest_force_shared_crt)
         # Always MT.
         string(REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
@@ -20,11 +22,13 @@ macro(fix_default_compiler_settings)
 
     # Warnings as errors.
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /WX")
 
     # Full path in error messages.
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FC")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /FC")
 
-    add_definitions(-DNOMINMAX)
+    add_definitions(-DNOMINMAX -D_CRT_SECURE_NO_WARNINGS)
   endif()
 endmacro()
 
@@ -33,17 +37,30 @@ fix_default_compiler_settings()
 
 add_subdirectory(third_party/gtest-1.7.0)
 
-include_directories(src)
+add_definitions(-DGLEW_STATIC)
+include_directories(src
+                    third_party/nanovg/src
+                    third_party/glew-1.10.0/include
+                   )
 # TODO
 #include_directories(../llvm/llvm/tools/clang/include)
 
 # Main code library.
 set(main_sources
   src/core/gfx.cc
+
   src/ui/dockable.cc
   src/ui/docking_resizer.cc
   src/ui/docking_split_container.cc
+  src/ui/docking_tool_window.cc
   src/ui/docking_workspace.cc
+  src/ui/focus.cc
+  src/ui/skin.cc
+  src/ui/tool_window_dragger.cc
+
+  third_party/glew-1.10.0/src/glew.c
+  third_party/nanovg/src/nanovg.c
+  third_party/nanovg/src/stb_image.c
 )
 add_library(sglib ${main_sources})
 
@@ -61,7 +78,6 @@ target_link_libraries(sg
 # Test binary
 include_directories(${gtest_SOURCE_DIR}/include)
 set(test_sources
-  src/core/rect_pack_test.cc
   src/ui/docking_test.cc
 )
 add_executable(sg_test ${test_sources})

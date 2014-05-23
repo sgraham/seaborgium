@@ -44,7 +44,7 @@ class DockingSplitContainer : public Dockable {
   Dockable* GetSiblingOf(Dockable* child);
 
   void SetScreenRect(const Rect& rect) override;
-  void Render(Renderer* renderer) override;
+  void Render() override;
   bool CouldStartDrag(DragSetup* drag_setup) override;
 
   DockingSplitDirection direction() const { return direction_; }

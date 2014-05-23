@@ -139,8 +139,7 @@ Rect DockingSplitContainer::GetRectForSplitter() {
   return Rect();
 }
 
-void DockingSplitContainer::Render(Renderer* renderer) {
-  CORE_UNUSED(renderer);
+void DockingSplitContainer::Render() {
 #if 0
   Point old_offset = renderer->GetRenderOffset();
 

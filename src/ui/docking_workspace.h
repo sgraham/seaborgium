@@ -19,7 +19,7 @@ class DockingWorkspace {
   DockingWorkspace();
   virtual ~DockingWorkspace();
 
-  void Render(Renderer* renderer);
+  void Render();
   bool CouldStartDrag(DragSetup* drag_setup);
 
   // Takes ownership.

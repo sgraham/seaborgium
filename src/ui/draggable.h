@@ -5,15 +5,13 @@
 #ifndef UI_DRAGGABLE_H_
 #define UI_DRAGGABLE_H_
 
-class Renderer;
-
 class Draggable {
  public:
   virtual ~Draggable() {}
 
   virtual void Drag(const Point& screen_position) = 0;
   virtual void CancelDrag() = 0;
-  virtual void Render(Renderer* renderer) = 0;
+  virtual void Render() = 0;
 };
 
 #endif  // UI_DRAGGABLE_H_

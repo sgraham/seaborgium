@@ -31,7 +31,7 @@ class Dockable /*: public InputHandler*/ {
   void set_parent(DockingSplitContainer* parent) { parent_ = parent; }
   DockingSplitContainer* parent() { return parent_; }
 
-  virtual void Render(Renderer* renderer) { CORE_UNUSED(renderer); }
+  virtual void Render() {}
   virtual void Invalidate();
   virtual bool CouldStartDrag(DragSetup* drag_setup) {
     CORE_UNUSED(drag_setup);

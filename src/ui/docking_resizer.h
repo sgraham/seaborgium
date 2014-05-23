@@ -18,7 +18,7 @@ class DockingResizer : public Draggable {
 
   virtual void Drag(const Point& screen_point) override;
   virtual void CancelDrag() override;
-  virtual void Render(Renderer* renderer) override;
+  virtual void Render() override;
 
   const Point& GetInitialLocationForTest() const { return initial_location_; }
 

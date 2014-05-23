@@ -36,9 +36,8 @@ void DockingResizer::CancelDrag() {
       static_cast<double>(initial_location_.x) / parent_size);
 }
 
-void DockingResizer::Render(Renderer* renderer) {
+void DockingResizer::Render() {
   // Nothing to do, we apply directly.
-  CORE_UNUSED(renderer);
 }
 
 int DockingResizer::ParentSize() {
