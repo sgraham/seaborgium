@@ -70,6 +70,20 @@ add_library(sglib ${main_sources})
 add_executable(sg
   src/core/entry.cc
   src/main.cc)
+
+
+if (WIN32)
+  set(CMAKE_SHARED_LINKER_FLAGS /MANIFEST:NO)
+endif()
+
+add_custom_command(
+  TARGET
+    sg
+  POST_BUILD
+    COMMAND
+      "mt.exe" -nologo -manifest \"${CMAKE_CURRENT_SOURCE_DIR}/src/core/dpiaware.manifest\" -outputresource:\"${CMAKE_CURRENT_BINARY_DIR}/sg.exe\"\;\#1
+  )
+
 target_link_libraries(sg
                       sglib
                       #d:/src/llvm/build/lib/libclang.imp
