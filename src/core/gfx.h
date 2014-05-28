@@ -15,6 +15,13 @@ void GfxInit();
 void GfxFrame();
 void GfxShutdown();
 
+
+float GfxTextf(float x, float y, const char* format, ...);
+
+void GfxDrawFps();
+
+float GetDpiScale();
+
 extern NVGcontext* VG;
 
 }  // namespace core

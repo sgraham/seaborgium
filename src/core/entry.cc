@@ -105,10 +105,6 @@ struct MainThreadEntry {
   static int32_t ThreadFunc(void* user_data);
 };
 
-float s_dpi_scale = 1.f;
-
-float GetDpiScale() { return s_dpi_scale; }
-
 #if CORE_PLATFORM_WINDOWS
 
 }  // namespace core
@@ -152,6 +148,7 @@ static Key::Enum TranslateKey(WPARAM wparam) {
 }
 
 extern void WinGfxSetHwnd(HWND hwnd);
+extern void WinGfxSetDpiScale(float dpi_scale);
 
 struct Context {
   Context() : init_(false), exit_(false) {
@@ -253,7 +250,7 @@ struct Context {
     float dpi_scale_y = GetDeviceCaps(screen_dc, LOGPIXELSY) / 96.f;
     CORE_CHECK(dpi_scale_x == dpi_scale_y,
                "Don't handle non-uniform DPI scale");
-    s_dpi_scale = dpi_scale_x;
+    WinGfxSetDpiScale(dpi_scale_x);
     ::ReleaseDC(NULL, screen_dc);
 
     hwnd_ =
@@ -262,8 +259,8 @@ struct Context {
                         WS_OVERLAPPEDWINDOW | WS_VISIBLE,
                         50,
                         50,
-                        static_cast<int>(CORE_DEFAULT_WIDTH * s_dpi_scale),
-                        static_cast<int>(CORE_DEFAULT_HEIGHT * s_dpi_scale),
+                        static_cast<int>(CORE_DEFAULT_WIDTH * GetDpiScale()),
+                        static_cast<int>(CORE_DEFAULT_HEIGHT * GetDpiScale()),
                         NULL,
                         NULL,
                         instance,
@@ -271,8 +268,8 @@ struct Context {
 
     WinGfxSetHwnd(hwnd_);
 
-    Adjust(static_cast<int>(CORE_DEFAULT_WIDTH * s_dpi_scale),
-           static_cast<int>(CORE_DEFAULT_HEIGHT * s_dpi_scale));
+    Adjust(static_cast<int>(CORE_DEFAULT_WIDTH * GetDpiScale()),
+           static_cast<int>(CORE_DEFAULT_HEIGHT * GetDpiScale()));
 
     MainThreadEntry mte;
     mte.argc_ = argc;
@@ -283,8 +280,8 @@ struct Context {
     init_ = true;
 
     event_queue_.PostSizeEvent(
-        static_cast<int>(CORE_DEFAULT_WIDTH * s_dpi_scale),
-        static_cast<int>(CORE_DEFAULT_HEIGHT * s_dpi_scale));
+        static_cast<int>(CORE_DEFAULT_WIDTH * GetDpiScale()),
+        static_cast<int>(CORE_DEFAULT_HEIGHT * GetDpiScale()));
 
     MSG msg;
     msg.message = WM_NULL;

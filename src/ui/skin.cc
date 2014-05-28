@@ -60,16 +60,14 @@ ColorScheme::ColorScheme()
     pc_indicator_(kYellow) {
 }
 
-Skin::Skin() {
-}
+Skin::Skin()
+    : title_bar_size_(24.f),
+      title_bar_text_size_(14.f),
+      border_size_(3.f),
+      status_bar_size_(26.f),
+      text_line_height_(17.f) {}
 
 void Skin::Init() {
-  // These can't go in the ctor because GetDpiScale won't be correct yet.
-  title_bar_size_ = 24.f * core::GetDpiScale();
-  title_bar_text_size_ = 14.f * core::GetDpiScale();
-  border_size_ = 3.f * core::GetDpiScale();
-  status_bar_size_ = 26.f * core::GetDpiScale();
-  text_line_height_ = 17.f * core::GetDpiScale();
 
   CORE_CHECK(nvgCreateFont(core::VG, "sans", "art/DejaVuSans.ttf") != -1,
              "font load failed");

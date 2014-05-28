@@ -4,6 +4,8 @@
 
 #include "core/gfx.h"
 
+#include "core/entry.h"
+
 #define NANOVG_GL2_IMPLEMENTATION
 #include <GL/glew.h>
 #include "nanovg_gl.h"
@@ -58,6 +60,8 @@ inline void glColorABGR(uint32_t abgr) {
                      ((abgr & 0xff000000) >> 24) / 255.f));
 }
 
+static float s_dpi_scale = 1.f;
+
 }  // namespace
 
 namespace core {
@@ -67,6 +71,10 @@ namespace core {
 static HWND s_hwnd;
 void WinGfxSetHwnd(HWND hwnd) {
   s_hwnd = hwnd;
+}
+
+void WinGfxSetDpiScale(float dpi_scale) {
+  s_dpi_scale = dpi_scale;
 }
 
 typedef BOOL(WINAPI* PFNWGLSWAPINTERVALEXTPROC)(int interval);
@@ -153,8 +161,24 @@ void GfxShutdown() {
   glctx_.Destroy();
 }
 
-void GfxFrame() {
-  /*
+float GfxTextf(float x, float y, const char* format, ...) {
+  va_list arg_list;
+  va_start(arg_list, format);
+
+  char temp[1024];
+  char* out = temp;
+  int32_t len = core::vsnprintf(out, sizeof(temp), format, arg_list);
+  if ((int32_t)sizeof(temp) < len) {
+    out = reinterpret_cast<char*>(alloca(len + 1));
+    len = core::vsnprintf(out, len, format, arg_list);
+  }
+  out[len] = '\0';
+  va_end(arg_list);
+
+  return nvgText(core::VG, x, y, out, out + len);
+}
+
+void GfxDrawFps() {
   int64_t now = core::GetHPCounter();
   static int64_t last = now;
   int64_t frame_time = now - last;
@@ -167,23 +191,29 @@ void GfxFrame() {
   double freq = static_cast<double>(core::GetHPFrequency());
   double to_ms = 1000.0 / freq;
   float pos = 1;
-  DrawTextf(10,
-            16 * pos++,
-            TextAlignmentLeft,
-            0xff00a000,
-            "      Frame: %7.3f, % 7.3f \x1f, % 7.3f \x1e [ms] / % 6.2f FPS ",
-            static_cast<double>(frame_time) * to_ms,
-            static_cast<double>(min) * to_ms,
-            static_cast<double>(max) * to_ms,
-            freq / frame_time);
-  DrawTextf(10, 16 * pos++, TextAlignmentLeft, 0xff008000,
-            "  GL_VENDOR: %s", s_ctx.vendor);
-  DrawTextf(10, 16 * pos++, TextAlignmentLeft, 0xff008000,
-            "GL_RENDERER: %s", s_ctx.renderer);
-  DrawTextf(10, 16 * pos++, TextAlignmentLeft, 0xff008000,
-            " GL_VERSION: %s", s_ctx.version);
-            */
 
+  nvgFontSize(VG, 13.f);
+  nvgFontFace(VG, "mono");
+  nvgFillColor(VG, nvgRGBA(0x00, 0xa0, 0x00, 0xff));
+  GfxTextf(10,
+           16 * pos++,
+           // utf-8 sequences are UPWARDS ARROW and DOWNWARDS ARROW.
+           "      Frame: %7.3f, % 7.3f \xe2\x86\x91, % 7.3f \xe2\x86\x93 [ms] "
+           "/ % 6.2f FPS ",
+           static_cast<double>(frame_time) * to_ms,
+           static_cast<double>(min) * to_ms,
+           static_cast<double>(max) * to_ms,
+           freq / frame_time);
+  GfxTextf(10, 16 * pos++, "  GL_VENDOR: %s", glGetString(GL_VENDOR));
+  GfxTextf(10, 16 * pos++, "GL_RENDERER: %s", glGetString(GL_RENDERER));
+  GfxTextf(10, 16 * pos++, " GL_VERSION: %s", glGetString(GL_VERSION));
+}
+
+float GetDpiScale() {
+  return s_dpi_scale;
+}
+
+void GfxFrame() {
   glctx_.Swap();
 
   GL_CHECK(glClearColor(.3f, .3f, .32f, 1.f));
