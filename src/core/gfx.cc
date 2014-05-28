@@ -117,7 +117,7 @@ void GlContext::Create(uint32_t /*width*/, uint32_t /*height*/) {
              "SetPixelFormat failed");
 
   context_ = ::wglCreateContext(hdc_);
-  wglMakeCurrent(hdc_, context_);
+  CORE_CHECK(wglMakeCurrent(hdc_, context_), "wglMakeCurrent");
 
   wglSwapIntervalEXT =
       (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
@@ -125,17 +125,17 @@ void GlContext::Create(uint32_t /*width*/, uint32_t /*height*/) {
 }
 
 void GlContext::Destroy() {
-  wglMakeCurrent(NULL, NULL);
-  wglDeleteContext(context_);
+  CORE_CHECK(wglMakeCurrent(NULL, NULL), "wglMakeCurrent");
+  CORE_CHECK(wglDeleteContext(context_), "wglDeleteContext");
   context_ = NULL;
-  ReleaseDC(s_hwnd, hdc_);
+  ::ReleaseDC(s_hwnd, hdc_);
   hdc_ = NULL;
 }
 
 void GlContext::Swap() {
   if (s_hwnd) {
-    wglMakeCurrent(hdc_, context_);
-    SwapBuffers(hdc_);
+    CORE_CHECK(wglMakeCurrent(hdc_, context_), "wglMakeCurrent");
+    ::SwapBuffers(hdc_);
   }
 }
 
@@ -145,20 +145,29 @@ void GlContext::Swap() {
 
 NVGcontext* VG;
 
-static GlContext glctx_;
+static GlContext s_glctx;
+static uint32_t s_width;
+static uint32_t s_height;
 
 void GfxInit() {
   CORE_CHECK(VG == NULL, "GfxInit called twice?");
-  glctx_.Create(0, 0);
+  s_glctx.Create(0, 0);
   CORE_CHECK(glewInit() == GLEW_OK, "couldn't glewInit");
-  VG = nvgCreateGL2(1024, 1024, NVG_ANTIALIAS);
+  GL_CHECK(glDisable(GL_DEPTH_TEST));
+  GL_CHECK(glDisable(GL_STENCIL_TEST));
+  VG = nvgCreateGL2(2048, 2048, NVG_ANTIALIAS);
+}
+
+void GfxResize(uint32_t width, uint32_t height) {
+  s_width = width;
+  s_height = height;
 }
 
 void GfxShutdown() {
   CORE_CHECK(VG, "GfxInit not called?");
   nvgDeleteGL2(VG);
   VG = NULL;
-  glctx_.Destroy();
+  s_glctx.Destroy();
 }
 
 float GfxTextf(float x, float y, const char* format, ...) {
@@ -214,7 +223,9 @@ float GetDpiScale() {
 }
 
 void GfxFrame() {
-  glctx_.Swap();
+  s_glctx.Swap();
+
+  GL_CHECK(glViewport(0, 0, s_width, s_height));
 
   GL_CHECK(glClearColor(.3f, .3f, .32f, 1.f));
   GL_CHECK(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |

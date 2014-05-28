@@ -12,6 +12,7 @@ struct NVGcolor;
 namespace core {
 
 void GfxInit();
+void GfxResize(uint32_t width, uint32_t height);
 void GfxFrame();
 void GfxShutdown();
 

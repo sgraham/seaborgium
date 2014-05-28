@@ -283,6 +283,8 @@ struct Context {
         static_cast<int>(CORE_DEFAULT_WIDTH * GetDpiScale()),
         static_cast<int>(CORE_DEFAULT_HEIGHT * GetDpiScale()));
 
+    //::ShowWindow(hwnd_, SW_MAXIMIZE);
+
     MSG msg;
     msg.message = WM_NULL;
 
@@ -428,8 +430,6 @@ struct Context {
   HWND hwnd_;
   bool init_;
   bool exit_;
-  float dpi_scale_x_;
-  float dpi_scale_y_;
 };
 
 static Context s_ctx;
@@ -467,8 +467,6 @@ int32_t MainThreadEntry::ThreadFunc(void* user_data) {
 #endif  // CORE_PLATFORM_LINUX
 
 bool ProcessEvents(uint32_t* width, uint32_t* height, MouseState* mouse) {
-  CORE_UNUSED(width);
-  CORE_UNUSED(height);
   CORE_UNUSED(mouse);
 
   const Event* ev;
@@ -481,8 +479,8 @@ bool ProcessEvents(uint32_t* width, uint32_t* height, MouseState* mouse) {
           Release(ev_);
         }
       }
-    } scope_event;
-    ev = scope_event.ev_;
+    } scoped_event;
+    ev = scoped_event.ev_;
 
     if (ev) {
       switch (ev->type) {
@@ -497,9 +495,12 @@ bool ProcessEvents(uint32_t* width, uint32_t* height, MouseState* mouse) {
           // TODO(scottmg): Something.
           break;
 
-        case Event::Size:
-          // TODO(scottmg): Something.
+        case Event::Size: {
+          const SizeEvent* size_event = static_cast<const SizeEvent*>(ev);
+          *width = size_event->width;
+          *height = size_event->height;
           break;
+        }
 
         default:
           break;

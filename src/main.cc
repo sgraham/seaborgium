@@ -77,12 +77,13 @@ int Main(int argc, char** argv) {
 #endif
 
   DockingWorkspace main_area;
-  SolidColor* source_view =
-      new SolidColor(Skin::current().GetColorScheme().background());
-  DockingToolWindow* stack = new DockingToolWindow(
-      new SolidColor(Skin::current().GetColorScheme().background()), "Stack");
-  DockingToolWindow* output = new DockingToolWindow(
-      new SolidColor(Skin::current().GetColorScheme().background()), "Output");
+  const Skin& skin = Skin::current();
+  const ColorScheme& cs = skin.GetColorScheme();
+  SolidColor* source_view = new SolidColor(cs.background());
+  DockingToolWindow* stack =
+      new DockingToolWindow(new SolidColor(cs.background()), "Stack");
+  DockingToolWindow* output =
+      new DockingToolWindow(new SolidColor(cs.background()), "Output");
 
   main_area.SetRoot(source_view);
   source_view->parent()->SplitChild(kSplitHorizontal, source_view, output);
@@ -91,22 +92,30 @@ int Main(int argc, char** argv) {
   source_view->parent()->SplitChild(kSplitVertical, source_view, stack);
   source_view->parent()->SetFraction(0.5);
 
-  main_area.SetScreenRect(Rect(4, 4, 1024 - 8, 768 - 8));
-
+  uint32_t prev_width = 0, prev_height = 0;
   uint32_t width, height;
   while (!core::ProcessEvents(&width, &height)) {
+    if (prev_width != width || prev_height != height) {
+      main_area.SetScreenRect(
+          Rect(static_cast<int>(skin.border_size() / core::GetDpiScale()),
+              static_cast<int>(skin.border_size() / core::GetDpiScale()),
+              static_cast<int>((width - skin.border_size() * 2) /
+                                core::GetDpiScale()),
+              static_cast<int>((height - skin.border_size() * 2) /
+                                core::GetDpiScale())));
+      core::GfxResize(width, height);
+      prev_width = width;
+      prev_height = height;
+    }
+
     nvgBeginFrame(core::VG,
-                  static_cast<int>(1024 * core::GetDpiScale()),
-                  static_cast<int>(768 * core::GetDpiScale()),
-                  1024.f / 768.f,
+                  width,
+                  height,
+                  1.3333f,
                   NVG_STRAIGHT_ALPHA);
     nvgScale(core::VG, core::GetDpiScale(), core::GetDpiScale());
 
     main_area.Render();
-#if 0
-    UiDrawWindow("Call stack", true, 100, 100, 300, 200);
-    UiDrawWindow("Breakpoints", false, 500, 100, 200, 400);
-#endif
 
     nvgFontSize(core::VG, 13.0f);
     nvgFontFace(core::VG, "mono");
