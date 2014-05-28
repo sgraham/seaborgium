@@ -105,6 +105,10 @@ struct MainThreadEntry {
   static int32_t ThreadFunc(void* user_data);
 };
 
+float s_dpi_scale = 1.f;
+
+float GetDpiScale() { return s_dpi_scale; }
+
 #if CORE_PLATFORM_WINDOWS
 
 }  // namespace core
@@ -244,21 +248,31 @@ struct Context {
     wnd.hIconSm = ::LoadIcon(NULL, IDI_APPLICATION);
     ::RegisterClassExA(&wnd);
 
-    hwnd_ = ::CreateWindowA("seaborgium",
-                            "Seaborgium",
-                            WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-                            50,
-                            50,
-                            CORE_DEFAULT_WIDTH,
-                            CORE_DEFAULT_HEIGHT,
-                            NULL,
-                            NULL,
-                            instance,
-                            0);
+    HDC screen_dc = ::GetDC(NULL);
+    float dpi_scale_x = GetDeviceCaps(screen_dc, LOGPIXELSX) / 96.f;
+    float dpi_scale_y = GetDeviceCaps(screen_dc, LOGPIXELSY) / 96.f;
+    CORE_CHECK(dpi_scale_x == dpi_scale_y,
+               "Don't handle non-uniform DPI scale");
+    s_dpi_scale = dpi_scale_x;
+    ::ReleaseDC(NULL, screen_dc);
+
+    hwnd_ =
+        ::CreateWindowA("seaborgium",
+                        "Seaborgium",
+                        WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+                        50,
+                        50,
+                        static_cast<int>(CORE_DEFAULT_WIDTH * s_dpi_scale),
+                        static_cast<int>(CORE_DEFAULT_HEIGHT * s_dpi_scale),
+                        NULL,
+                        NULL,
+                        instance,
+                        0);
 
     WinGfxSetHwnd(hwnd_);
 
-    Adjust(CORE_DEFAULT_WIDTH, CORE_DEFAULT_HEIGHT);
+    Adjust(static_cast<int>(CORE_DEFAULT_WIDTH * s_dpi_scale),
+           static_cast<int>(CORE_DEFAULT_HEIGHT * s_dpi_scale));
 
     MainThreadEntry mte;
     mte.argc_ = argc;
@@ -268,7 +282,9 @@ struct Context {
     thread.Init(mte.ThreadFunc, &mte);
     init_ = true;
 
-    event_queue_.PostSizeEvent(CORE_DEFAULT_WIDTH, CORE_DEFAULT_HEIGHT);
+    event_queue_.PostSizeEvent(
+        static_cast<int>(CORE_DEFAULT_WIDTH * s_dpi_scale),
+        static_cast<int>(CORE_DEFAULT_HEIGHT * s_dpi_scale));
 
     MSG msg;
     msg.message = WM_NULL;
@@ -415,6 +431,8 @@ struct Context {
   HWND hwnd_;
   bool init_;
   bool exit_;
+  float dpi_scale_x_;
+  float dpi_scale_y_;
 };
 
 static Context s_ctx;

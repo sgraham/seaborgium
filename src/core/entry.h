@@ -127,6 +127,8 @@ bool ProcessEvents(uint32_t* width,
                    uint32_t* height,
                    MouseState* mouse = NULL);
 
+float GetDpiScale();
+
 }  // namespace core
 
 #endif  // CORE_ENTRY_H_

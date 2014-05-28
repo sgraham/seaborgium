@@ -101,12 +101,12 @@ int Main(int argc, char** argv) {
 #if 0
     UiDrawWindow("Call stack", true, 100, 100, 300, 200);
     UiDrawWindow("Breakpoints", false, 500, 100, 200, 400);
+#endif
 
-    nvgFontSize(core::VG, 15.0f);
+    nvgFontSize(core::VG, 12.0f * core::GetDpiScale());
     nvgFontFace(core::VG, "mono");
     nvgFillColor(core::VG, Skin::current().GetColorScheme().text());
     nvgText(core::VG, 100, 200, "int main(int argc, char** argv) {", NULL);
-#endif
 
     nvgEndFrame(core::VG);
     core::GfxFrame();
