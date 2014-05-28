@@ -65,8 +65,8 @@ Skin::Skin() {
 
 void Skin::Init() {
   // These can't go in the ctor because GetDpiScale won't be correct yet.
-  title_bar_size_ = 20.f * core::GetDpiScale();
-  title_bar_text_size_ = 13.f * core::GetDpiScale();
+  title_bar_size_ = 24.f * core::GetDpiScale();
+  title_bar_text_size_ = 14.f * core::GetDpiScale();
   border_size_ = 3.f * core::GetDpiScale();
   status_bar_size_ = 26.f * core::GetDpiScale();
   text_line_height_ = 17.f * core::GetDpiScale();

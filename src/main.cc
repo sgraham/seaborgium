@@ -91,11 +91,19 @@ int Main(int argc, char** argv) {
   source_view->parent()->SplitChild(kSplitVertical, source_view, stack);
   source_view->parent()->SetFraction(0.5);
 
-  main_area.SetScreenRect(Rect(4, 4, 1024-8, 768-8));
+  main_area.SetScreenRect(Rect(
+      static_cast<int>(4 * core::GetDpiScale()),
+      static_cast<int>(4 * core::GetDpiScale()),
+      static_cast<int>(1024 * core::GetDpiScale() - 8 * core::GetDpiScale()),
+      static_cast<int>(768 * core::GetDpiScale() - 8 * core::GetDpiScale())));
 
   uint32_t width, height;
   while (!core::ProcessEvents(&width, &height)) {
-    nvgBeginFrame(core::VG, 1024, 768, 1024.f / 768.f, NVG_STRAIGHT_ALPHA);
+    nvgBeginFrame(core::VG,
+                  static_cast<int>(1024 * core::GetDpiScale()),
+                  static_cast<int>(768 * core::GetDpiScale()),
+                  1024.f / 768.f,
+                  NVG_STRAIGHT_ALPHA);
 
     main_area.Render();
 #if 0
@@ -103,10 +111,14 @@ int Main(int argc, char** argv) {
     UiDrawWindow("Breakpoints", false, 500, 100, 200, 400);
 #endif
 
-    nvgFontSize(core::VG, 12.0f * core::GetDpiScale());
+    nvgFontSize(core::VG, 13.0f*core::GetDpiScale());
     nvgFontFace(core::VG, "mono");
     nvgFillColor(core::VG, Skin::current().GetColorScheme().text());
-    nvgText(core::VG, 100, 200, "int main(int argc, char** argv) {", NULL);
+    nvgText(core::VG,
+            100 * core::GetDpiScale(),
+            200 * core::GetDpiScale(),
+            "int main(int argc, char** argv) {",
+            NULL);
 
     nvgEndFrame(core::VG);
     core::GfxFrame();
