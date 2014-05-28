@@ -11,6 +11,7 @@
 #include "ui/docking_split_container.h"
 #include "ui/docking_tool_window.h"
 #include "ui/docking_workspace.h"
+#include "ui/focus.h"
 
 #include "nanovg.h"
 
@@ -82,11 +83,13 @@ int Main(int argc, char** argv) {
   SolidColor* source_view = new SolidColor(cs.background());
   DockingToolWindow* stack =
       new DockingToolWindow(new SolidColor(cs.background()), "Stack");
-  DockingToolWindow* output =
-      new DockingToolWindow(new SolidColor(cs.background()), "Output");
+  SolidColor* command_contents = new SolidColor(cs.background());
+  DockingToolWindow* command =
+      new DockingToolWindow(command_contents, "Command");
+  SetFocusedContents(command_contents);
 
   main_area.SetRoot(source_view);
-  source_view->parent()->SplitChild(kSplitHorizontal, source_view, output);
+  source_view->parent()->SplitChild(kSplitHorizontal, source_view, command);
   source_view->parent()->SetFraction(0.7);
 
   source_view->parent()->SplitChild(kSplitVertical, source_view, stack);
