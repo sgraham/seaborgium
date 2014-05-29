@@ -8,13 +8,15 @@
 #include <memory>
 #include <vector>
 
+#include "core/entry.h"
 #include "ui/dockable.h"
 #include "ui/drag_direction.h"
+#include "ui/draggable.h"
 
 class DockingSplitContainer;
 
 // Top level container holding a tree of |Dockable|s.
-class DockingWorkspace {
+class DockingWorkspace : public core::InputHandler {
  public:
   DockingWorkspace();
   virtual ~DockingWorkspace();
@@ -35,10 +37,29 @@ class DockingWorkspace {
 
   Dockable* FindTopMostUnderPoint(const Point& point);
 
+  // Implementation of core::InputHandler:
+  virtual bool WantMouseEvents() override { return true; }
+  virtual bool WantKeyEvents() override { return true; }
+  virtual bool NotifyMouseMoved(int x, int y, uint8_t modifiers) override;
+  virtual bool NotifyMouseWheel(int x, int y, float delta, uint8_t modifiers)
+      override;
+  virtual bool NotifyMouseButton(core::MouseButton::Enum button,
+                                 bool down,
+                                 uint8_t modifiers) override;
+  virtual bool NotifyKey(core::Key::Enum key,
+                         bool down,
+                         uint8_t modifiers) override;
+
  private:
   void GetDockTargets(Dockable* root, std::vector<Dockable*>* into);
 
+  void UpdateCursorForLocation();
+
   std::unique_ptr<DockingSplitContainer> root_;
+
+  Point mouse_position_;
+
+  std::unique_ptr<Draggable> draggable_;
 };
 
 #endif  // UI_DOCKING_WORKSPACE_H_

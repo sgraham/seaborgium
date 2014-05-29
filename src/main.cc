@@ -97,7 +97,7 @@ int Main(int argc, char** argv) {
 
   uint32_t prev_width = 0, prev_height = 0;
   uint32_t width, height;
-  while (!core::ProcessEvents(&width, &height)) {
+  while (!core::ProcessEvents(&width, &height, &main_area)) {
     if (prev_width != width || prev_height != height) {
       main_area.SetScreenRect(
           Rect(static_cast<int>(skin.border_size() / core::GetDpiScale()),

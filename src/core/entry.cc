@@ -26,9 +26,12 @@ struct KeyEvent : public Event {
 struct MouseEvent : public Event {
   int32_t mx;
   int32_t my;
+  float delta;
   MouseButton::Enum button;
+  uint8_t modifiers;
   bool down;
   bool move;
+  bool wheel;
 };
 
 struct SizeEvent : public Event {
@@ -55,28 +58,52 @@ class EventQueue {
     queue_.push(ev);
   }
 
-  void PostMouseEvent(int32_t mx, int32_t my) {
+  void PostMouseMoveEvent(int32_t mx, int32_t my) {
     MouseEvent* ev = new MouseEvent;
     ev->type = Event::Mouse;
     ev->mx = mx;
     ev->my = my;
+    ev->delta = 0;
     ev->button = MouseButton::None;
+    ev->modifiers = 0;
     ev->down = false;
     ev->move = true;
+    ev->wheel = false;
     queue_.push(ev);
   }
 
-  void PostMouseEvent(int32_t mx,
-                      int32_t my,
-                      MouseButton::Enum button,
-                      bool down) {
+  void PostMouseWheelEvent(int32_t mx,
+                           int32_t my,
+                           float delta,
+                           uint8_t modifiers) {
     MouseEvent* ev = new MouseEvent;
     ev->type = Event::Mouse;
     ev->mx = mx;
     ev->my = my;
+    ev->delta = delta;
+    ev->modifiers = modifiers;
+    ev->button = MouseButton::None;
+    ev->down = false;
+    ev->move = false;
+    ev->wheel = true;
+    queue_.push(ev);
+  }
+
+  void PostMouseButtonEvent(int32_t mx,
+                            int32_t my,
+                            MouseButton::Enum button,
+                            bool down,
+                            uint8_t modifiers) {
+    MouseEvent* ev = new MouseEvent;
+    ev->type = Event::Mouse;
+    ev->mx = mx;
+    ev->my = my;
+    ev->delta = 0;
     ev->button = button;
+    ev->modifiers = modifiers;
     ev->down = down;
     ev->move = false;
+    ev->wheel = false;
     queue_.push(ev);
   }
 
@@ -114,6 +141,7 @@ namespace core {
 #pragma comment(lib, "user32.lib")
 
 #define WM_USER_SET_WINDOW_SIZE (WM_USER + 0)
+#define WM_USER_SET_MOUSE_CURSOR (WM_USER + 1)
 
 #define CORE_DEFAULT_WIDTH 1024
 #define CORE_DEFAULT_HEIGHT 768
@@ -146,6 +174,8 @@ static uint8_t s_translateKey[256];
 static Key::Enum TranslateKey(WPARAM wparam) {
   return static_cast<Key::Enum>(s_translateKey[wparam & 0xff]);
 }
+
+static HCURSOR s_current_cursor;
 
 extern void WinGfxSetHwnd(HWND hwnd);
 extern void WinGfxSetDpiScale(float dpi_scale);
@@ -304,6 +334,11 @@ struct Context {
     return 0;
   }
 
+  void MouseFromLparam(LPARAM lparam, int32_t* mx, int32_t* my) {
+    *mx = static_cast<int32_t>(GET_X_LPARAM(lparam) / GetDpiScale());
+    *my = static_cast<int32_t>(GET_Y_LPARAM(lparam) / GetDpiScale());
+  }
+
   LRESULT Process(HWND hwnd, UINT id, WPARAM wparam, LPARAM lparam) {
     if (init_) {
       switch (id) {
@@ -312,6 +347,23 @@ struct Context {
           uint32_t height = GET_Y_LPARAM(lparam);
           Adjust(width, height);
         } break;
+
+        case WM_USER_SET_MOUSE_CURSOR: {
+          MouseCursor::Enum cursor = static_cast<MouseCursor::Enum>(lparam);
+          static LPSTR IdcCursorForMouseCursor[] = {
+              IDC_ARROW,    // Default
+              IDC_SIZEWE,   // DragLeftRight
+              IDC_SIZENS,   // DragUpDown
+              IDC_SIZEALL,  // DragAll,
+              IDC_HAND,     // Pointer,
+          };
+          s_current_cursor = ::LoadCursor(NULL, IdcCursorForMouseCursor[cursor]);
+          ::SetCursor(s_current_cursor);
+        } break;
+
+        case WM_SETCURSOR:
+          ::SetCursor(s_current_cursor);
+          return TRUE;
 
         case WM_DESTROY:
           break;
@@ -329,38 +381,53 @@ struct Context {
         } break;
 
         case WM_MOUSEMOVE: {
-          int32_t mx = GET_X_LPARAM(lparam);
-          int32_t my = GET_Y_LPARAM(lparam);
+          int32_t mx, my;
+          MouseFromLparam(lparam, &mx, &my);
+          event_queue_.PostMouseMoveEvent(mx, my);
+        } break;
 
-          event_queue_.PostMouseEvent(mx, my);
+        case WM_MOUSEWHEEL: {
+          int32_t mx, my;
+          MouseFromLparam(lparam, &mx, &my);
+          uint8_t modifiers = TranslateKeyModifiers();
+          event_queue_.PostMouseWheelEvent(
+              mx,
+              my,
+              static_cast<float>(wparam) / static_cast<float>(WHEEL_DELTA),
+              modifiers);
         } break;
 
         case WM_LBUTTONDOWN:
         case WM_LBUTTONUP:
         case WM_LBUTTONDBLCLK: {
-          int32_t mx = GET_X_LPARAM(lparam);
-          int32_t my = GET_Y_LPARAM(lparam);
-          event_queue_.PostMouseEvent(
-              mx, my, MouseButton::Left, id == WM_LBUTTONDOWN);
+          int32_t mx, my;
+          MouseFromLparam(lparam, &mx, &my);
+          uint8_t modifiers = TranslateKeyModifiers();
+          event_queue_.PostMouseButtonEvent(
+              mx, my, MouseButton::Left, id == WM_LBUTTONDOWN, modifiers);
         } break;
 
         case WM_MBUTTONDOWN:
         case WM_MBUTTONUP:
         case WM_MBUTTONDBLCLK: {
-          int32_t mx = GET_X_LPARAM(lparam);
-          int32_t my = GET_Y_LPARAM(lparam);
-          event_queue_.PostMouseEvent(
-              mx, my, MouseButton::Middle, id == WM_MBUTTONDOWN);
+          int32_t mx, my;
+          MouseFromLparam(lparam, &mx, &my);
+          uint8_t modifiers = TranslateKeyModifiers();
+          event_queue_.PostMouseButtonEvent(
+              mx, my, MouseButton::Middle, id == WM_MBUTTONDOWN, modifiers);
         } break;
 
         case WM_RBUTTONUP:
         case WM_RBUTTONDOWN:
         case WM_RBUTTONDBLCLK: {
-          int32_t mx = GET_X_LPARAM(lparam);
-          int32_t my = GET_Y_LPARAM(lparam);
-          event_queue_.PostMouseEvent(
-              mx, my, MouseButton::Right, id == WM_RBUTTONDOWN);
+          int32_t mx, my;
+          MouseFromLparam(lparam, &mx, &my);
+          uint8_t modifiers = TranslateKeyModifiers();
+          event_queue_.PostMouseButtonEvent(
+              mx, my, MouseButton::Right, id == WM_RBUTTONDOWN, modifiers);
         } break;
+
+
 
         case WM_KEYDOWN:
         case WM_SYSKEYDOWN:
@@ -450,6 +517,10 @@ void SetWindowSize(uint32_t width, uint32_t height) {
                 (height << 16) | (width & 0xffff));
 }
 
+void SetMouseCursor(MouseCursor::Enum cursor) {
+  ::PostMessage(s_ctx.hwnd_, WM_USER_SET_MOUSE_CURSOR, 0, cursor);
+}
+
 int32_t MainThreadEntry::ThreadFunc(void* user_data) {
   MainThreadEntry* self = reinterpret_cast<MainThreadEntry*>(user_data);
   int32_t result = Main(self->argc_, self->argv_);
@@ -466,9 +537,7 @@ int32_t MainThreadEntry::ThreadFunc(void* user_data) {
 
 #endif  // CORE_PLATFORM_LINUX
 
-bool ProcessEvents(uint32_t* width, uint32_t* height, MouseState* mouse) {
-  CORE_UNUSED(mouse);
-
+bool ProcessEvents(uint32_t* width, uint32_t* height, InputHandler* handler) {
   const Event* ev;
   do {
     struct SE {
@@ -488,17 +557,32 @@ bool ProcessEvents(uint32_t* width, uint32_t* height, MouseState* mouse) {
           return true;
 
         case Event::Mouse:
-          // TODO(scottmg): Something.
+          if (handler->WantMouseEvents()) {
+            const MouseEvent& mouse_event = *static_cast<const MouseEvent*>(ev);
+            if (mouse_event.move) {
+              handler->NotifyMouseMoved(
+                  mouse_event.mx, mouse_event.my, mouse_event.modifiers);
+            } else if (mouse_event.wheel) {
+              handler->NotifyMouseWheel(mouse_event.mx,
+                                        mouse_event.my,
+                                        mouse_event.delta,
+                                        mouse_event.modifiers);
+            } else {
+              // Button press.
+              handler->NotifyMouseButton(
+                  mouse_event.button, mouse_event.down, mouse_event.modifiers);
+            }
+          }
           break;
 
         case Event::Key:
-          // TODO(scottmg): Something.
+          CORE_UNUSED(handler);
           break;
 
         case Event::Size: {
-          const SizeEvent* size_event = static_cast<const SizeEvent*>(ev);
-          *width = size_event->width;
-          *height = size_event->height;
+          const SizeEvent& size_event = *static_cast<const SizeEvent*>(ev);
+          *width = size_event.width;
+          *height = size_event.height;
           break;
         }
 

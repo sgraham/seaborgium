@@ -111,23 +111,45 @@ struct Key {
   };
 };
 
-struct MouseState {
-  MouseState() : mx(0), my(0) {
-    for (uint32_t i = 0; i < MouseButton::Count; ++i) {
-      buttons[i] = MouseButton::None;
-    }
-  }
+class InputHandler {
+ public:
+  virtual ~InputHandler() {}
 
-  uint32_t mx;
-  uint32_t my;
-  uint8_t buttons[MouseButton::Count];
+  virtual bool WantMouseEvents() = 0;
+  virtual bool WantKeyEvents() = 0;
+
+  virtual bool NotifyMouseMoved(int x,
+                                int y,
+                                uint8_t modifiers) = 0;
+  virtual bool NotifyMouseWheel(int x,
+                                int y,
+                                float delta,
+                                uint8_t modifiers) = 0;
+  virtual bool NotifyMouseButton(MouseButton::Enum button,
+                                 bool down,
+                                 uint8_t modifiers) = 0;
+  virtual bool NotifyKey(Key::Enum key, bool down, uint8_t modifiers) = 0;
 };
 
 bool ProcessEvents(uint32_t* width,
                    uint32_t* height,
-                   MouseState* mouse = NULL);
+                   InputHandler* input_handler);
 
 float GetDpiScale();
+
+void SetWindowSize(uint32_t width, uint32_t height);
+
+struct MouseCursor {
+  enum Enum {
+    Default,
+    DragLeftRight,
+    DragUpDown,
+    DragAll,
+    Pointer,
+  };
+};
+
+void SetMouseCursor(MouseCursor::Enum cursor);
 
 }  // namespace core
 

@@ -160,9 +160,6 @@ void DockingSplitContainer::Render() {
 }
 
 bool DockingSplitContainer::CouldStartDrag(DragSetup* drag_setup) {
-  CORE_UNUSED(drag_setup);
-  return false;
-#if 0
   Point client_position = ToClient(drag_setup->screen_position);
   if (GetRectForSplitter().Contains(client_position)) {
     if (drag_setup->draggable)
@@ -181,7 +178,6 @@ bool DockingSplitContainer::CouldStartDrag(DragSetup* drag_setup) {
     }
   }
   return false;
-#endif
 }
 
 void DockingSplitContainer::SetFraction(double fraction) {

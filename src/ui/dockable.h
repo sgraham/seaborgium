@@ -6,17 +6,16 @@
 #define UI_DOCKABLE_H_
 
 #include "core/core.h"
+#include "core/entry.h"
 #include "core/geometric_types.h"
 #include "ui/drag_setup.h"
-#pragma message("todo!")
-// #include "ui/input.h"
 
 class DockingSplitContainer;
 class Draggable;
 class Renderer;
 class Workspace;
 
-class Dockable /*: public InputHandler*/ {
+class Dockable : public core::InputHandler {
  public:
   Dockable();
   virtual ~Dockable();
@@ -53,27 +52,30 @@ class Dockable /*: public InputHandler*/ {
   // equivalently lowest in the tree).
   virtual Dockable* FindTopMostUnderPoint(const Point& point);
 
-  /*
-  // Default implementation of InputHandler.
-  virtual bool NotifyMouseMoved(
-      int x, int y, int dx, int dy, const InputModifiers& modifiers) override {
+  // Default implementation of core::InputHandler.
+  virtual bool NotifyMouseMoved(int /*x*/,
+                                int /*y*/,
+                                uint8_t /*modifiers*/) override {
     return false;
   }
-  virtual bool NotifyMouseWheel(
-      int delta, const InputModifiers& modifiers) override {
+  virtual bool NotifyMouseWheel(int /*x*/,
+                                int /*y*/,
+                                float /*delta*/,
+                                uint8_t /*modifiers*/) override {
     return false;
   }
-  virtual bool NotifyMouseButton(
-      int index, bool down, const InputModifiers& modifiers) override {
+  virtual bool NotifyMouseButton(core::MouseButton::Enum /*button*/,
+                                 bool /*down*/,
+                                 uint8_t /*modifiers*/) override {
     return false;
   }
-  virtual bool NotifyKey(
-      InputKey key, bool down, const InputModifiers& modifiers) override {
+  virtual bool NotifyKey(core::Key::Enum /*key*/,
+                         bool /*down*/,
+                         uint8_t /*modifiers*/) override {
     return false;
   }
   virtual bool WantMouseEvents() { return false; }
   virtual bool WantKeyEvents() { return false; }
-  */
 
  private:
   DockingSplitContainer* parent_;

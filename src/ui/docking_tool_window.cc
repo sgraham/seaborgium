@@ -34,26 +34,6 @@ void DockingToolWindow::Render() {
 
   ScopedRenderOffset offset(this, contents_, true);
   contents_->Render();
-
-#if 0
-  const Skin& skin = Skin::current();
-  bool focused = GetFocusedContents() == contents_;
-
-  if (focused)
-    renderer->SetDrawColor(skin.GetColorScheme().title_bar_active());
-  else
-    renderer->SetDrawColor(skin.GetColorScheme().title_bar_inactive());
-  renderer->DrawFilledRect(RectForTitleBar());
-
-  if (focused)
-    renderer->SetDrawColor(skin.GetColorScheme().title_bar_text_active());
-  else
-    renderer->SetDrawColor(skin.GetColorScheme().title_bar_text_inactive());
-  renderer->RenderText(skin.ui_font(), Point(kTitleOffset, 0), title_);
-
-  ScopedRenderOffset offset(renderer, this, contents_);
-  contents_->Render(renderer);
-#endif
 }
 
 void DockingToolWindow::SetScreenRect(const Rect& rect) {
