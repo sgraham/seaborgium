@@ -205,21 +205,26 @@ void ToolWindowDragger::CancelDrag() {
 }
 
 void ToolWindowDragger::Render() {
-#if 0
+  // TODO(scottmg): nanovg doesn't currently support render to texture
+  // https://github.com/memononen/nanovg/issues/90 so we just do simple
+  // outline box for now.
+#if 0  // R-T-T
   // TODO(rendering): Not much practical reason to re-render this every frame
   // during drag. Investigate if it makes anything snappier if it's cached
   // after the first render.
   scoped_ptr<RenderToTextureRenderer> render_to_texture_renderer(
-      renderer->CreateRenderToTextureRenderer(
-          dragging_->GetScreenRect().w,
-          dragging_->GetScreenRect().h));
+      renderer->CreateRenderToTextureRenderer(dragging_->GetScreenRect().w,
+        dragging_->GetScreenRect().h));
   dragging_->Render(render_to_texture_renderer.get());
+#endif
 
+#if 0
   for (size_t i = 0; i < targets_.size(); ++i) {
     const DropTargetIndicator& dti = targets_[i];
     renderer->DrawTexturedRectAlpha(
         dti.texture, dti.rect, kDropTargetAlpha, 0, 0, 1, 1);
   }
+#endif
 
   Rect draw_rect;
   if (on_drop_target_) {
@@ -232,6 +237,7 @@ void ToolWindowDragger::Render() {
         static_cast<int>(dragging_->GetClientRect().w * kDetachedScale),
         static_cast<int>(dragging_->GetClientRect().h * kDetachedScale));
   }
+#if 0  // R-T-T
   renderer->DrawRenderToTextureResult(
       render_to_texture_renderer.get(),
       draw_rect,
@@ -239,7 +245,9 @@ void ToolWindowDragger::Render() {
       0.f, 0.f, 1.f, 1.f);
   renderer->SetDrawColor(Color(0, 128, 128, kHoveringAlpha * 128));
   renderer->DrawFilledRect(draw_rect);
-
-  Workspace::Invalidate();
+#else
+  // Rect at draw_rect.
 #endif
+
+  // TODO(scottmg): Workspace::Invalidate();
 }
