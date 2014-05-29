@@ -112,11 +112,10 @@ int Main(int argc, char** argv) {
     }
 
     nvgBeginFrame(core::VG,
-                  width,
-                  height,
-                  1.3333f,
+                  static_cast<int>(width / core::GetDpiScale()),
+                  static_cast<int>(height / core::GetDpiScale()),
+                  core::GetDpiScale(),
                   NVG_STRAIGHT_ALPHA);
-    nvgScale(core::VG, core::GetDpiScale(), core::GetDpiScale());
 
     main_area.Render();
 
