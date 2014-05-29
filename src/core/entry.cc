@@ -362,8 +362,10 @@ struct Context {
         } break;
 
         case WM_SETCURSOR:
-          ::SetCursor(s_current_cursor);
-          return TRUE;
+          if (LOWORD(lparam) == HTCLIENT) {
+            ::SetCursor(s_current_cursor);
+            return TRUE;
+          }
 
         case WM_DESTROY:
           break;
