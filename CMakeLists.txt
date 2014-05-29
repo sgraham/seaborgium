@@ -93,6 +93,7 @@ target_link_libraries(sg
 # Test binary
 include_directories(${gtest_SOURCE_DIR}/include)
 set(test_sources
+  src/ui/test_stubs.cc
   src/ui/docking_test.cc
 )
 add_executable(sg_test ${test_sources})
