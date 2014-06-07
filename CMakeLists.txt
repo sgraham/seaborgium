@@ -58,6 +58,7 @@ set(main_sources
   src/ui/drawing_common.cc
   src/ui/focus.cc
   src/ui/skin.cc
+  src/ui/text_edit.cc
   src/ui/tool_window_dragger.cc
 
   src/ui/source_view/cpp_lexer.cc

@@ -5,13 +5,14 @@
 #include "core/core.h"
 #include "core/entry.h"
 #include "core/gfx.h"
-#include "ui/drawing_common.h"
-#include "ui/skin.h"
-#include "ui/solid_color.h"
 #include "ui/docking_split_container.h"
 #include "ui/docking_tool_window.h"
 #include "ui/docking_workspace.h"
+#include "ui/drawing_common.h"
 #include "ui/focus.h"
+#include "ui/skin.h"
+#include "ui/solid_color.h"
+#include "ui/text_edit.h"
 
 #include "nanovg.h"
 
@@ -91,7 +92,7 @@ int Main(int argc, char** argv) {
   DockingToolWindow* breakpoints =
       new DockingToolWindow(new SolidColor(cs.background()), "Breakpoints");
 
-  SolidColor* command_contents = new SolidColor(cs.background());
+  TextEdit* command_contents = new TextEdit();
   DockingToolWindow* command =
       new DockingToolWindow(command_contents, "Command");
   SetFocusedContents(command_contents);

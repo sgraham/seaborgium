@@ -28,9 +28,11 @@ https://github.com/memononen/nanovg/
 Copyright (c) 2013 Mikko Mononen memon@inside.org
 
 
-https://github.com/nothings/stb/stb_image.c
-https://github.com/nothings/stb/stb_freetype.h
-Public domain by Sean Barrett
+https://github.com/nothings/stb/
+stb_image.c
+stb_freetype.h
+stb_textedit.h
+Public domain by Sean Barrett (image and freetype are via nanovg)
 
 
 http://glew.sourceforge.net/

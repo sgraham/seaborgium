@@ -47,6 +47,8 @@ struct Key {
     PageDown,
     Home,
     End,
+    Insert,
+    Delete,
     Print,
     Plus,
     Minus,

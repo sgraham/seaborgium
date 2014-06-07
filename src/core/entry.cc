@@ -196,6 +196,8 @@ struct Context {
     s_translateKey[VK_NEXT] = Key::PageUp;
     s_translateKey[VK_HOME] = Key::Home;
     s_translateKey[VK_END] = Key::End;
+    s_translateKey[VK_INSERT] = Key::Insert;
+    s_translateKey[VK_DELETE] = Key::Delete;
     s_translateKey[VK_SNAPSHOT] = Key::Print;
     s_translateKey[VK_OEM_PLUS] = Key::Plus;
     s_translateKey[VK_OEM_MINUS] = Key::Minus;
@@ -579,7 +581,12 @@ bool ProcessEvents(uint32_t* width, uint32_t* height, InputHandler* handler) {
           break;
 
         case Event::Key:
-          CORE_UNUSED(handler);
+          if (handler->WantKeyEvents()) {
+            const KeyEvent& key_event = *static_cast<const KeyEvent*>(ev);
+            handler->NotifyKey(
+                key_event.key, key_event.down, key_event.modifiers);
+          }
+          break;
           break;
 
         case Event::Size: {
