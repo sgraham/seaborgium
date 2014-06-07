@@ -80,10 +80,17 @@ class LogMessageFatal : public LogMessage {
  public:
   LogMessageFatal(const char* file, int line)
     : LogMessage(file, line) { }
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4722)  // destructor never returns
+#endif
   ~LogMessageFatal() {
     Flush();
     abort();
   }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
  private:
   DISALLOW_EVIL_CONSTRUCTORS(LogMessageFatal);
 };
