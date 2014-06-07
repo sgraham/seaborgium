@@ -129,6 +129,16 @@ bool DockingWorkspace::NotifyKey(core::Key::Enum key,
   return false;
 }
 
+bool DockingWorkspace::NotifyChar(int character) {
+  Dockable* focused = GetFocusedContents();
+  if (!focused)
+    return false;
+  if (focused->WantKeyEvents() && focused->NotifyChar(character))
+    return true;
+  // TODO(scottmg): Global keys.
+  // return debug_presenter_notify_->NotifyChar(character);
+  return false;
+}
 
 void DockingWorkspace::GetDockTargets(
     Dockable* root, std::vector<Dockable*>* into) {

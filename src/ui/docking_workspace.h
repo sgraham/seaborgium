@@ -49,6 +49,7 @@ class DockingWorkspace : public core::InputHandler {
   virtual bool NotifyKey(core::Key::Enum key,
                          bool down,
                          uint8_t modifiers) override;
+  virtual bool NotifyChar(int character) override;
 
  private:
   void GetDockTargets(Dockable* root, std::vector<Dockable*>* into);

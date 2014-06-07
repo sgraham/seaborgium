@@ -37,6 +37,7 @@ ColorScheme::ColorScheme()
   : border_(nvgRGBA(0, 0, 0, 32)),
     background_(kBase03),
     text_(kBase0),
+    cursor_(kBase1),
     title_bar_active_inner_(nvgRGBA(128, 255, 255, 192)),
     title_bar_active_outer_(nvgRGBA(128, 255, 255, 32)),
     title_bar_inactive_inner_(nvgRGBA(128, 128, 128, 8)),

@@ -74,6 +74,9 @@ class Dockable : public core::InputHandler {
                          uint8_t /*modifiers*/) override {
     return false;
   }
+  virtual bool NotifyChar(int /*character*/) override {
+    return false;
+  }
   virtual bool WantMouseEvents() { return false; }
   virtual bool WantKeyEvents() { return false; }
 

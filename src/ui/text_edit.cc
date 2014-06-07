@@ -107,7 +107,13 @@ int InsertChars(STB_TEXTEDIT_STRING* str,
 #define LOCAL_control() \
   STB_TEXTEDIT_STRING* control = static_cast<STB_TEXTEDIT_STRING*>(impl_);
 
-TextEdit::TextEdit() : mouse_x_(-1.f), mouse_y_(-1.f) {
+TextEdit::TextEdit()
+    : mouse_x_(-1.f),
+      mouse_y_(-1.f) {
+  const ColorScheme& cs = Skin::current().GetColorScheme();
+  cursor_color_ = cursor_color_target_ = cs.cursor();
+  cursor_color_.a = 255.f;
+  cursor_color_target_.a = 0.f;
   impl_ = calloc(1, sizeof(STB_TEXTEDIT_STRING));
   LOCAL_state();
   LOCAL_control();
@@ -147,6 +153,10 @@ bool TextEdit::NotifyMouseButton(core::MouseButton::Enum button,
 }
 
 bool TextEdit::NotifyKey(core::Key::Enum key, bool down, uint8_t modifiers) {
+  // We use NotifyChar for regular characters to attempt to get some semblance
+  // of support for VK->character mapping from the host OS.
+  if (key == core::Key::None || key > core::Key::LAST_NON_PRINTABLE || !down)
+    return false;
   LOCAL_state();
   LOCAL_control();
   int stb_key = key;
@@ -163,8 +173,17 @@ bool TextEdit::NotifyKey(core::Key::Enum key, bool down, uint8_t modifiers) {
   // TODO(scottmg): Cut, copy, paste shortcuts.
   CORE_UNUSED(&stb_textedit_cut);
   CORE_UNUSED(&stb_textedit_paste);
-  // TODO(scottmg): Catch up/down for history in subclass.
+  // TODO(scottmg): Catch others in subclass (up/down for history, etc.)
   stb_textedit_key(control, state, stb_key);
+  return true;
+}
+
+bool TextEdit::NotifyChar(int character) {
+  if (!isprint(character))
+    return false;
+  LOCAL_state();
+  LOCAL_control();
+  stb_textedit_key(control, state, character);
   return true;
 }
 
@@ -181,14 +200,52 @@ void TextEdit::Render() {
   nvgFillColor(core::VG, cs.background());
   nvgFill(core::VG);
 
+  LOCAL_state();
   LOCAL_control();
+
   nvgFontSize(core::VG, 13.f);  // TODO
   nvgFontFace(core::VG, "mono");
+  float ascender, descender, line_height;
+  nvgTextMetrics(core::VG, &ascender, &descender, &line_height);
   nvgFillColor(core::VG, cs.text());
   nvgText(core::VG,
           static_cast<float>(rect.x),
-          static_cast<float>(rect.y + 16.f),  // TODO
+          static_cast<float>(rect.y + line_height),
           control->string,
           control->string + control->string_len);
+
+  nvgBeginPath(core::VG);
+  // TODO(scottmg): Frame rate.
+  cursor_color_ = nvgLerpRGBA(cursor_color_, cursor_color_target_, 0.2f);
+  if (fabsf(cursor_color_.a - cursor_color_target_.a) < 0.01f) {
+    if (cursor_color_target_.a == 0.f)
+      cursor_color_target_.a = 255.f;
+    else
+      cursor_color_target_.a = 0.f;
+  }
+  nvgFillColor(core::VG, cursor_color_);
+  std::unique_ptr<NVGglyphPosition[]> positions(
+      new NVGglyphPosition[control->string_len]);
+  nvgTextGlyphPositions(core::VG,
+                        static_cast<float>(rect.x),
+                        static_cast<float>(rect.y),
+                        control->string,
+                        control->string + control->string_len,
+                        positions.get(),
+                        control->string_len);
+  float cursor_x;
+  if (state->cursor == 0)
+    cursor_x = 0.f;
+  else if (state->cursor == control->string_len)
+    cursor_x = positions[state->cursor - 1].maxx;
+  else
+    cursor_x = positions[state->cursor].minx;
+
+  nvgRect(core::VG,
+          cursor_x,
+          static_cast<float>(rect.y),
+          1.f,
+          line_height - descender);
+  nvgFill(core::VG);
   nvgRestore(core::VG);
 }

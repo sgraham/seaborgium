@@ -5,9 +5,10 @@
 #ifndef UI_TEXT_EDIT_H_
 #define UI_TEXT_EDIT_H_
 
+#include "nanovg.h"
 #include "ui/dockable.h"
 
-// Single line text edit control, and currently only supports monospace fonts.
+// Single line text edit control.
 class TextEdit : public Dockable {
  public:
   TextEdit();
@@ -26,6 +27,7 @@ class TextEdit : public Dockable {
   virtual bool NotifyKey(core::Key::Enum key,
                          bool down,
                          uint8_t modifiers) override;
+  virtual bool NotifyChar(int character) override;
 
   // Implementation of Dockable:
   void Render() override;
@@ -34,6 +36,8 @@ class TextEdit : public Dockable {
   void* impl_;
   float mouse_x_;
   float mouse_y_;
+  NVGcolor cursor_color_;
+  NVGcolor cursor_color_target_;
 };
 
 #endif  // UI_TEXT_EDIT_H_

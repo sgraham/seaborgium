@@ -37,7 +37,6 @@ struct Key {
     Esc,
     Return,
     Tab,
-    Space,
     Backspace,
     Up,
     Down,
@@ -50,8 +49,6 @@ struct Key {
     Insert,
     Delete,
     Print,
-    Plus,
-    Minus,
     F1,
     F2,
     F3,
@@ -64,6 +61,12 @@ struct Key {
     F10,
     F11,
     F12,
+
+    LAST_NON_PRINTABLE = F12,
+
+    Space,
+    Plus,
+    Minus,
     NumPad0,
     NumPad1,
     NumPad2,
@@ -131,6 +134,7 @@ class InputHandler {
                                  bool down,
                                  uint8_t modifiers) = 0;
   virtual bool NotifyKey(Key::Enum key, bool down, uint8_t modifiers) = 0;
+  virtual bool NotifyChar(int character) = 0;
 };
 
 bool ProcessEvents(uint32_t* width,

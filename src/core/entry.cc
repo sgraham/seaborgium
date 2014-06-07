@@ -13,7 +13,7 @@ extern int Main(int argc, char** argv);
 namespace core {
 
 struct Event {
-  enum Enum { Exit, Key, Mouse, Size, };
+  enum Enum { Exit, Key, Char, Mouse, Size, };
   Event::Enum type;
 };
 
@@ -21,6 +21,10 @@ struct KeyEvent : public Event {
   Key::Enum key;
   uint8_t modifiers;
   bool down;
+};
+
+struct CharEvent : public Event {
+  int character;
 };
 
 struct MouseEvent : public Event {
@@ -55,6 +59,13 @@ class EventQueue {
     ev->key = key;
     ev->modifiers = modifiers;
     ev->down = down;
+    queue_.push(ev);
+  }
+
+  void PostCharEvent(int character) {
+    CharEvent* ev = new CharEvent;
+    ev->type = Event::Char;
+    ev->character = character;
     queue_.push(ev);
   }
 
@@ -432,8 +443,6 @@ struct Context {
               mx, my, MouseButton::Right, id == WM_RBUTTONDOWN, modifiers);
         } break;
 
-
-
         case WM_KEYDOWN:
         case WM_SYSKEYDOWN:
         case WM_KEYUP:
@@ -453,6 +462,12 @@ struct Context {
           event_queue_.PostKeyEvent(
               key, modifiers, id == WM_KEYDOWN || id == WM_SYSKEYDOWN);
         } break;
+
+        case WM_CHAR: {
+          int character = static_cast<int>(wparam);
+          event_queue_.PostCharEvent(character);
+        } break;
+
 
         // These don't appear sufficient to avoid flicker during drag resizing
         // with GL rendering. I don't know why.
@@ -587,6 +602,12 @@ bool ProcessEvents(uint32_t* width, uint32_t* height, InputHandler* handler) {
                 key_event.key, key_event.down, key_event.modifiers);
           }
           break;
+
+        case Event::Char:
+          if (handler->WantKeyEvents()) {
+            const CharEvent& char_event = *static_cast<const CharEvent*>(ev);
+            handler->NotifyChar(char_event.character);
+          }
           break;
 
         case Event::Size: {
