@@ -280,7 +280,7 @@ struct Context {
     float dpi_scale_y = GetDeviceCaps(screen_dc, LOGPIXELSY) / 96.f;
     CORE_CHECK(dpi_scale_x == dpi_scale_y,
                "Don't handle non-uniform DPI scale");
-    //WinGfxSetDpiScale(dpi_scale_x);
+    WinGfxSetDpiScale(dpi_scale_x);
     ::ReleaseDC(NULL, screen_dc);
 
     hwnd_ =
