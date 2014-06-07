@@ -60,6 +60,10 @@ set(main_sources
   src/ui/skin.cc
   src/ui/tool_window_dragger.cc
 
+  src/ui/source_view/cpp_lexer.cc
+  src/ui/source_view/lexer.cc
+  src/ui/source_view/lexer_state.cc
+
   third_party/glew-1.10.0/src/glew.c
   third_party/nanovg/src/nanovg.c
   third_party/nanovg/src/stb_image.c
@@ -143,6 +147,7 @@ include_directories(${gtest_SOURCE_DIR}/include)
 set(test_sources
   src/ui/test_stubs.cc
   src/ui/docking_test.cc
+  src/ui/source_view/lexer_test.cc
 )
 add_executable(sg_test ${test_sources})
 target_link_libraries(sg_test sglib gtest_main)
