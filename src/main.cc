@@ -81,8 +81,16 @@ int Main(int argc, char** argv) {
   const Skin& skin = Skin::current();
   const ColorScheme& cs = skin.GetColorScheme();
   SolidColor* source_view = new SolidColor(cs.background());
+
   DockingToolWindow* stack =
       new DockingToolWindow(new SolidColor(cs.background()), "Stack");
+
+  DockingToolWindow* watch =
+      new DockingToolWindow(new SolidColor(cs.background()), "Watch");
+
+  DockingToolWindow* breakpoints =
+      new DockingToolWindow(new SolidColor(cs.background()), "Breakpoints");
+
   SolidColor* command_contents = new SolidColor(cs.background());
   DockingToolWindow* command =
       new DockingToolWindow(command_contents, "Command");
@@ -93,7 +101,13 @@ int Main(int argc, char** argv) {
   source_view->parent()->SetFraction(0.7);
 
   source_view->parent()->SplitChild(kSplitVertical, source_view, stack);
-  source_view->parent()->SetFraction(0.5);
+  source_view->parent()->SetFraction(0.4);
+
+  stack->parent()->SplitChild(kSplitVertical, stack, watch);
+  stack->parent()->SetFraction(0.5);
+
+  stack->parent()->SplitChild(kSplitHorizontal, stack, breakpoints);
+  stack->parent()->SetFraction(0.7);
 
   uint32_t prev_width = 0, prev_height = 0;
   uint32_t width, height;
