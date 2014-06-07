@@ -26,6 +26,8 @@ void DockingWorkspace::Render() {
     ScopedRenderOffset offset(rect.x, rect.y);
     root_->left()->Render();
   }
+  if (draggable_.get())
+    draggable_->Render();
 }
 
 void DockingWorkspace::SetRoot(Dockable* root) {
@@ -104,10 +106,12 @@ bool DockingWorkspace::NotifyMouseButton(core::MouseButton::Enum button,
     return true;
   } else if (button == core::MouseButton::Left && down) {
     Dockable* target = root_->left()->FindTopMostUnderPoint(mouse_position_);
-    SetFocusedContents(target);
-    target->NotifyMouseMoved(mouse_position_.x, mouse_position_.y, modifiers);
-    target->NotifyMouseButton(button, down, modifiers);
-    // TODO(scottmg): Invalidate();
+    if (target) {
+      SetFocusedContents(target);
+      target->NotifyMouseMoved(mouse_position_.x, mouse_position_.y, modifiers);
+      target->NotifyMouseButton(button, down, modifiers);
+      // TODO(scottmg): Invalidate();
+    }
   }
   return false;
 }

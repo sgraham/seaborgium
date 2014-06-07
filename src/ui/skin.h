@@ -5,6 +5,7 @@
 #ifndef UI_SKIN_H_
 #define UI_SKIN_H_
 
+#include "core/core.h"
 #include "nanovg.h"
 
 class ColorScheme {
@@ -97,14 +98,14 @@ class Skin {
   float status_bar_size() const { return status_bar_size_; }
   float text_line_height() const { return text_line_height_; }
 
+  const char* dock_top_icon() const { return dock_top_icon_; }
+  const char* dock_left_icon() const { return dock_left_icon_; }
+  const char* dock_right_icon() const { return dock_right_icon_; }
+  const char* dock_bottom_icon() const { return dock_bottom_icon_; }
   // TODO(icons): These will all be chars from icons font.
 #if 0
   const Texture* pc_indicator_texture() const { return &pc_indicator_texture_; }
   const Texture* breakpoint_texture() const { return &breakpoint_texture_; }
-  const Texture* dock_top_texture() const { return &dock_top_texture_; }
-  const Texture* dock_left_texture() const { return &dock_left_texture_; }
-  const Texture* dock_right_texture() const { return &dock_right_texture_; }
-  const Texture* dock_bottom_texture() const { return &dock_bottom_texture_; }
   const Texture* vscrollbar_top_texture() const {
     return &vscrollbar_top_texture_;
   }
@@ -134,19 +135,21 @@ class Skin {
   float status_bar_size_;
   float text_line_height_;
 
+  const char* dock_top_icon_;
+  const char* dock_left_icon_;
+  const char* dock_right_icon_;
+  const char* dock_bottom_icon_;
 #if 0
   Texture pc_indicator_texture_;
   Texture breakpoint_texture_;
-  Texture dock_top_texture_;
-  Texture dock_left_texture_;
-  Texture dock_right_texture_;
-  Texture dock_bottom_texture_;
   Texture vscrollbar_top_texture_;
   Texture vscrollbar_middle_texture_;
   Texture vscrollbar_bottom_texture_;
   Texture tree_collapsed_texture_;
   Texture tree_expanded_texture_;
 #endif
+
+  CORE_DISALLOW_COPY_AND_ASSIGN(Skin);
 };
 
 #endif  // UI_SKIN_H_

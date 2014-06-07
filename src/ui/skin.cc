@@ -79,6 +79,10 @@ void Skin::Init() {
   CORE_CHECK(nvgCreateFont(core::VG, "icons", "art/entypo.ttf") != -1,
              "font load failed");
 
+  dock_bottom_icon_ = "\xee\x9d\x98";  // circled-down
+  dock_left_icon_ = "\xee\x9d\x99";  // circled-left
+  dock_right_icon_ = "\xee\x9d\x9a";  // circled-right
+  dock_top_icon_ = "\xee\x9d\x9b";  // circled-up
 #if 0
   pc_indicator_texture_.name = L"art/pc-location.png";
   breakpoint_texture_.name = L"art/breakpoint.png";

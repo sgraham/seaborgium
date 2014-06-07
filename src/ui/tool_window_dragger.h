@@ -21,7 +21,7 @@ class Workspace;
 
 struct DropTargetIndicator {
   Dockable* dockable;
-  const Texture* texture;
+  const char* icon;
   Rect rect;
   DockingSplitDirection direction;
   bool this_dockable_first;

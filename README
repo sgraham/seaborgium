@@ -15,6 +15,7 @@ messageloop: ~1w
 simple 2d renderer, look at what gwen does for basic abstraction ~2w
 - opengl everywhere is probably simplest: rect, line, texture, etc.
 - font rendering: simple monospace bitmap font, maybe a few sizes
+- nanovg is nice, needs render to texture
 
 ui widgets:
 - docking panes ~1w
@@ -41,7 +42,7 @@ actual ui
 - step in, out, over
 
 
-thread 0: SYSTEM: window create, post system events to MAIN
+thread 0: SYSTEM: window create, post system events to UI
 thread 1: UI: handles events, draws UI, sends control events to DEBUGGER
 thread 2: RENDER: double buffered renderer processing UI draws
 thread 3: DEBUGGER: interacts with debugger engine and target process

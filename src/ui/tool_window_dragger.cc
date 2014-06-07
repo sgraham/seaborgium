@@ -6,6 +6,7 @@
 
 #include <algorithm>
 
+#include "core/gfx.h"
 #include "ui/docking_split_container.h"
 #include "ui/docking_tool_window.h"
 #include "ui/docking_workspace.h"
@@ -19,27 +20,41 @@ float kDetachedScale = 0.8f;
 float kHoveringAlpha = 0.75f;
 float kDropTargetAlpha = 0.6f;
 
+struct ScopedIcon {
+  ScopedIcon() {
+    nvgSave(core::VG);
+    nvgFontFace(core::VG, "icons");
+    nvgFontSize(core::VG, 72);
+  }
+  ~ScopedIcon() {
+    nvgRestore(core::VG);
+  }
+};
+
+int IconWidth(const char* icon) {
+  float bounds[4];
+  nvgTextBounds(core::VG, 0, 0, icon, NULL, bounds);
+  return static_cast<int>(ceilf(bounds[2] - bounds[0]));
+}
+
+int IconHeight(const char* icon) {
+  float bounds[4];
+  nvgTextBounds(core::VG, 0, 0, icon, NULL, bounds);
+  return static_cast<int>(ceilf(bounds[3] - bounds[1]));
+}
+
 DropTargetIndicator IndicatorAt(
     Dockable* dockable,
-    const Texture* texture,
+    const char* icon,
     int x, int y,
     DockingSplitDirection direction,
     bool this_dockable_first) {
   DropTargetIndicator target;
-  CORE_CHECK(false, "");
-  CORE_UNUSED(dockable);
-  CORE_UNUSED(texture);
-  CORE_UNUSED(x);
-  CORE_UNUSED(y);
-  CORE_UNUSED(direction);
-  CORE_UNUSED(this_dockable_first);
-#if 0
   target.dockable = dockable;
-  target.texture = texture;
-  target.rect = Rect(x, y, texture->width, texture->height);
+  target.icon = icon;
+  target.rect = Rect(x, y, IconWidth(icon), IconHeight(icon));
   target.direction = direction;
   target.this_dockable_first = this_dockable_first;
-#endif
   return target;
 }
 
@@ -47,74 +62,68 @@ void PlaceIndicatorsAroundEdge(
     const Rect& rect,
     std::vector<DropTargetIndicator>* into,
     Dockable* dockable) {
-  CORE_UNUSED(rect);
-  CORE_UNUSED(into);
-  CORE_UNUSED(dockable);
-#if 0
   const Skin& skin = Skin::current();
-  into->push_back(IndicatorAt(
-      dockable,
-      skin.dock_top_texture(),
-      rect.x + rect.w / 2 - skin.dock_top_texture()->width / 2,
-      rect.y,
-      kSplitHorizontal, false));
-  into->push_back(IndicatorAt(
-      dockable,
-      skin.dock_left_texture(),
-      rect.x,
-      rect.y + rect.h / 2 - skin.dock_left_texture()->height / 2,
-      kSplitVertical, false));
-  into->push_back(IndicatorAt(
-      dockable,
-      skin.dock_right_texture(),
-      rect.x + rect.w - skin.dock_right_texture()->width,
-      rect.y + rect.h / 2 - skin.dock_right_texture()->height / 2,
-      kSplitVertical, true));
-  into->push_back(IndicatorAt(
-      dockable,
-      skin.dock_bottom_texture(),
-      rect.x + rect.w / 2 - skin.dock_bottom_texture()->width / 2,
-      rect.y + rect.h - skin.dock_bottom_texture()->height,
-      kSplitHorizontal, true));
-#endif
+  into->push_back(
+      IndicatorAt(dockable,
+                  skin.dock_top_icon(),
+                  rect.x + rect.w / 2 - IconWidth(skin.dock_top_icon()) / 2,
+                  rect.y,
+                  kSplitHorizontal,
+                  false));
+  into->push_back(
+      IndicatorAt(dockable,
+                  skin.dock_left_icon(),
+                  rect.x,
+                  rect.y + rect.h / 2 - IconHeight(skin.dock_left_icon()) / 2,
+                  kSplitVertical,
+                  false));
+  into->push_back(
+      IndicatorAt(dockable,
+                  skin.dock_right_icon(),
+                  rect.x + rect.w - IconWidth(skin.dock_right_icon()),
+                  rect.y + rect.h / 2 - IconHeight(skin.dock_right_icon()) / 2,
+                  kSplitVertical,
+                  true));
+  into->push_back(
+      IndicatorAt(dockable,
+                  skin.dock_bottom_icon(),
+                  rect.x + rect.w / 2 - IconWidth(skin.dock_bottom_icon()) / 2,
+                  rect.y + rect.h - IconHeight(skin.dock_bottom_icon()),
+                  kSplitHorizontal,
+                  true));
 }
 
 void PlaceIndicatorsAtCenter(
     const Rect& rect,
     std::vector<DropTargetIndicator>* into,
     Dockable* dockable) {
-  CORE_UNUSED(rect);
-  CORE_UNUSED(into);
-  CORE_UNUSED(dockable);
-#if 0
   const Skin& skin = Skin::current();
   int cx = rect.x + rect.w / 2;
   int cy = rect.y + rect.h / 2;
-  into->push_back(IndicatorAt(
-      dockable,
-      skin.dock_top_texture(),
-      cx - skin.dock_top_texture()->width / 2,
-      cy - skin.dock_top_texture()->height * 2,
-      kSplitHorizontal, false));
-  into->push_back(IndicatorAt(
-      dockable,
-      skin.dock_left_texture(),
-      cx - skin.dock_left_texture()->height * 2,
-      cy - skin.dock_left_texture()->height / 2,
-      kSplitVertical, false));
-  into->push_back(IndicatorAt(
-      dockable,
-      skin.dock_right_texture(),
-      cx + skin.dock_right_texture()->width,
-      cy - skin.dock_right_texture()->height / 2,
-      kSplitVertical, true));
-  into->push_back(IndicatorAt(
-      dockable,
-      skin.dock_bottom_texture(),
-      cx - skin.dock_bottom_texture()->width / 2,
-      cy + skin.dock_bottom_texture()->height,
-      kSplitHorizontal, true));
-#endif
+  into->push_back(IndicatorAt(dockable,
+                              skin.dock_top_icon(),
+                              cx - IconWidth(skin.dock_top_icon()) / 2,
+                              cy - IconHeight(skin.dock_top_icon()) * 2,
+                              kSplitHorizontal,
+                              false));
+  into->push_back(IndicatorAt(dockable,
+                              skin.dock_left_icon(),
+                              cx - IconHeight(skin.dock_left_icon()) * 2,
+                              cy - IconHeight(skin.dock_left_icon()) / 2,
+                              kSplitVertical,
+                              false));
+  into->push_back(IndicatorAt(dockable,
+                              skin.dock_right_icon(),
+                              cx + IconWidth(skin.dock_right_icon()),
+                              cy - IconHeight(skin.dock_right_icon()) / 2,
+                              kSplitVertical,
+                              true));
+  into->push_back(IndicatorAt(dockable,
+                              skin.dock_bottom_icon(),
+                              cx - IconWidth(skin.dock_bottom_icon()) / 2,
+                              cy + IconHeight(skin.dock_bottom_icon()),
+                              kSplitHorizontal,
+                              true));
 }
 
 }  // namespace
@@ -124,6 +133,7 @@ ToolWindowDragger::ToolWindowDragger(
     DragSetup* drag_setup)
     : on_drop_target_(NULL),
       docking_workspace_(drag_setup->docking_workspace) {
+  ScopedIcon state;
   pick_up_offset_ = dragging->ToClient(drag_setup->screen_position);
   initial_screen_rect_ = dragging->GetScreenRect();
   current_position_ = drag_setup->screen_position;
@@ -205,6 +215,7 @@ void ToolWindowDragger::CancelDrag() {
 }
 
 void ToolWindowDragger::Render() {
+  ScopedIcon state;
   // TODO(scottmg): nanovg doesn't currently support render to texture
   // https://github.com/memononen/nanovg/issues/90 so we just do simple
   // outline box for now.
@@ -218,13 +229,25 @@ void ToolWindowDragger::Render() {
   dragging_->Render(render_to_texture_renderer.get());
 #endif
 
-#if 0
   for (size_t i = 0; i < targets_.size(); ++i) {
     const DropTargetIndicator& dti = targets_[i];
-    renderer->DrawTexturedRectAlpha(
-        dti.texture, dti.rect, kDropTargetAlpha, 0, 0, 1, 1);
+    nvgTextBox(core::VG,
+               static_cast<float>(dti.rect.x),
+               static_cast<float>(dti.rect.y + IconHeight(dti.icon)),
+               static_cast<float>(dti.rect.w),
+               dti.icon,
+               NULL);
+    /*
+    nvgBeginPath(core::VG);
+    nvgFillColor(core::VG, nvgRGBA(255, 0, 0, 255));
+    nvgRect(core::VG,
+            static_cast<float>(dti.rect.x),
+            static_cast<float>(dti.rect.y),
+            static_cast<float>(dti.rect.w),
+            static_cast<float>(dti.rect.h));
+    nvgFill(core::VG);
+    */
   }
-#endif
 
   Rect draw_rect;
   if (on_drop_target_) {
@@ -247,6 +270,14 @@ void ToolWindowDragger::Render() {
   renderer->DrawFilledRect(draw_rect);
 #else
   // Rect at draw_rect.
+  nvgBeginPath(core::VG);
+  nvgFillColor(core::VG, nvgRGBA(255, 255, 255, 64));
+  nvgRect(core::VG,
+          static_cast<float>(draw_rect.x),
+          static_cast<float>(draw_rect.y),
+          static_cast<float>(draw_rect.w),
+          static_cast<float>(draw_rect.h));
+  nvgFill(core::VG);
 #endif
 
   // TODO(scottmg): Workspace::Invalidate();

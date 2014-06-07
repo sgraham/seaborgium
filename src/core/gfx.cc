@@ -203,7 +203,7 @@ void GfxDrawFps() {
 
   nvgFontSize(VG, 13.f);
   nvgFontFace(VG, "mono");
-  nvgFillColor(VG, nvgRGBA(0x00, 0xa0, 0x00, 0xff));
+  nvgFillColor(VG, nvgRGBA(0x00, 0xa0, 0x00, 0x60));
   GfxTextf(10,
            16 * pos++,
            // utf-8 sequences are UPWARDS ARROW and DOWNWARDS ARROW.
