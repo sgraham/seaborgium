@@ -154,11 +154,33 @@ bool TextEdit::NotifyMouseButton(core::MouseButton::Enum button,
   return true;
 }
 
+// Reset the cursor to fully visible, but only if it moves during the scope.
+struct ScopedCursorAlphaReset {
+  ScopedCursorAlphaReset(TextEdit* parent) : parent_(parent) {
+    STB_TexteditState* state =
+        &static_cast<STB_TEXTEDIT_STRING*>(parent_->impl_)->state;
+    cursor_orig_ = state->cursor;
+  }
+
+  ~ScopedCursorAlphaReset() {
+    STB_TexteditState* state =
+        &static_cast<STB_TEXTEDIT_STRING*>(parent_->impl_)->state;
+    if (cursor_orig_ != state->cursor) {
+      parent_->cursor_color_.a = 1.f;
+      parent_->cursor_color_target_.a = 0.f;
+    }
+  }
+
+  TextEdit* parent_;
+  int cursor_orig_;
+};
+
 bool TextEdit::NotifyKey(core::Key::Enum key, bool down, uint8_t modifiers) {
   // We use NotifyChar for regular characters to attempt to get some semblance
   // of support for VK->character mapping from the host OS.
   if (key == core::Key::None || key > core::Key::LAST_NON_PRINTABLE || !down)
     return false;
+  ScopedCursorAlphaReset reset(this);
   LOCAL_state();
   LOCAL_control();
   int stb_key = key;
@@ -181,6 +203,7 @@ bool TextEdit::NotifyKey(core::Key::Enum key, bool down, uint8_t modifiers) {
 }
 
 bool TextEdit::NotifyChar(int character) {
+  ScopedCursorAlphaReset reset(this);
   if (!isprint(character))
     return false;
   LOCAL_state();
@@ -227,10 +250,10 @@ void TextEdit::Render() {
 
   nvgBeginPath(core::VG);
   // TODO(scottmg): Frame rate.
-  cursor_color_ = nvgLerpRGBA(cursor_color_, cursor_color_target_, 0.2f);
-  if (fabsf(cursor_color_.a - cursor_color_target_.a) < 0.01f) {
+  cursor_color_ = nvgLerpRGBA(cursor_color_, cursor_color_target_, 0.3f);
+  if (fabsf(cursor_color_.a - cursor_color_target_.a) < 0.0001f) {
     if (cursor_color_target_.a == 0.f)
-      cursor_color_target_.a = 255.f;
+      cursor_color_target_.a = 1.f;
     else
       cursor_color_target_.a = 0.f;
   }
@@ -251,7 +274,7 @@ void TextEdit::Render() {
   nvgRect(core::VG,
           cursor_x,
           static_cast<float>(rect.y),
-          1.f,
+          1.5f,
           line_height - descender);
   nvgFill(core::VG);
 

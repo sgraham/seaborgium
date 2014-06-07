@@ -38,6 +38,8 @@ class TextEdit : public Dockable {
   float mouse_y_;
   NVGcolor cursor_color_;
   NVGcolor cursor_color_target_;
+
+  friend struct ScopedCursorAlphaReset;
 };
 
 #endif  // UI_TEXT_EDIT_H_
