@@ -8,6 +8,8 @@
 #include <string.h>
 #include <ctype.h>
 
+#include <algorithm>
+
 #include "core/entry.h"
 #include "core/gfx.h"
 #include "nanovg.h"
@@ -187,6 +189,15 @@ bool TextEdit::NotifyChar(int character) {
   return true;
 }
 
+float CursorXFromIndex(NVGglyphPosition* positions, int count, int index) {
+  if (index == 0)
+    return 0.f;
+  else if (index == count)
+    return positions[index - 1].maxx;
+  else
+    return positions[index].minx;
+}
+
 void TextEdit::Render() {
   nvgSave(core::VG);
   nvgBeginPath(core::VG);
@@ -233,13 +244,9 @@ void TextEdit::Render() {
                         control->string + control->string_len,
                         positions.get(),
                         control->string_len);
-  float cursor_x;
-  if (state->cursor == 0)
-    cursor_x = 0.f;
-  else if (state->cursor == control->string_len)
-    cursor_x = positions[state->cursor - 1].maxx;
-  else
-    cursor_x = positions[state->cursor].minx;
+
+  float cursor_x =
+      CursorXFromIndex(positions.get(), control->string_len, state->cursor);
 
   nvgRect(core::VG,
           cursor_x,
@@ -247,5 +254,24 @@ void TextEdit::Render() {
           1.f,
           line_height - descender);
   nvgFill(core::VG);
+
+  if (state->select_start != state->select_end) {
+    nvgBeginPath(core::VG);
+    nvgFillColor(core::VG, cs.text_selection());
+    int start = std::min(state->select_start, state->select_end);
+    int end = std::max(state->select_start, state->select_end);
+    float select_x =
+        CursorXFromIndex(positions.get(), control->string_len, start);
+    float select_w =
+        CursorXFromIndex(positions.get(), control->string_len, end) - select_x;
+    nvgRoundedRect(core::VG,
+        select_x,
+        static_cast<float>(rect.y),
+        select_w,
+        static_cast<float>(rect.y + line_height - descender),
+        3.f);
+    nvgFill(core::VG);
+  }
+
   nvgRestore(core::VG);
 }

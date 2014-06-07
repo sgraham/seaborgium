@@ -37,6 +37,7 @@ ColorScheme::ColorScheme()
   : border_(nvgRGBA(0, 0, 0, 32)),
     background_(kBase03),
     text_(kBase0),
+    text_selection_(kYellow),
     cursor_(kBase1),
     title_bar_active_inner_(nvgRGBA(128, 255, 255, 192)),
     title_bar_active_outer_(nvgRGBA(128, 255, 255, 32)),
@@ -60,6 +61,7 @@ ColorScheme::ColorScheme()
     margin_(kBase02),
     margin_text_(kBase0),
     pc_indicator_(kYellow) {
+  text_selection_.a = .3f;
 }
 
 Skin::Skin()

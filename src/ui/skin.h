@@ -15,6 +15,7 @@ class ColorScheme {
   const NVGcolor& border() const { return border_; }
   const NVGcolor& background() const { return background_; }
   const NVGcolor& text() const { return text_; }
+  const NVGcolor& text_selection() const { return text_selection_; }
   const NVGcolor& cursor() const { return cursor_; }
   const NVGcolor& title_bar_active_inner() const {
     return title_bar_active_inner_;
@@ -60,6 +61,7 @@ class ColorScheme {
   NVGcolor border_;
   NVGcolor background_;
   NVGcolor text_;
+  NVGcolor text_selection_;
   NVGcolor cursor_;
   NVGcolor title_bar_active_inner_;
   NVGcolor title_bar_active_outer_;
