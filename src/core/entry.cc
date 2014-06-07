@@ -313,7 +313,7 @@ struct Context {
         static_cast<int>(CORE_DEFAULT_WIDTH * GetDpiScale()),
         static_cast<int>(CORE_DEFAULT_HEIGHT * GetDpiScale()));
 
-    //::ShowWindow(hwnd_, SW_MAXIMIZE);
+    ::ShowWindow(hwnd_, SW_MAXIMIZE);
 
     MSG msg;
     msg.message = WM_NULL;
