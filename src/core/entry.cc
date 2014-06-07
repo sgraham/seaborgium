@@ -357,7 +357,8 @@ struct Context {
               IDC_SIZEALL,  // DragAll,
               IDC_HAND,     // Pointer,
           };
-          s_current_cursor = ::LoadCursor(NULL, IdcCursorForMouseCursor[cursor]);
+          s_current_cursor =
+              ::LoadCursor(NULL, IdcCursorForMouseCursor[cursor]);
           ::SetCursor(s_current_cursor);
         } break;
 

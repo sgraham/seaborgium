@@ -7,7 +7,7 @@
 #include "core/entry.h"
 
 #define NANOVG_GL2_IMPLEMENTATION
-#include <GL/glew.h>
+#include <GL/glew.h>  // NOLINT(build/include)
 #include "nanovg_gl.h"
 
 #if CORE_PLATFORM_WINDOWS

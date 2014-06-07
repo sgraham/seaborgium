@@ -1,3 +1,45 @@
+Seaborgium
+----------
+
+Debugger prototype.
+
+Not much to see yet.
+
+License: http://opensource.org/licenses/BSD-3-Clause
+
+
+CREDITS
+-------
+
+Nice libraries that Seaborgium uses/referenced in whole or in part:
+
+https://github.com/bkaradzic/bx
+https://github.com/bkaradzic/bgfx
+Copyright 2010-2014 Branimir Karadzic. All rights reserved.
+http://opensource.org/licenses/BSD-2-Clause
+
+
+https://github.com/memononen/nanovg/
+Copyright (c) 2013 Mikko Mononen memon@inside.org
+
+
+https://github.com/nothings/stb/stb_image.c
+https://github.com/nothings/stb/stb_freetype.h
+Public domain by Sean Barrett
+
+
+http://glew.sourceforge.net/
+Modified BSD License and MIT License by Milan Ikits, Marcelo Magallon, et al.
+
+
+http://code.google.com/p/re2/
+http://opensource.org/licenses/BSD-3-Clause
+
+
+
+RANDOM MUTTERINGS
+-----------------
+
 bx is great except for the casing of function names, want a bunch of it:
 - platform macros
 - simple os functionality (dlopen, etc.)

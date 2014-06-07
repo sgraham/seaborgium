@@ -41,6 +41,7 @@ add_definitions(-DGLEW_STATIC)
 include_directories(src
                     third_party/nanovg/src
                     third_party/glew-1.10.0/include
+                    third_party/re2
                    )
 # TODO
 #include_directories(../llvm/llvm/tools/clang/include)
@@ -62,6 +63,53 @@ set(main_sources
   third_party/glew-1.10.0/src/glew.c
   third_party/nanovg/src/nanovg.c
   third_party/nanovg/src/stb_image.c
+
+  third_party/re2/re2/bitstate.cc
+  third_party/re2/re2/compile.cc
+  third_party/re2/re2/dfa.cc
+  third_party/re2/re2/filtered_re2.cc
+  third_party/re2/re2/filtered_re2.h
+  third_party/re2/re2/mimics_pcre.cc
+  third_party/re2/re2/nfa.cc
+  third_party/re2/re2/onepass.cc
+  third_party/re2/re2/parse.cc
+  third_party/re2/re2/perl_groups.cc
+  third_party/re2/re2/prefilter.cc
+  third_party/re2/re2/prefilter.h
+  third_party/re2/re2/prefilter_tree.cc
+  third_party/re2/re2/prefilter_tree.h
+  third_party/re2/re2/prog.cc
+  third_party/re2/re2/prog.h
+  third_party/re2/re2/re2.cc
+  third_party/re2/re2/re2.h
+  third_party/re2/re2/regexp.cc
+  third_party/re2/re2/regexp.h
+  third_party/re2/re2/set.cc
+  third_party/re2/re2/set.h
+  third_party/re2/re2/simplify.cc
+  third_party/re2/re2/stringpiece.h
+  third_party/re2/re2/tostring.cc
+  third_party/re2/re2/unicode_casefold.cc
+  third_party/re2/re2/unicode_casefold.h
+  third_party/re2/re2/unicode_groups.cc
+  third_party/re2/re2/unicode_groups.h
+  third_party/re2/re2/variadic_function.h
+  third_party/re2/re2/walker-inl.h
+  third_party/re2/util/arena.cc
+  third_party/re2/util/arena.h
+  third_party/re2/util/atomicops.h
+  third_party/re2/util/flags.h
+  third_party/re2/util/hash.cc
+  third_party/re2/util/logging.h
+  third_party/re2/util/mutex.h
+  third_party/re2/util/rune.cc
+  third_party/re2/util/sparse_array.h
+  third_party/re2/util/sparse_set.h
+  third_party/re2/util/stringpiece.cc
+  third_party/re2/util/stringprintf.cc
+  third_party/re2/util/strutil.cc
+  third_party/re2/util/utf.h
+  third_party/re2/util/util.h
 )
 add_library(sglib ${main_sources})
 

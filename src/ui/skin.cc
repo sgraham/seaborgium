@@ -69,7 +69,6 @@ Skin::Skin()
       text_line_height_(17.f) {}
 
 void Skin::Init() {
-
   CORE_CHECK(nvgCreateFont(core::VG, "sans", "art/DejaVuSans.ttf") != -1,
              "font load failed");
   CORE_CHECK(
