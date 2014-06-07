@@ -38,6 +38,7 @@ class ColorScheme {
   }
   const NVGcolor& drop_shadow_inner() const { return drop_shadow_inner_; }
   const NVGcolor& drop_shadow_outer() const { return drop_shadow_outer_; }
+  const NVGcolor& drop_indicator() const { return drop_indicator_; }
 
   const NVGcolor& comment() const { return comment_; }
   const NVGcolor& comment_preprocessor() const { return comment_preprocessor_; }
@@ -68,6 +69,7 @@ class ColorScheme {
   NVGcolor title_bar_text_drop_shadow_;
   NVGcolor drop_shadow_inner_;
   NVGcolor drop_shadow_outer_;
+  NVGcolor drop_indicator_;
 
   NVGcolor comment_;
   NVGcolor comment_preprocessor_;

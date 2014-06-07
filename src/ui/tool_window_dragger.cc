@@ -25,6 +25,7 @@ struct ScopedIcon {
     nvgSave(core::VG);
     nvgFontFace(core::VG, "icons");
     nvgFontSize(core::VG, 72);
+    nvgFillColor(core::VG, Skin::current().GetColorScheme().drop_indicator());
   }
   ~ScopedIcon() {
     nvgRestore(core::VG);

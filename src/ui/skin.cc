@@ -46,6 +46,7 @@ ColorScheme::ColorScheme()
     title_bar_text_drop_shadow_(nvgRGBA(0, 0, 0, 128)),
     drop_shadow_inner_(nvgRGBA(0, 0, 0, 128)),
     drop_shadow_outer_(nvgRGBA(0, 0, 0, 0)),
+    drop_indicator_(kBase1),
     comment_(kBase01),
     comment_preprocessor_(kOrange),
     error_(kRed),
