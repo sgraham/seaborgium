@@ -26,15 +26,49 @@ struct TextControl {
   STB_TexteditState state;
 };
 
+struct ScopedTextSetup {
+  ScopedTextSetup() {
+    nvgSave(core::VG);
+    nvgFontSize(core::VG, 144.f);  // TODO
+    nvgFontFace(core::VG, "mono");
+  }
+  ~ScopedTextSetup() {
+    nvgRestore(core::VG);
+  }
+};
+
+float CursorXFromIndex(NVGglyphPosition* positions, int count, int index) {
+  CORE_CHECK(index <= count, "index out of range");
+  if (index == 0)
+    return 0.f;
+  else if (index == count)
+    return positions[index - 1].maxx;
+  else
+    return positions[index].minx;
+}
+
 void LayoutFunc(StbTexteditRow* row, STB_TEXTEDIT_STRING* str, int start_i) {
+  ScopedTextSetup text_setup;
+
   int remaining_chars = str->string_len - start_i;
   // Always single line.
   row->num_chars = remaining_chars;
-  row->x0 = 0;
-  row->x1 = static_cast<float>(remaining_chars);
-  row->baseline_y_delta = 1.25;
-  row->ymin = -1;
-  row->ymax = 0;
+  std::unique_ptr<NVGglyphPosition[]> positions(
+      new NVGglyphPosition[str->string_len]);
+  nvgTextGlyphPositions(core::VG,
+                        0,
+                        0,
+                        str->string,
+                        str->string + str->string_len,
+                        positions.get(),
+                        str->string_len);
+  float ascender, descender, line_height;
+  nvgTextMetrics(core::VG, &ascender, &descender, &line_height);
+  row->x0 = 0.f;  // TODO(scottmg): This seems suspect.
+  row->x1 = positions[str->string_len - 1].maxx;
+  row->baseline_y_delta = line_height;
+  row->ymin = 0;
+  row->ymax = line_height - descender;
 }
 
 int DeleteChars(STB_TEXTEDIT_STRING* str, int pos, int num) {
@@ -56,12 +90,30 @@ int InsertChars(STB_TEXTEDIT_STRING* str,
   return 1;
 }
 
+float GetWidth(STB_TEXTEDIT_STRING* str, int n, int i) {
+  ScopedTextSetup text_setup;
+  CORE_UNUSED(n);  // Single line only.
+  std::unique_ptr<NVGglyphPosition[]> positions(
+      new NVGglyphPosition[str->string_len]);
+  nvgTextGlyphPositions(core::VG,
+                        0,
+                        0,
+                        str->string,
+                        str->string + str->string_len,
+                        positions.get(),
+                        str->string_len);
+  CORE_CHECK(i < str->string_len, "out of bounds request");
+  return CursorXFromIndex(positions.get(), str->string_len, i + 1) -
+         CursorXFromIndex(positions.get(), str->string_len, i);
+}
+
+
 // Define all the #defines needed for stb_textedit's implementation.
 
 #define KEYDOWN_BIT 0x80000000
 #define STB_TEXTEDIT_STRINGLEN(tc) ((tc)->string_len)
 #define STB_TEXTEDIT_LAYOUTROW LayoutFunc
-#define STB_TEXTEDIT_GETWIDTH(tc, n, i) (1)
+#define STB_TEXTEDIT_GETWIDTH(tc, n, i) GetWidth(tc, n, i)
 #define STB_TEXTEDIT_KEYTOTEXT(key) (((key) & KEYDOWN_BIT) ? 0 : (key))
 #define STB_TEXTEDIT_GETCHAR(tc, i) ((tc)->string[i])
 #define STB_TEXTEDIT_NEWLINE '\n'
@@ -133,6 +185,8 @@ bool TextEdit::NotifyMouseMoved(int x, int y, uint8_t modifiers) {
   CORE_UNUSED(modifiers);
   // TODO(scottmg): Drag selection.
   CORE_UNUSED(&stb_textedit_drag);
+  //if (GetScreenRect().Contains(Point(x, y)))
+    //core::SetMouseCursor(core::MouseCursor::IBeam);
   return true;
 }
 
@@ -144,13 +198,35 @@ bool TextEdit::NotifyMouseWheel(int x, int y, float delta, uint8_t modifiers) {
   return true;
 }
 
+// Reset the cursor to fully visible, but only if it moves during the scope.
+struct ScopedCursorAlphaReset {
+  ScopedCursorAlphaReset(TextEdit* parent) : parent_(parent) {
+    STB_TexteditState* state =
+        &static_cast<STB_TEXTEDIT_STRING*>(parent_->impl_)->state;
+    cursor_orig_ = state->cursor;
+  }
+
+  ~ScopedCursorAlphaReset() {
+    STB_TexteditState* state =
+        &static_cast<STB_TEXTEDIT_STRING*>(parent_->impl_)->state;
+    if (cursor_orig_ != state->cursor) {
+      parent_->cursor_color_.a = 1.f;
+      parent_->cursor_color_target_.a = 0.f;
+    }
+  }
+
+  TextEdit* parent_;
+  int cursor_orig_;
+};
+
 bool TextEdit::NotifyMouseButton(core::MouseButton::Enum button,
                                  bool down,
                                  uint8_t modifiers) {
+  ScopedCursorAlphaReset reset(this);
   LOCAL_state();
   LOCAL_control();
   if (button == core::MouseButton::Left && down && modifiers == 0)
-    stb_textedit_click(control, state, mouse_x_, mouse_y_);
+    stb_textedit_click(control, state, mouse_x_ - X(), mouse_y_ - Y());
   return true;
 }
 
@@ -212,17 +288,9 @@ bool TextEdit::NotifyChar(int character) {
   return true;
 }
 
-float CursorXFromIndex(NVGglyphPosition* positions, int count, int index) {
-  if (index == 0)
-    return 0.f;
-  else if (index == count)
-    return positions[index - 1].maxx;
-  else
-    return positions[index].minx;
-}
-
 void TextEdit::Render() {
-  nvgSave(core::VG);
+  ScopedTextSetup text_setup;
+
   nvgBeginPath(core::VG);
   const Rect& rect = GetClientRect();
   const ColorScheme& cs = Skin::current().GetColorScheme();
@@ -237,8 +305,6 @@ void TextEdit::Render() {
   LOCAL_state();
   LOCAL_control();
 
-  nvgFontSize(core::VG, 13.f);  // TODO
-  nvgFontFace(core::VG, "mono");
   float ascender, descender, line_height;
   nvgTextMetrics(core::VG, &ascender, &descender, &line_height);
   nvgFillColor(core::VG, cs.text());
@@ -295,6 +361,4 @@ void TextEdit::Render() {
         3.f);
     nvgFill(core::VG);
   }
-
-  nvgRestore(core::VG);
 }

@@ -369,6 +369,7 @@ struct Context {
               IDC_SIZENS,   // DragUpDown
               IDC_SIZEALL,  // DragAll,
               IDC_HAND,     // Pointer,
+              IDC_IBEAM,    // IBeam,
           };
           s_current_cursor =
               ::LoadCursor(NULL, IdcCursorForMouseCursor[cursor]);

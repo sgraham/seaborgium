@@ -152,6 +152,7 @@ struct MouseCursor {
     DragUpDown,
     DragAll,
     Pointer,
+    IBeam,
   };
 };
 
