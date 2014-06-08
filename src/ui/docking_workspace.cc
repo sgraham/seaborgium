@@ -104,10 +104,11 @@ bool DockingWorkspace::NotifyMouseButton(core::MouseButton::Enum button,
              root_->left()->CouldStartDrag(&drag_setup)) {
     // TODO(scottmg): Invalidate();
     return true;
-  } else if (button == core::MouseButton::Left && down) {
+  } else if (button == core::MouseButton::Left) {
     Dockable* target = root_->left()->FindTopMostUnderPoint(mouse_position_);
     if (target) {
-      SetFocusedContents(target);
+      if (down)
+        SetFocusedContents(target);
       target->NotifyMouseMoved(mouse_position_.x, mouse_position_.y, modifiers);
       target->NotifyMouseButton(button, down, modifiers);
       // TODO(scottmg): Invalidate();

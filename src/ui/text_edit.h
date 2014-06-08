@@ -38,6 +38,7 @@ class TextEdit : public Dockable {
   float mouse_y_;
   NVGcolor cursor_color_;
   NVGcolor cursor_color_target_;
+  bool left_mouse_is_down_;
 
   friend struct ScopedCursorAlphaReset;
 };

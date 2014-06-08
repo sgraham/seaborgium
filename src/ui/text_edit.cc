@@ -162,8 +162,7 @@ float GetWidth(STB_TEXTEDIT_STRING* str, int n, int i) {
   STB_TEXTEDIT_STRING* control = static_cast<STB_TEXTEDIT_STRING*>(impl_);
 
 TextEdit::TextEdit()
-    : mouse_x_(-1.f),
-      mouse_y_(-1.f) {
+    : mouse_x_(-1.f), mouse_y_(-1.f), left_mouse_is_down_(false) {
   const ColorScheme& cs = Skin::current().GetColorScheme();
   cursor_color_ = cursor_color_target_ = cs.cursor();
   cursor_color_.a = 255.f;
@@ -183,10 +182,12 @@ bool TextEdit::NotifyMouseMoved(int x, int y, uint8_t modifiers) {
   mouse_x_ = static_cast<float>(x);
   mouse_y_ = static_cast<float>(y);
   CORE_UNUSED(modifiers);
-  // TODO(scottmg): Drag selection.
-  CORE_UNUSED(&stb_textedit_drag);
+  LOCAL_state();
+  LOCAL_control();
   if (GetScreenRect().Contains(Point(x, y)))
     core::SetMouseCursor(core::MouseCursor::IBeam);
+  if (left_mouse_is_down_)
+    stb_textedit_drag(control, state, mouse_x_ - X(), mouse_y_ - Y());
   return true;
 }
 
@@ -227,6 +228,8 @@ bool TextEdit::NotifyMouseButton(core::MouseButton::Enum button,
   LOCAL_control();
   if (button == core::MouseButton::Left && down && modifiers == 0)
     stb_textedit_click(control, state, mouse_x_ - X(), mouse_y_ - Y());
+  if (button == core::MouseButton::Left)
+    left_mouse_is_down_ = down;
   return true;
 }
 
