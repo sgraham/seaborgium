@@ -161,6 +161,27 @@ float GetWidth(STB_TEXTEDIT_STRING* str, int n, int i) {
 #define LOCAL_control() \
   STB_TEXTEDIT_STRING* control = static_cast<STB_TEXTEDIT_STRING*>(impl_);
 
+// Reset the cursor to fully visible, but only if it moves during the scope.
+struct ScopedCursorAlphaReset {
+  ScopedCursorAlphaReset(TextEdit* parent) : parent_(parent) {
+    STB_TexteditState* state =
+        &static_cast<STB_TEXTEDIT_STRING*>(parent_->impl_)->state;
+    cursor_orig_ = state->cursor;
+  }
+
+  ~ScopedCursorAlphaReset() {
+    STB_TexteditState* state =
+        &static_cast<STB_TEXTEDIT_STRING*>(parent_->impl_)->state;
+    if (cursor_orig_ != state->cursor) {
+      parent_->cursor_color_.a = 1.f;
+      parent_->cursor_color_target_.a = 0.f;
+    }
+  }
+
+  TextEdit* parent_;
+  int cursor_orig_;
+};
+
 TextEdit::TextEdit()
     : mouse_x_(-1.f), mouse_y_(-1.f), left_mouse_is_down_(false) {
   const ColorScheme& cs = Skin::current().GetColorScheme();
@@ -199,27 +220,6 @@ bool TextEdit::NotifyMouseWheel(int x, int y, float delta, uint8_t modifiers) {
   return true;
 }
 
-// Reset the cursor to fully visible, but only if it moves during the scope.
-struct ScopedCursorAlphaReset {
-  ScopedCursorAlphaReset(TextEdit* parent) : parent_(parent) {
-    STB_TexteditState* state =
-        &static_cast<STB_TEXTEDIT_STRING*>(parent_->impl_)->state;
-    cursor_orig_ = state->cursor;
-  }
-
-  ~ScopedCursorAlphaReset() {
-    STB_TexteditState* state =
-        &static_cast<STB_TEXTEDIT_STRING*>(parent_->impl_)->state;
-    if (cursor_orig_ != state->cursor) {
-      parent_->cursor_color_.a = 1.f;
-      parent_->cursor_color_target_.a = 0.f;
-    }
-  }
-
-  TextEdit* parent_;
-  int cursor_orig_;
-};
-
 bool TextEdit::NotifyMouseButton(core::MouseButton::Enum button,
                                  bool down,
                                  uint8_t modifiers) {
@@ -232,27 +232,6 @@ bool TextEdit::NotifyMouseButton(core::MouseButton::Enum button,
     left_mouse_is_down_ = down;
   return true;
 }
-
-// Reset the cursor to fully visible, but only if it moves during the scope.
-struct ScopedCursorAlphaReset {
-  ScopedCursorAlphaReset(TextEdit* parent) : parent_(parent) {
-    STB_TexteditState* state =
-        &static_cast<STB_TEXTEDIT_STRING*>(parent_->impl_)->state;
-    cursor_orig_ = state->cursor;
-  }
-
-  ~ScopedCursorAlphaReset() {
-    STB_TexteditState* state =
-        &static_cast<STB_TEXTEDIT_STRING*>(parent_->impl_)->state;
-    if (cursor_orig_ != state->cursor) {
-      parent_->cursor_color_.a = 1.f;
-      parent_->cursor_color_target_.a = 0.f;
-    }
-  }
-
-  TextEdit* parent_;
-  int cursor_orig_;
-};
 
 bool TextEdit::NotifyKey(core::Key::Enum key, bool down, uint8_t modifiers) {
   // We use NotifyChar for regular characters to attempt to get some semblance
