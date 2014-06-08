@@ -29,7 +29,7 @@ struct TextControl {
 struct ScopedTextSetup {
   ScopedTextSetup() {
     nvgSave(core::VG);
-    nvgFontSize(core::VG, 144.f);  // TODO
+    nvgFontSize(core::VG, 14.f);  // TODO
     nvgFontFace(core::VG, "mono");
   }
   ~ScopedTextSetup() {
@@ -185,8 +185,8 @@ bool TextEdit::NotifyMouseMoved(int x, int y, uint8_t modifiers) {
   CORE_UNUSED(modifiers);
   // TODO(scottmg): Drag selection.
   CORE_UNUSED(&stb_textedit_drag);
-  //if (GetScreenRect().Contains(Point(x, y)))
-    //core::SetMouseCursor(core::MouseCursor::IBeam);
+  if (GetScreenRect().Contains(Point(x, y)))
+    core::SetMouseCursor(core::MouseCursor::IBeam);
   return true;
 }
 
