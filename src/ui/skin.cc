@@ -34,7 +34,7 @@ Skin g_skin;
 }  // namespace
 
 ColorScheme::ColorScheme()
-  : border_(nvgRGBA(0, 0, 0, 32)),
+  : border_(nvgRGBA(0, 0, 0, 255)),
     background_(kBase03),
     text_(kBase0),
     text_selection_(kYellow),

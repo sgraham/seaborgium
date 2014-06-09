@@ -104,12 +104,18 @@ void TreeGrid::Render() {
   nvgFill(core::VG);
 
   const int kMarginWidth = static_cast<int>(line_height - descender);
+  const int kHeaderHeight = kMarginWidth;
   const int kPaddingFromMarginToBody = 3;
-  Rect margin(0, 0, kMarginWidth, client_rect.h);
+  const int kPaddingFromHeaderToBody = 3;
+  const int kTitlePadding = 3;
+
+  Rect margin(0, kHeaderHeight, kMarginWidth, client_rect.h - kHeaderHeight);
+  Rect header(kMarginWidth, 0, client_rect.w - kMarginWidth, kHeaderHeight);
+
   Rect body(kMarginWidth + kPaddingFromMarginToBody,
-            0,
+            kHeaderHeight + kPaddingFromHeaderToBody,
             client_rect.w - (kMarginWidth + kPaddingFromMarginToBody),
-            client_rect.h);
+            client_rect.h - (kHeaderHeight + kPaddingFromHeaderToBody));
 
   nvgBeginPath(core::VG);
   nvgRect(core::VG,
@@ -120,12 +126,54 @@ void TreeGrid::Render() {
   nvgFillColor(core::VG, cs.margin());
   nvgFill(core::VG);
 
+  nvgBeginPath(core::VG);
+  nvgRect(core::VG,
+          static_cast<float>(header.x),
+          static_cast<float>(header.y),
+          static_cast<float>(header.w),
+          static_cast<float>(header.h));
+  nvgFillColor(core::VG, cs.margin());
+  nvgFill(core::VG);
+
+  std::vector<int> column_widths = GetColumnWidths(body.w);
+  nvgFillColor(core::VG, cs.margin_text());
+  nvgStrokeColor(core::VG, cs.border());
+  CORE_DCHECK(columns_.size() == column_widths.size(), "num columns broken");
+  int last_x = 0;
+  nvgBeginPath(core::VG);
+  nvgMoveTo(core::VG,
+      static_cast<float>(header.x + last_x),
+      static_cast<float>(header.y));
+  nvgLineTo(core::VG,
+      static_cast<float>(header.x + last_x),
+      static_cast<float>(client_rect.h));
+  nvgStroke(core::VG);
+  for (size_t i = 0; i < columns_.size(); ++i) {
+    // TODO: clip
+    nvgText(core::VG,
+            static_cast<float>(header.x + last_x + kTitlePadding),
+            static_cast<float>(header.y + line_height),
+            columns_[i]->GetCaption().c_str(),
+            NULL);
+    last_x += column_widths[i];
+    nvgBeginPath(core::VG);
+    nvgMoveTo(core::VG,
+              static_cast<float>(header.x + last_x),
+              static_cast<float>(header.y));
+    nvgLineTo(core::VG,
+              static_cast<float>(header.x + last_x),
+              static_cast<float>(client_rect.h - header.y));
+    nvgStroke(core::VG);
+  }
+
+  /*
   nvgFillColor(core::VG, cs.text());
   nvgText(core::VG,
           static_cast<float>(body.x),
           static_cast<float>(body.y + (line_height - descender)),
           "ui/stuff.cc, line 34",
           NULL);
+          */
 
   nvgRestore(core::VG);
 }
