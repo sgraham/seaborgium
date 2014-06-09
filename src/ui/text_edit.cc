@@ -13,6 +13,7 @@
 #include "core/entry.h"
 #include "core/gfx.h"
 #include "nanovg.h"
+#include "ui/focus.h"
 #include "ui/skin.h"
 
 #define STB_TEXTEDIT_CHARTYPE char
@@ -296,16 +297,6 @@ void TextEdit::Render() {
           control->string,
           control->string + control->string_len);
 
-  nvgBeginPath(core::VG);
-  // TODO(scottmg): Frame rate.
-  cursor_color_ = nvgLerpRGBA(cursor_color_, cursor_color_target_, 0.3f);
-  if (fabsf(cursor_color_.a - cursor_color_target_.a) < 0.0001f) {
-    if (cursor_color_target_.a == 0.f)
-      cursor_color_target_.a = 1.f;
-    else
-      cursor_color_target_.a = 0.f;
-  }
-  nvgFillColor(core::VG, cursor_color_);
   std::unique_ptr<NVGglyphPosition[]> positions(
       new NVGglyphPosition[control->string_len]);
   nvgTextGlyphPositions(core::VG,
@@ -316,15 +307,28 @@ void TextEdit::Render() {
                         positions.get(),
                         control->string_len);
 
-  float cursor_x =
-      CursorXFromIndex(positions.get(), control->string_len, state->cursor);
+  if (GetFocusedContents() == this) {
+    nvgBeginPath(core::VG);
+    // TODO(scottmg): Frame rate.
+    cursor_color_ = nvgLerpRGBA(cursor_color_, cursor_color_target_, 0.3f);
+    if (fabsf(cursor_color_.a - cursor_color_target_.a) < 0.0001f) {
+      if (cursor_color_target_.a == 0.f)
+        cursor_color_target_.a = 1.f;
+      else
+        cursor_color_target_.a = 0.f;
+    }
+    nvgFillColor(core::VG, cursor_color_);
 
-  nvgRect(core::VG,
-          cursor_x,
-          static_cast<float>(rect.y),
-          1.5f,
-          line_height - descender);
-  nvgFill(core::VG);
+    float cursor_x =
+        CursorXFromIndex(positions.get(), control->string_len, state->cursor);
+
+    nvgRect(core::VG,
+            cursor_x,
+            static_cast<float>(rect.y),
+            1.5f,
+            line_height - descender);
+    nvgFill(core::VG);
+  }
 
   if (state->select_start != state->select_end) {
     nvgBeginPath(core::VG);

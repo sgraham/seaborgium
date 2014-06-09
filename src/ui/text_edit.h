@@ -33,6 +33,8 @@ class TextEdit : public Dockable {
   void Render() override;
 
  private:
+  friend struct ScopedCursorAlphaReset;
+
   void* impl_;
   float mouse_x_;
   float mouse_y_;
@@ -40,7 +42,7 @@ class TextEdit : public Dockable {
   NVGcolor cursor_color_target_;
   bool left_mouse_is_down_;
 
-  friend struct ScopedCursorAlphaReset;
+  CORE_DISALLOW_COPY_AND_ASSIGN(TextEdit);
 };
 
 #endif  // UI_TEXT_EDIT_H_
