@@ -37,6 +37,9 @@ class TreeGridNode {
   bool Expanded() const { return expanded_; }
   void SetExpanded(bool expanded) { expanded_ = expanded; }
 
+  bool Selected() const { return selected_; }
+  void SetSelected(bool selected) { selected_ = selected; }
+
   const TreeGridNode* Parent() const { return parent_; }
 
   std::vector<TreeGridNode*>* Nodes();
@@ -50,6 +53,7 @@ class TreeGridNode {
   TreeGrid* tree_grid_;
   TreeGridNode* parent_;
   bool expanded_;
+  bool selected_;
   std::vector<TreeGridNode*> nodes_;
   std::map<int, TreeGridNodeValue*> items_;
 };
@@ -58,12 +62,21 @@ class TreeGridColumn {
  public:
   TreeGridColumn(TreeGrid* tree_grid, const std::string& caption);
 
+  const TreeGrid* GetTreeGrid() const { return tree_grid_; }
+
   const std::string& GetCaption() const { return caption_; }
   void SetCaption(const std::string& caption) { caption_ = caption; }
 
+  void SetWidthPercentage(float fraction);
+  void SetWidthFixed(int size);
+
  private:
+  friend TreeGrid;
   TreeGrid* tree_grid_;
   std::string caption_;
+
+  float width_fraction_;
+  int width_fixed_;
 };
 
 // Hierarchical view, with columns.
@@ -76,6 +89,8 @@ class TreeGrid : public Dockable {
   std::vector<TreeGridColumn*>* Columns();
 
   void Render() override;
+
+  std::vector<int> GetColumnWidths(int layout_in_width) const;
 
  private:
   std::vector<TreeGridNode*> nodes_;

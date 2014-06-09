@@ -4,6 +4,8 @@
 
 #include "ui/tree_grid.h"
 
+#include <algorithm>
+
 #include "core/gfx.h"
 #include "nanovg.h"
 #include "ui/skin.h"
@@ -21,7 +23,10 @@ void TreeGridNodeValueString::Render() {
 
 // --------------------------------------------------------------------
 TreeGridNode::TreeGridNode(TreeGrid* tree_grid, TreeGridNode* parent)
-    : tree_grid_(tree_grid), parent_(parent), expanded_(false) {}
+    : tree_grid_(tree_grid),
+      parent_(parent),
+      expanded_(false),
+      selected_(false) {}
 
 TreeGridNode::~TreeGridNode() {
   for (std::map<int, TreeGridNodeValue*>::iterator i(items_.begin());
@@ -53,6 +58,16 @@ const TreeGridNodeValue* TreeGridNode::GetValue(int column) {
 // --------------------------------------------------------------------
 TreeGridColumn::TreeGridColumn(TreeGrid* tree_grid, const std::string& caption)
     : tree_grid_(tree_grid), caption_(caption) {}
+
+void TreeGridColumn::SetWidthPercentage(float fraction) {
+  width_fraction_ = fraction;
+  width_fixed_ = -1;
+}
+
+void TreeGridColumn::SetWidthFixed(int size) {
+  width_fraction_ = 0.f;
+  width_fixed_ = size;
+}
 
 // --------------------------------------------------------------------
 TreeGrid::TreeGrid() {
@@ -113,4 +128,31 @@ void TreeGrid::Render() {
           NULL);
 
   nvgRestore(core::VG);
+}
+
+std::vector<int> TreeGrid::GetColumnWidths(int layout_in_width) const {
+  float total_fraction = 0.f;
+  std::vector<int> ret(columns_.size());
+  int remaining_width = layout_in_width;
+  for (size_t j = 0; j < columns_.size(); ++j) {
+    TreeGridColumn* i = columns_[j];
+    if (i->width_fixed_ == -1) {
+      total_fraction += i->width_fraction_;
+    } else {
+      remaining_width -= i->width_fixed_;
+      ret[j] = std::min(layout_in_width, i->width_fixed_);
+    }
+  }
+
+  if (remaining_width < 0)
+    remaining_width = 0;
+
+  for (size_t j = 0; j < columns_.size(); ++j) {
+    TreeGridColumn* i = columns_[j];
+    if (i->width_fixed_ == -1) {
+      ret[j] = static_cast<int>((i->width_fraction_ / total_fraction) *
+                                remaining_width);
+    }
+  }
+  return ret;
 }

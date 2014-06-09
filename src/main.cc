@@ -21,6 +21,30 @@
 #include "clang-c/Index.h"
 #endif
 
+void FillWatchWithSampleData(TreeGrid* watch) {
+  CORE_UNUSED(watch);
+#if 0
+  // The TreeGrid owns all these pointers once they're added.
+
+  TreeGridColumn* name_column = new TreeGridColumn(watch, "Name");
+  TreeGridColumn* value_column = new TreeGridColumn(watch, "Value");
+  TreeGridColumn* type_column = new TreeGridColumn(watch, "Type");
+  watch->Columns()->push_back(name_column);
+  watch->Columns()->push_back(value_column);
+  watch->Columns()->push_back(type_column);
+  watch->SetColumnWidthPercentage(name_column, 0.3f);
+  watch->SetColumnWidthPercentage(value_column, 0.7f);
+  watch->SetColumnWidthFixed(type_column, 140);
+
+  TreeGrideNode* root0 = new TreeGridNode(watch, NULL);
+  watch_contents->Nodes().push_back(root0);
+  root0->Nodes().push_back(
+
+  TreeGrideNode* root1 = new TreeGridNode(watch, NULL);
+  watch_contents->Nodes().push_back(root1);
+#endif
+}
+
 int Main(int argc, char** argv) {
   core::GfxInit();
   Skin::LoadData();
@@ -87,8 +111,10 @@ int Main(int argc, char** argv) {
   DockingToolWindow* stack =
       new DockingToolWindow(new SolidColor(cs.background()), "Stack");
 
-  DockingToolWindow* watch =
-      new DockingToolWindow(new SolidColor(cs.background()), "Watch");
+  TreeGrid* watch_contents = new TreeGrid();
+  DockingToolWindow* watch = new DockingToolWindow(watch_contents, "Watch");
+
+  FillWatchWithSampleData(watch_contents);
 
   DockingToolWindow* breakpoints =
       new DockingToolWindow(new TreeGrid(), "Breakpoints");

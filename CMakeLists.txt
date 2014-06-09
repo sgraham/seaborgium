@@ -150,6 +150,7 @@ set(test_sources
   src/ui/test_stubs.cc
   src/ui/docking_test.cc
   src/ui/source_view/lexer_test.cc
+  src/ui/tree_grid_test.cc
 )
 add_executable(sg_test ${test_sources})
 target_link_libraries(sg_test sglib gtest_main)
