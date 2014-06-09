@@ -21,9 +21,16 @@
 #include "clang-c/Index.h"
 #endif
 
+void FillColumns(TreeGridNode* node,
+                 const char* name,
+                 const char* value,
+                 const char* type) {
+  node->SetValue(0, new TreeGridNodeValueString(name));
+  node->SetValue(1, new TreeGridNodeValueString(value));
+  node->SetValue(2, new TreeGridNodeValueString(type));
+}
+
 void FillWatchWithSampleData(TreeGrid* watch) {
-  CORE_UNUSED(watch);
-#if 0
   // The TreeGrid owns all these pointers once they're added.
 
   TreeGridColumn* name_column = new TreeGridColumn(watch, "Name");
@@ -32,17 +39,61 @@ void FillWatchWithSampleData(TreeGrid* watch) {
   watch->Columns()->push_back(name_column);
   watch->Columns()->push_back(value_column);
   watch->Columns()->push_back(type_column);
-  watch->SetColumnWidthPercentage(name_column, 0.3f);
-  watch->SetColumnWidthPercentage(value_column, 0.7f);
-  watch->SetColumnWidthFixed(type_column, 140);
+  name_column->SetWidthPercentage(0.3f);
+  value_column->SetWidthPercentage(0.7f);
+  type_column->SetWidthFixed(100);
 
-  TreeGrideNode* root0 = new TreeGridNode(watch, NULL);
-  watch_contents->Nodes().push_back(root0);
-  root0->Nodes().push_back(
+  TreeGridNode* root0 = new TreeGridNode(watch, NULL);
+  watch->Nodes()->push_back(root0);
+  FillColumns(root0,
+              "this",
+              "{root_=unique_ptr {direction_=kSplitNoneRoot (0) "
+              "fraction_=0.50000000000000000 left_=unique_ptr "
+              "{direction_=kSplitHorizontal (2) fraction_=0.69999999999999996 "
+              "left_=unique_ptr ...} ...} ...}",
+              "DockingWorkspace *");
 
-  TreeGrideNode* root1 = new TreeGridNode(watch, NULL);
-  watch_contents->Nodes().push_back(root1);
-#endif
+  TreeGridNode* child0 = new TreeGridNode(watch, root0);
+  root0->Nodes()->push_back(child0);
+  FillColumns(child0, "core::InputHandler", "{...}", "core::InputHandler");
+
+  TreeGridNode* child1 = new TreeGridNode(watch, root0);
+  root0->Nodes()->push_back(child1);
+  FillColumns(child1,
+              "root_",
+              "unique_ptr {direction_=kSplitNoneRoot (0) "
+              "fraction_=0.50000000000000000 left_=unique_ptr "
+              "{direction_=kSplitHorizontal (2) fraction_=0.69999999999999996 "
+              "left_=unique_ptr {...} ...} ...}",
+              "std::unique_ptr<DockingSplitContainer,std::default_delete<"
+              "DockingSplitContainer> >");
+
+  TreeGridNode* child2 = new TreeGridNode(watch, root0);
+  root0->Nodes()->push_back(child2);
+  FillColumns(child2, "mouse_position_", "{x=1924 y=440 }", "Point");
+
+  TreeGridNode* child2_0 = new TreeGridNode(watch, child2);
+  child2->Nodes()->push_back(child2_0);
+  FillColumns(child2_0, "x", "1924", "int");
+
+  TreeGridNode* child2_1 = new TreeGridNode(watch, child2);
+  child2->Nodes()->push_back(child2_1);
+  FillColumns(child2_1, "y", "440", "int");
+
+  TreeGridNode* child3 = new TreeGridNode(watch, root0);
+  root0->Nodes()->push_back(child3);
+  FillColumns(child3,
+              "draggable_",
+              "empty",
+              "std::unique_ptr<Draggable,std::default_delete<Draggable> >");
+
+  TreeGridNode* root1 = new TreeGridNode(watch, NULL);
+  watch->Nodes()->push_back(root1);
+  FillColumns(root1,
+              "target",
+              "0x040a87b0 {color_={rgba=0x040a87c8 {0.000000000, 0.168627456, "
+              "0.211764708, 1.00000000} r=0.000000000 ...} }",
+              "Dockable *");
 }
 
 int Main(int argc, char** argv) {

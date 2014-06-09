@@ -40,3 +40,5 @@ TEST(TreeGridTest, ColumnSizing) {
   EXPECT_EQ(0, width_three_col[1]);
   EXPECT_EQ(100, width_three_col[2]);
 }
+
+// TODO: Leaky.
