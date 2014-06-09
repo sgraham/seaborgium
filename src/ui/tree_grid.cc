@@ -8,10 +8,65 @@
 #include "nanovg.h"
 #include "ui/skin.h"
 
+TreeGridNodeValue::~TreeGridNodeValue() {
+}
+
+// --------------------------------------------------------------------
+TreeGridNodeValueString::TreeGridNodeValueString(const std::string& value)
+    : value_(value) {}
+
+void TreeGridNodeValueString::Render() {
+  // TODO: draw
+}
+
+// --------------------------------------------------------------------
+TreeGridNode::TreeGridNode(TreeGrid* tree_grid, TreeGridNode* parent)
+    : tree_grid_(tree_grid), parent_(parent), expanded_(false) {}
+
+TreeGridNode::~TreeGridNode() {
+  for (std::map<int, TreeGridNodeValue*>::iterator i(items_.begin());
+       i != items_.end();
+       ++i) {
+    delete i->second;
+  }
+  // TODO: nodes_ cleanup.
+}
+
+std::vector<TreeGridNode*>* TreeGridNode::Nodes() {
+  return &nodes_;
+}
+
+void TreeGridNode::SetValue(int column, TreeGridNodeValue* value) {
+  std::map<int, TreeGridNodeValue*>::iterator i = items_.find(column);
+  if (i != items_.end())
+    delete i->second;
+  items_[column] = value;
+}
+
+const TreeGridNodeValue* TreeGridNode::GetValue(int column) {
+  std::map<int, TreeGridNodeValue*>::iterator i = items_.find(column);
+  if (i == items_.end())
+    return NULL;
+  return i->second;
+}
+
+// --------------------------------------------------------------------
+TreeGridColumn::TreeGridColumn(TreeGrid* tree_grid, const std::string& caption)
+    : tree_grid_(tree_grid), caption_(caption) {}
+
+// --------------------------------------------------------------------
 TreeGrid::TreeGrid() {
 }
 
 TreeGrid::~TreeGrid() {
+}
+
+std::vector<TreeGridNode*>* TreeGrid::Nodes() {
+  return &nodes_;
+}
+
+std::vector<TreeGridColumn*>* TreeGrid::Columns() {
+  return &columns_;
 }
 
 void TreeGrid::Render() {
