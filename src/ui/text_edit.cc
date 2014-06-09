@@ -30,7 +30,7 @@ struct TextControl {
 struct ScopedTextSetup {
   ScopedTextSetup() {
     nvgSave(core::VG);
-    nvgFontSize(core::VG, 14.f);  // TODO
+    nvgFontSize(core::VG, 14.f);  // TODO(font)
     nvgFontFace(core::VG, "mono");
   }
   ~ScopedTextSetup() {
