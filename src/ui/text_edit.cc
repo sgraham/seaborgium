@@ -206,7 +206,7 @@ bool TextEdit::NotifyMouseMoved(int x, int y, uint8_t modifiers) {
   CORE_UNUSED(modifiers);
   LOCAL_state();
   LOCAL_control();
-  if (GetScreenRect().Contains(Point(mouse_x_, mouse_x_)))
+  if (GetScreenRect().Contains(Point(mouse_x_, mouse_y_)))
     core::SetMouseCursor(core::MouseCursor::IBeam);
   if (left_mouse_is_down_)
     stb_textedit_drag(control, state, mouse_x_ - X(), mouse_y_ - Y());
