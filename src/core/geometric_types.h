@@ -10,7 +10,7 @@ class Point;
 class Rect {
  public:
   Rect() : x(0), y(0), w(-1), h(-1) {}
-  Rect(int x, int y, int w, int h) : x(x), y(y), w(w), h(h) {}
+  Rect(float x, float y, float w, float h) : x(x), y(y), w(w), h(h) {}
   Rect Expand(const Rect& by) const {
     return Rect(x - by.x, y - by.y, w + by.x + by.w, h + by.y + by.w);
   }
@@ -21,27 +21,20 @@ class Rect {
   Rect RelativeTo(const Rect& other) const {
     return Rect(x - other.x, y - other.y, w, h);
   }
-  int x, y, w, h;
+  float x, y, w, h;
 };
 
 class Point {
  public:
   Point() : x(0), y(0) {}
-  Point(int x, int y) : x(x), y(y) {}
+  Point(float x, float y) : x(x), y(y) {}
   Point Subtract(const Point& other) const {
     return Point(x - other.x, y - other.y);
   }
   Point Scale(float scale) const {
-    return Point(static_cast<int>(x * scale), static_cast<int>(y * scale));
+    return Point(x * scale, y * scale);
   }
-  int x, y;
-};
-
-class Size {
- public:
-  Size() : w(0), h(0) {}
-  Size(int w, int h) : w(w), h(h) {}
-  int w, h;
+  float x, y;
 };
 
 inline bool Rect::Contains(const Point& point) const {
@@ -50,6 +43,5 @@ inline bool Rect::Contains(const Point& point) const {
          point.y >= y &&
          point.y < y + h;
 }
-
 
 #endif  // CORE_GEOMETRIC_TYPES_H_

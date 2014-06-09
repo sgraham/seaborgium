@@ -17,11 +17,7 @@ class SolidColor : public Dockable {
   virtual void Render() override {
     nvgBeginPath(core::VG);
     const Rect& rect = GetClientRect();
-    nvgRect(core::VG,
-            static_cast<float>(rect.x),
-            static_cast<float>(rect.y),
-            static_cast<float>(rect.w),
-            static_cast<float>(rect.h));
+    nvgRect(core::VG, rect.x, rect.y, rect.w, rect.h);
     nvgFillColor(core::VG, color_);
     nvgFill(core::VG);
   }

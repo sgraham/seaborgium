@@ -32,24 +32,24 @@ struct ScopedIcon {
   }
 };
 
-int IconWidth(const char* icon) {
+float IconWidth(const char* icon) {
   float bounds[4];
   nvgTextBounds(core::VG, 0, 0, icon, NULL, bounds);
-  return static_cast<int>(ceilf(bounds[2] - bounds[0]));
+  return bounds[2] - bounds[0];
 }
 
-int IconHeight(const char* icon) {
+float IconHeight(const char* icon) {
   float bounds[4];
   nvgTextBounds(core::VG, 0, 0, icon, NULL, bounds);
-  return static_cast<int>(ceilf(bounds[3] - bounds[1]));
+  return bounds[3] - bounds[1];
 }
 
-DropTargetIndicator IndicatorAt(
-    Dockable* dockable,
-    const char* icon,
-    int x, int y,
-    DockingSplitDirection direction,
-    bool this_dockable_first) {
+DropTargetIndicator IndicatorAt(Dockable* dockable,
+                                const char* icon,
+                                float x,
+                                float y,
+                                DockingSplitDirection direction,
+                                bool this_dockable_first) {
   DropTargetIndicator target;
   target.dockable = dockable;
   target.icon = icon;
@@ -99,8 +99,8 @@ void PlaceIndicatorsAtCenter(
     std::vector<DropTargetIndicator>* into,
     Dockable* dockable) {
   const Skin& skin = Skin::current();
-  int cx = rect.x + rect.w / 2;
-  int cy = rect.y + rect.h / 2;
+  float cx = rect.x + rect.w / 2;
+  float cy = rect.y + rect.h / 2;
   into->push_back(IndicatorAt(dockable,
                               skin.dock_top_icon(),
                               cx - IconWidth(skin.dock_top_icon()) / 2,
@@ -233,19 +233,19 @@ void ToolWindowDragger::Render() {
   for (size_t i = 0; i < targets_.size(); ++i) {
     const DropTargetIndicator& dti = targets_[i];
     nvgTextBox(core::VG,
-               static_cast<float>(dti.rect.x),
-               static_cast<float>(dti.rect.y + IconHeight(dti.icon)),
-               static_cast<float>(dti.rect.w),
+               dti.rect.x,
+               dti.rect.y + IconHeight(dti.icon),
+               dti.rect.w,
                dti.icon,
                NULL);
     /*
     nvgBeginPath(core::VG);
     nvgFillColor(core::VG, nvgRGBA(255, 0, 0, 255));
     nvgRect(core::VG,
-            static_cast<float>(dti.rect.x),
-            static_cast<float>(dti.rect.y),
-            static_cast<float>(dti.rect.w),
-            static_cast<float>(dti.rect.h));
+            dti.rect.x,
+            dti.rect.y,
+            dti.rect.w,
+            dti.rect.h);
     nvgFill(core::VG);
     */
   }
@@ -256,10 +256,10 @@ void ToolWindowDragger::Render() {
   } else {
     Point draw_at = current_position_.Subtract(
         pick_up_offset_.Scale(kDetachedScale));
-    draw_rect = Rect(
-        draw_at.x, draw_at.y,
-        static_cast<int>(dragging_->GetClientRect().w * kDetachedScale),
-        static_cast<int>(dragging_->GetClientRect().h * kDetachedScale));
+    draw_rect = Rect(draw_at.x,
+                     draw_at.y,
+                     dragging_->GetClientRect().w * kDetachedScale,
+                     dragging_->GetClientRect().h * kDetachedScale);
   }
 #if 0  // R-T-T
   renderer->DrawRenderToTextureResult(
@@ -273,11 +273,7 @@ void ToolWindowDragger::Render() {
   // Rect at draw_rect.
   nvgBeginPath(core::VG);
   nvgFillColor(core::VG, nvgRGBA(255, 255, 255, 64));
-  nvgRect(core::VG,
-          static_cast<float>(draw_rect.x),
-          static_cast<float>(draw_rect.y),
-          static_cast<float>(draw_rect.w),
-          static_cast<float>(draw_rect.h));
+  nvgRect(core::VG, draw_rect.x, draw_rect.y, draw_rect.w, draw_rect.h);
   nvgFill(core::VG);
 #endif
 

@@ -10,32 +10,25 @@
 #include "nanovg.h"
 
 void UiDrawWindow(const char* title,
-                  bool active,
-                  int xi,
-                  int yi,
-                  int wi,
-                  int hi);
+                  bool acive,
+                  float x,
+                  float y,
+                  float w,
+                  float h);
 
 class ScopedRenderOffset {
  public:
   ScopedRenderOffset(Dockable* parent, Dockable* child, bool scissor) {
     nvgSave(core::VG);
     Rect relative = child->GetScreenRect().RelativeTo(parent->GetScreenRect());
-    nvgTranslate(core::VG,
-                 static_cast<float>(relative.x),
-                 static_cast<float>(relative.y));
-    if (scissor) {
-      nvgScissor(core::VG,
-                 0,
-                 0,
-                 static_cast<float>(relative.w),
-                 static_cast<float>(relative.h));
-    }
+    nvgTranslate(core::VG, relative.x, relative.y);
+    if (scissor)
+      nvgScissor(core::VG, 0, 0, relative.w, relative.h);
   }
 
-  ScopedRenderOffset(int dx, int dy) {
+  ScopedRenderOffset(float dx, float dy) {
     nvgSave(core::VG);
-    nvgTranslate(core::VG, static_cast<float>(dx), static_cast<float>(dy));
+    nvgTranslate(core::VG, dx, dy);
   }
 
   ~ScopedRenderOffset() {

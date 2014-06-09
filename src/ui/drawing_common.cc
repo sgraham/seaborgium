@@ -10,14 +10,10 @@
 
 void UiDrawWindow(const char* title,
                   bool active,
-                  int xi,
-                  int yi,
-                  int wi,
-                  int hi) {
-  const float x = static_cast<float>(xi);
-  const float y = static_cast<float>(yi);
-  const float w = static_cast<float>(wi);
-  const float h = static_cast<float>(hi);
+                  float x,
+                  float y,
+                  float w,
+                  float h) {
   const Skin& sk = Skin::current();
   const ColorScheme& cs = sk.GetColorScheme();
   const float corner_radius = 3.0f;

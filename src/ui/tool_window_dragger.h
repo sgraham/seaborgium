@@ -51,7 +51,7 @@ class ToolWindowDragger : public Draggable {
 
   Dockable* cancel_sibling_;
   DockingSplitDirection cancel_direction_;
-  double cancel_fraction_;
+  float cancel_fraction_;
   bool cancel_was_primary_;
 };
 

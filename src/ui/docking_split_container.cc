@@ -12,15 +12,15 @@
 
 namespace {
 
-int gSplitterWidth = 4;
+float gSplitterWidth = 4;
 
 }  // namespace
 
-void DockingSplitContainer::SetSplitterWidth(int width) {
+void DockingSplitContainer::SetSplitterWidth(float width) {
   gSplitterWidth = width;
 }
 
-int DockingSplitContainer::GetSplitterWidth() {
+float DockingSplitContainer::GetSplitterWidth() {
   return gSplitterWidth;
 }
 
@@ -103,17 +103,17 @@ Dockable* DockingSplitContainer::GetSiblingOf(Dockable* child) {
 void DockingSplitContainer::SetScreenRect(const Rect& rect) {
   Dockable::SetScreenRect(rect);
   if (direction_ == kSplitVertical) {
-    int width = GetScreenRect().w - gSplitterWidth;
-    int width_for_left = static_cast<int>(width * fraction_);
-    int width_for_right = static_cast<int>(width - width_for_left);
+    float width = GetScreenRect().w - gSplitterWidth;
+    float width_for_left = width * fraction_;
+    float width_for_right = width - width_for_left;
     left_->SetScreenRect(Rect(rect.x, rect.y, width_for_left, rect.h));
     right_->SetScreenRect(
         Rect(rect.x + width_for_left + gSplitterWidth, rect.y,
              width_for_right, rect.h));
   } else if (direction_ == kSplitHorizontal) {
-    int height = GetScreenRect().h - gSplitterWidth;
-    int height_for_left = static_cast<int>(height * fraction_);
-    int height_for_right = static_cast<int>(height - height_for_left);
+    float height = GetScreenRect().h - gSplitterWidth;
+    float height_for_left = height * fraction_;
+    float height_for_right = height - height_for_left;
     left_->SetScreenRect(Rect(rect.x, rect.y, rect.w, height_for_left));
     right_->SetScreenRect(
         Rect(rect.x, rect.y + height_for_left + gSplitterWidth,
@@ -127,12 +127,12 @@ void DockingSplitContainer::SetScreenRect(const Rect& rect) {
 
 Rect DockingSplitContainer::GetRectForSplitter() {
   if (direction_ == kSplitVertical) {
-    int width = GetScreenRect().w - gSplitterWidth;
-    int width_for_left = static_cast<int>(width * fraction_);
+    float width = GetScreenRect().w - gSplitterWidth;
+    float width_for_left = width * fraction_;
     return Rect(width_for_left, 0, gSplitterWidth, GetScreenRect().h);
   } else if (direction_ == kSplitHorizontal) {
-    int height = GetScreenRect().h - gSplitterWidth;
-    int height_for_top = static_cast<int>(height * fraction_);
+    float height = GetScreenRect().h - gSplitterWidth;
+    float height_for_top = height * fraction_;
     return Rect(0, height_for_top, GetScreenRect().w, gSplitterWidth);
   }
   return Rect();
@@ -180,7 +180,7 @@ bool DockingSplitContainer::CouldStartDrag(DragSetup* drag_setup) {
   return false;
 }
 
-void DockingSplitContainer::SetFraction(double fraction) {
+void DockingSplitContainer::SetFraction(float fraction) {
   fraction_ = fraction;
   // Propagate fraction changes to children.
   SetScreenRect(GetScreenRect());

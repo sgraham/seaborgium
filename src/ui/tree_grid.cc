@@ -95,19 +95,15 @@ void TreeGrid::Render() {
   nvgBeginPath(core::VG);
   const Rect& client_rect = GetClientRect();
   const ColorScheme& cs = Skin::current().GetColorScheme();
-  nvgRect(core::VG,
-          static_cast<float>(client_rect.x),
-          static_cast<float>(client_rect.y),
-          static_cast<float>(client_rect.w),
-          static_cast<float>(client_rect.h));
+  nvgRect(core::VG, client_rect.x, client_rect.y, client_rect.w, client_rect.h);
   nvgFillColor(core::VG, cs.background());
   nvgFill(core::VG);
 
-  const int kMarginWidth = static_cast<int>(line_height - descender);
-  const int kHeaderHeight = kMarginWidth;
-  const int kPaddingFromMarginToBody = 3;
-  const int kPaddingFromHeaderToBody = 3;
-  const int kTitlePadding = 3;
+  const float kMarginWidth = line_height - descender;
+  const float kHeaderHeight = kMarginWidth;
+  const float kPaddingFromMarginToBody = 3;
+  const float kPaddingFromHeaderToBody = 3;
+  const float kTitlePadding = 3;
 
   Rect margin(0, kHeaderHeight, kMarginWidth, client_rect.h - kHeaderHeight);
   Rect header(kMarginWidth, 0, client_rect.w - kMarginWidth, kHeaderHeight);
@@ -118,59 +114,43 @@ void TreeGrid::Render() {
             client_rect.h - (kHeaderHeight + kPaddingFromHeaderToBody));
 
   nvgBeginPath(core::VG);
-  nvgRect(core::VG,
-          static_cast<float>(margin.x),
-          static_cast<float>(margin.y),
-          static_cast<float>(margin.w),
-          static_cast<float>(margin.h));
+  nvgRect(core::VG, margin.x, margin.y, margin.w, margin.h);
   nvgFillColor(core::VG, cs.margin());
   nvgFill(core::VG);
 
   nvgBeginPath(core::VG);
-  nvgRect(core::VG,
-          static_cast<float>(header.x),
-          static_cast<float>(header.y),
-          static_cast<float>(header.w),
-          static_cast<float>(header.h));
+  nvgRect(core::VG, header.x, header.y, header.w, header.h);
   nvgFillColor(core::VG, cs.margin());
   nvgFill(core::VG);
 
-  std::vector<int> column_widths = GetColumnWidths(body.w);
+  std::vector<float> column_widths = GetColumnWidths(body.w);
   nvgFillColor(core::VG, cs.margin_text());
   nvgStrokeColor(core::VG, cs.border());
   CORE_DCHECK(columns_.size() == column_widths.size(), "num columns broken");
-  int last_x = 0;
+  float last_x = 0;
   nvgBeginPath(core::VG);
-  nvgMoveTo(core::VG,
-      static_cast<float>(header.x + last_x),
-      static_cast<float>(header.y));
-  nvgLineTo(core::VG,
-      static_cast<float>(header.x + last_x),
-      static_cast<float>(client_rect.h));
+  nvgMoveTo(core::VG, header.x + last_x, header.y);
+  nvgLineTo(core::VG, header.x + last_x, client_rect.h);
   nvgStroke(core::VG);
   for (size_t i = 0; i < columns_.size(); ++i) {
     // TODO: clip
     nvgText(core::VG,
-            static_cast<float>(header.x + last_x + kTitlePadding),
-            static_cast<float>(header.y + line_height),
+            header.x + last_x + kTitlePadding,
+            header.y + line_height,
             columns_[i]->GetCaption().c_str(),
             NULL);
     last_x += column_widths[i];
     nvgBeginPath(core::VG);
-    nvgMoveTo(core::VG,
-              static_cast<float>(header.x + last_x),
-              static_cast<float>(header.y));
-    nvgLineTo(core::VG,
-              static_cast<float>(header.x + last_x),
-              static_cast<float>(client_rect.h - header.y));
+    nvgMoveTo(core::VG, header.x + last_x, header.y);
+    nvgLineTo(core::VG, header.x + last_x, client_rect.h - header.y);
     nvgStroke(core::VG);
   }
 
   /*
   nvgFillColor(core::VG, cs.text());
   nvgText(core::VG,
-          static_cast<float>(body.x),
-          static_cast<float>(body.y + (line_height - descender)),
+          body.x,
+          body.y + (line_height - descender),
           "ui/stuff.cc, line 34",
           NULL);
           */
@@ -178,17 +158,17 @@ void TreeGrid::Render() {
   nvgRestore(core::VG);
 }
 
-std::vector<int> TreeGrid::GetColumnWidths(int layout_in_width) const {
+std::vector<float> TreeGrid::GetColumnWidths(float layout_in_width) const {
   float total_fraction = 0.f;
-  std::vector<int> ret(columns_.size());
-  int remaining_width = layout_in_width;
+  std::vector<float> ret(columns_.size());
+  float remaining_width = layout_in_width;
   for (size_t j = 0; j < columns_.size(); ++j) {
     TreeGridColumn* i = columns_[j];
     if (i->width_fixed_ == -1) {
       total_fraction += i->width_fraction_;
     } else {
       remaining_width -= i->width_fixed_;
-      ret[j] = std::min(layout_in_width, i->width_fixed_);
+      ret[j] = std::min(layout_in_width, static_cast<float>(i->width_fixed_));
     }
   }
 
@@ -198,8 +178,7 @@ std::vector<int> TreeGrid::GetColumnWidths(int layout_in_width) const {
   for (size_t j = 0; j < columns_.size(); ++j) {
     TreeGridColumn* i = columns_[j];
     if (i->width_fixed_ == -1) {
-      ret[j] = static_cast<int>((i->width_fraction_ / total_fraction) *
-                                remaining_width);
+      ret[j] = (i->width_fraction_ / total_fraction) * remaining_width;
     }
   }
   return ret;

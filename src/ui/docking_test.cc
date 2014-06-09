@@ -23,7 +23,7 @@ class ContentPane : public Dockable {
 
 std::string RectAsString(const Rect &r) {
   char buf[256];
-  core::snprintf(buf, sizeof(buf), "%d,%d %dx%d", r.x, r.y, r.w, r.h);
+  core::snprintf(buf, sizeof(buf), "%.0f,%.0f %.0fx%.0f", r.x, r.y, r.w, r.h);
   return buf;
 }
 

@@ -177,28 +177,26 @@ int Main(int argc, char** argv) {
 
   main_area.SetRoot(source_view);
   source_view->parent()->SplitChild(kSplitHorizontal, source_view, command);
-  source_view->parent()->SetFraction(0.7);
+  source_view->parent()->SetFraction(0.7f);
 
   source_view->parent()->SplitChild(kSplitVertical, source_view, stack);
-  source_view->parent()->SetFraction(0.4);
+  source_view->parent()->SetFraction(0.4f);
 
   stack->parent()->SplitChild(kSplitVertical, stack, watch);
-  stack->parent()->SetFraction(0.5);
+  stack->parent()->SetFraction(0.5f);
 
   stack->parent()->SplitChild(kSplitHorizontal, stack, breakpoints);
-  stack->parent()->SetFraction(0.7);
+  stack->parent()->SetFraction(0.7f);
 
   uint32_t prev_width = 0, prev_height = 0;
   uint32_t width, height;
   while (!core::ProcessEvents(&width, &height, &main_area)) {
     if (prev_width != width || prev_height != height) {
       main_area.SetScreenRect(
-          Rect(static_cast<int>(skin.border_size() / core::GetDpiScale()),
-              static_cast<int>(skin.border_size() / core::GetDpiScale()),
-              static_cast<int>((width - skin.border_size() * 2) /
-                                core::GetDpiScale()),
-              static_cast<int>((height - skin.border_size() * 2) /
-                                core::GetDpiScale())));
+          Rect(skin.border_size() / core::GetDpiScale(),
+               skin.border_size() / core::GetDpiScale(),
+               (width - skin.border_size() * 2) / core::GetDpiScale(),
+               (height - skin.border_size() * 2) / core::GetDpiScale()));
       core::GfxResize(width, height);
       prev_width = width;
       prev_height = height;

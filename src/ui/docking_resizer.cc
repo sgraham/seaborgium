@@ -13,10 +13,9 @@ DockingResizer::DockingResizer(DockingSplitContainer* resizing)
     : resizing_(resizing) {
   // Only one of these is relevant, so we handle both vertical and horizontal
   // by making the point on the splitter be the same fraction.
-  int parent_size = ParentSize();
-  initial_location_ = Point(
-      static_cast<int>(parent_size * resizing_->fraction()),
-      static_cast<int>(parent_size * resizing_->fraction()));
+  float parent_size = ParentSize();
+  initial_location_ = Point(parent_size * resizing_->fraction(),
+                            parent_size * resizing_->fraction());
 }
 
 DockingResizer::~DockingResizer() {
@@ -24,25 +23,24 @@ DockingResizer::~DockingResizer() {
 
 void DockingResizer::Drag(const Point& screen_point) {
   Point point_in_parent = resizing_->ToClient(screen_point);
-  int parent_size = ParentSize();
-  int clamped = std::min(std::max(ComponentForDirection(point_in_parent), 0),
-                         parent_size);
-  resizing_->SetFraction(static_cast<double>(clamped) / parent_size);
+  float parent_size = ParentSize();
+  float clamped = std::min(
+      std::max(ComponentForDirection(point_in_parent), 0.f), parent_size);
+  resizing_->SetFraction(clamped / parent_size);
 }
 
 void DockingResizer::CancelDrag() {
-  int parent_size = ParentSize();
-  resizing_->SetFraction(
-      static_cast<double>(initial_location_.x) / parent_size);
+  float parent_size = ParentSize();
+  resizing_->SetFraction(initial_location_.x / parent_size);
 }
 
 void DockingResizer::Render() {
   // Nothing to do, we apply directly.
 }
 
-int DockingResizer::ParentSize() {
+float DockingResizer::ParentSize() {
   const Rect& parent_rect = resizing_->GetScreenRect();
-  int splitter_width = DockingSplitContainer::GetSplitterWidth();
+  float splitter_width = DockingSplitContainer::GetSplitterWidth();
   CORE_CHECK(resizing_->direction() == kSplitVertical ||
              resizing_->direction() == kSplitHorizontal, "no splitter?");
   if (resizing_->direction() == kSplitVertical)
@@ -51,7 +49,7 @@ int DockingResizer::ParentSize() {
     return parent_rect.h - splitter_width;
 }
 
-int DockingResizer::ComponentForDirection(const Point& point) {
+float DockingResizer::ComponentForDirection(const Point& point) {
   CORE_CHECK(resizing_->direction() == kSplitVertical ||
                  resizing_->direction() == kSplitHorizontal,
              "no splitter?");

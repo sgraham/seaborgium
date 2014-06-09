@@ -20,8 +20,8 @@ class DockingSplitContainer : public Dockable {
                         Dockable* left, Dockable* right);
   virtual ~DockingSplitContainer();
 
-  static void SetSplitterWidth(int width);
-  static int GetSplitterWidth();
+  static void SetSplitterWidth(float width);
+  static float GetSplitterWidth();
 
   virtual bool IsContainer() const { return true; }
 
@@ -48,11 +48,11 @@ class DockingSplitContainer : public Dockable {
   bool CouldStartDrag(DragSetup* drag_setup) override;
 
   DockingSplitDirection direction() const { return direction_; }
-  double fraction() const { return fraction_; }
+  float fraction() const { return fraction_; }
   Dockable* left() { return left_.get(); }
   Dockable* right() { return right_.get(); }
 
-  void SetFraction(double fraction);
+  void SetFraction(float fraction);
 
   // Hokey method only used for DockingWorkspace that uses left as root.
   void ReplaceLeft(Dockable* left);
@@ -63,7 +63,7 @@ class DockingSplitContainer : public Dockable {
   Rect GetRectForSplitter();
 
   DockingSplitDirection direction_;
-  double fraction_;
+  float fraction_;
 
   // Named left/right for simplicity, but "left" is also "top" if the split is
   // horizontal rather than vertical.

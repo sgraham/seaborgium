@@ -90,7 +90,7 @@ class TreeGrid : public Dockable {
 
   void Render() override;
 
-  std::vector<int> GetColumnWidths(int layout_in_width) const;
+  std::vector<float> GetColumnWidths(float layout_in_width) const;
 
  private:
   std::vector<TreeGridNode*> nodes_;

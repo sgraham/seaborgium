@@ -37,10 +37,10 @@ class Dockable : public core::InputHandler {
     return false;
   }
 
-  virtual int X() const { return GetScreenRect().x; }
-  virtual int Y() const { return GetScreenRect().y; }
-  virtual int Width() const { return GetScreenRect().w; }
-  virtual int Height() const { return GetScreenRect().h; }
+  virtual float X() const { return GetScreenRect().x; }
+  virtual float Y() const { return GetScreenRect().y; }
+  virtual float Width() const { return GetScreenRect().w; }
+  virtual float Height() const { return GetScreenRect().h; }
   Rect GetClientRect() {
     return Rect(0, 0, GetScreenRect().w, GetScreenRect().h);
   }

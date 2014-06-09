@@ -23,8 +23,8 @@ class DockingResizer : public Draggable {
   const Point& GetInitialLocationForTest() const { return initial_location_; }
 
  private:
-  int ParentSize();
-  int ComponentForDirection(const Point& point);
+  float ParentSize();
+  float ComponentForDirection(const Point& point);
 
   DockingSplitContainer* resizing_;
   // Relative to parent.

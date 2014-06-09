@@ -206,7 +206,7 @@ bool TextEdit::NotifyMouseMoved(int x, int y, uint8_t modifiers) {
   CORE_UNUSED(modifiers);
   LOCAL_state();
   LOCAL_control();
-  if (GetScreenRect().Contains(Point(x, y)))
+  if (GetScreenRect().Contains(Point(mouse_x_, mouse_x_)))
     core::SetMouseCursor(core::MouseCursor::IBeam);
   if (left_mouse_is_down_)
     stb_textedit_drag(control, state, mouse_x_ - X(), mouse_y_ - Y());
@@ -277,11 +277,7 @@ void TextEdit::Render() {
   nvgBeginPath(core::VG);
   const Rect& rect = GetClientRect();
   const ColorScheme& cs = Skin::current().GetColorScheme();
-  nvgRect(core::VG,
-          static_cast<float>(rect.x),
-          static_cast<float>(rect.y),
-          static_cast<float>(rect.w),
-          static_cast<float>(rect.h));
+  nvgRect(core::VG, rect.x, rect.y, rect.w, rect.h);
   nvgFillColor(core::VG, cs.background());
   nvgFill(core::VG);
 
@@ -292,16 +288,16 @@ void TextEdit::Render() {
   nvgTextMetrics(core::VG, &ascender, &descender, &line_height);
   nvgFillColor(core::VG, cs.text());
   nvgText(core::VG,
-          static_cast<float>(rect.x),
-          static_cast<float>(rect.y + line_height),
+          rect.x,
+          rect.y + line_height,
           control->string,
           control->string + control->string_len);
 
   std::unique_ptr<NVGglyphPosition[]> positions(
       new NVGglyphPosition[control->string_len]);
   nvgTextGlyphPositions(core::VG,
-                        static_cast<float>(rect.x),
-                        static_cast<float>(rect.y),
+                        rect.x,
+                        rect.y,
                         control->string,
                         control->string + control->string_len,
                         positions.get(),
@@ -322,11 +318,7 @@ void TextEdit::Render() {
     float cursor_x =
         CursorXFromIndex(positions.get(), control->string_len, state->cursor);
 
-    nvgRect(core::VG,
-            cursor_x,
-            static_cast<float>(rect.y),
-            1.5f,
-            line_height - descender);
+    nvgRect(core::VG, cursor_x, rect.y, 1.5f, line_height - descender);
     nvgFill(core::VG);
   }
 
@@ -341,9 +333,9 @@ void TextEdit::Render() {
         CursorXFromIndex(positions.get(), control->string_len, end) - select_x;
     nvgRoundedRect(core::VG,
         select_x,
-        static_cast<float>(rect.y),
+        rect.y,
         select_w,
-        static_cast<float>(rect.y + line_height - descender),
+        rect.y + line_height - descender,
         3.f);
     nvgFill(core::VG);
   }

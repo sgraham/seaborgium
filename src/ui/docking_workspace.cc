@@ -64,8 +64,8 @@ Dockable* DockingWorkspace::FindTopMostUnderPoint(const Point& point) {
 }
 
 bool DockingWorkspace::NotifyMouseMoved(int x, int y, uint8_t modifiers) {
-  mouse_position_.x = x;
-  mouse_position_.y = y;
+  mouse_position_.x = static_cast<float>(x);
+  mouse_position_.y = static_cast<float>(y);
   if (draggable_.get()) {
     draggable_->Drag(mouse_position_);
     // TODO(scottmg): InvalidateImpl();
@@ -82,8 +82,8 @@ bool DockingWorkspace::NotifyMouseWheel(int x,
                                         int y,
                                         float delta,
                                         uint8_t modifiers) {
-  mouse_position_.x = x;
-  mouse_position_.y = y;
+  mouse_position_.x = static_cast<float>(x);
+  mouse_position_.y = static_cast<float>(y);
   Dockable* focused = GetFocusedContents();
   if (!focused || !focused->WantMouseEvents())
     return false;
@@ -109,7 +109,9 @@ bool DockingWorkspace::NotifyMouseButton(core::MouseButton::Enum button,
     if (target) {
       if (down)
         SetFocusedContents(target);
-      target->NotifyMouseMoved(mouse_position_.x, mouse_position_.y, modifiers);
+      target->NotifyMouseMoved(static_cast<int>(mouse_position_.x),
+                               static_cast<int>(mouse_position_.y),
+                               modifiers);
       target->NotifyMouseButton(button, down, modifiers);
       // TODO(scottmg): Invalidate();
     }
