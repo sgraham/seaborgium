@@ -7,7 +7,6 @@
 
 #include "core/core.h"
 struct NVGcontext;
-struct NVGcolor;
 
 namespace core {
 
@@ -24,6 +23,12 @@ void GfxDrawFps();
 float GetDpiScale();
 
 extern NVGcontext* VG;
+
+struct Context {
+ public:
+  Context();
+  ~Context();
+};
 
 }  // namespace core
 

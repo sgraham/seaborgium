@@ -29,7 +29,7 @@ Rect DockingToolWindow::RectForTitleBar() {
 
 void DockingToolWindow::Render() {
   bool focused = GetFocusedContents() == contents_;
-  UiDrawWindow(title_.c_str(), focused, 0, 0, Width(), Height());
+  DrawWindow(title_.c_str(), focused, 0, 0, Width(), Height());
 
   ScopedRenderOffset offset(this, contents_, true);
   contents_->Render();

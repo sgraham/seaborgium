@@ -8,12 +8,12 @@
 #include "nanovg.h"
 #include "ui/skin.h"
 
-void UiDrawWindow(const char* title,
-                  bool active,
-                  float x,
-                  float y,
-                  float w,
-                  float h) {
+void DrawWindow(const char* title,
+                bool active,
+                float x,
+                float y,
+                float w,
+                float h) {
   const Skin& sk = Skin::current();
   const ColorScheme& cs = sk.GetColorScheme();
   const float corner_radius = 3.0f;
@@ -86,5 +86,25 @@ void UiDrawWindow(const char* title,
           title,
           NULL);
 
+  nvgRestore(core::VG);
+}
+
+void DrawSolidRect(const Rect& rect, const NVGcolor& color) {
+  nvgSave(core::VG);
+  nvgBeginPath(core::VG);
+  nvgRect(core::VG, rect.x, rect.y, rect.w, rect.h);
+  nvgFillColor(core::VG, color);
+  nvgFill(core::VG);
+  nvgRestore(core::VG);
+}
+
+void DrawSolidRoundedRect(const Rect& rect,
+                          const NVGcolor& color,
+                          float radius) {
+  nvgSave(core::VG);
+  nvgBeginPath(core::VG);
+  nvgRoundedRect(core::VG, rect.x, rect.y, rect.w, rect.h, radius);
+  nvgFillColor(core::VG, color);
+  nvgFill(core::VG);
   nvgRestore(core::VG);
 }

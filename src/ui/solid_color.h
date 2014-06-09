@@ -4,8 +4,8 @@
 #define UI_SOLID_COLOR_H_
 
 #include "core/gfx.h"
-#include "nanovg.h"
 #include "ui/dockable.h"
+#include "ui/drawing_common.h"
 
 class SolidColor : public Dockable {
  public:
@@ -15,11 +15,7 @@ class SolidColor : public Dockable {
   virtual ~SolidColor() {}
 
   virtual void Render() override {
-    nvgBeginPath(core::VG);
-    const Rect& rect = GetClientRect();
-    nvgRect(core::VG, rect.x, rect.y, rect.w, rect.h);
-    nvgFillColor(core::VG, color_);
-    nvgFill(core::VG);
+    DrawSolidRect(GetClientRect(), color_);
   }
 
  private:

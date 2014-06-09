@@ -8,6 +8,7 @@
 
 #include "core/gfx.h"
 #include "nanovg.h"
+#include "ui/drawing_common.h"
 #include "ui/skin.h"
 
 TreeGridNodeValue::~TreeGridNodeValue() {
@@ -92,12 +93,9 @@ void TreeGrid::Render() {
   float ascender, descender, line_height;
   nvgTextMetrics(core::VG, &ascender, &descender, &line_height);
 
-  nvgBeginPath(core::VG);
   const Rect& client_rect = GetClientRect();
   const ColorScheme& cs = Skin::current().GetColorScheme();
-  nvgRect(core::VG, client_rect.x, client_rect.y, client_rect.w, client_rect.h);
-  nvgFillColor(core::VG, cs.background());
-  nvgFill(core::VG);
+  DrawSolidRect(client_rect, cs.background());
 
   const float kMarginWidth = line_height - descender;
   const float kHeaderHeight = kMarginWidth;
@@ -113,15 +111,8 @@ void TreeGrid::Render() {
             client_rect.w - (kMarginWidth + kPaddingFromMarginToBody),
             client_rect.h - (kHeaderHeight + kPaddingFromHeaderToBody));
 
-  nvgBeginPath(core::VG);
-  nvgRect(core::VG, margin.x, margin.y, margin.w, margin.h);
-  nvgFillColor(core::VG, cs.margin());
-  nvgFill(core::VG);
-
-  nvgBeginPath(core::VG);
-  nvgRect(core::VG, header.x, header.y, header.w, header.h);
-  nvgFillColor(core::VG, cs.margin());
-  nvgFill(core::VG);
+  DrawSolidRect(margin, cs.margin());
+  DrawSolidRect(header, cs.margin());
 
   std::vector<float> column_widths = GetColumnWidths(body.w);
   nvgFillColor(core::VG, cs.margin_text());

@@ -9,12 +9,17 @@
 #include "core/gfx.h"
 #include "nanovg.h"
 
-void UiDrawWindow(const char* title,
-                  bool acive,
-                  float x,
-                  float y,
-                  float w,
-                  float h);
+void DrawWindow(const char* title,
+                bool acive,
+                float x,
+                float y,
+                float w,
+                float h);
+
+void DrawSolidRect(const Rect& rect, const NVGcolor& color);
+void DrawSolidRoundedRect(const Rect& rect,
+                          const NVGcolor& color,
+                          float radius);
 
 class ScopedRenderOffset {
  public:

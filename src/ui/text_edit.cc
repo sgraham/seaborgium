@@ -13,6 +13,7 @@
 #include "core/entry.h"
 #include "core/gfx.h"
 #include "nanovg.h"
+#include "ui/drawing_common.h"
 #include "ui/focus.h"
 #include "ui/skin.h"
 
@@ -274,12 +275,9 @@ bool TextEdit::NotifyChar(int character) {
 void TextEdit::Render() {
   ScopedTextSetup text_setup;
 
-  nvgBeginPath(core::VG);
-  const Rect& rect = GetClientRect();
   const ColorScheme& cs = Skin::current().GetColorScheme();
-  nvgRect(core::VG, rect.x, rect.y, rect.w, rect.h);
-  nvgFillColor(core::VG, cs.background());
-  nvgFill(core::VG);
+  const Rect& rect = GetClientRect();
+  DrawSolidRect(rect, cs.background());
 
   LOCAL_state();
   LOCAL_control();
@@ -304,7 +302,6 @@ void TextEdit::Render() {
                         control->string_len);
 
   if (GetFocusedContents() == this) {
-    nvgBeginPath(core::VG);
     // TODO(scottmg): Frame rate.
     cursor_color_ = nvgLerpRGBA(cursor_color_, cursor_color_target_, 0.3f);
     if (fabsf(cursor_color_.a - cursor_color_target_.a) < 0.0001f) {
@@ -313,30 +310,23 @@ void TextEdit::Render() {
       else
         cursor_color_target_.a = 0.f;
     }
-    nvgFillColor(core::VG, cursor_color_);
-
     float cursor_x =
         CursorXFromIndex(positions.get(), control->string_len, state->cursor);
 
-    nvgRect(core::VG, cursor_x, rect.y, 1.5f, line_height - descender);
-    nvgFill(core::VG);
+    DrawSolidRect(Rect(cursor_x, rect.y, 1.5f, line_height - descender),
+                  cursor_color_);
   }
 
   if (state->select_start != state->select_end) {
-    nvgBeginPath(core::VG);
-    nvgFillColor(core::VG, cs.text_selection());
     int start = std::min(state->select_start, state->select_end);
     int end = std::max(state->select_start, state->select_end);
     float select_x =
         CursorXFromIndex(positions.get(), control->string_len, start);
     float select_w =
         CursorXFromIndex(positions.get(), control->string_len, end) - select_x;
-    nvgRoundedRect(core::VG,
-        select_x,
-        rect.y,
-        select_w,
-        rect.y + line_height - descender,
+    DrawSolidRoundedRect(
+        Rect(select_x, rect.y, select_w, rect.y + line_height - descender),
+        cs.text_selection(),
         3.f);
-    nvgFill(core::VG);
   }
 }

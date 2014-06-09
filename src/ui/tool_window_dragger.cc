@@ -10,6 +10,7 @@
 #include "ui/docking_split_container.h"
 #include "ui/docking_tool_window.h"
 #include "ui/docking_workspace.h"
+#include "ui/drawing_common.h"
 #include "ui/skin.h"
 #pragma message("todo")
 // #include "sg/workspace.h"
@@ -238,16 +239,6 @@ void ToolWindowDragger::Render() {
                dti.rect.w,
                dti.icon,
                NULL);
-    /*
-    nvgBeginPath(core::VG);
-    nvgFillColor(core::VG, nvgRGBA(255, 0, 0, 255));
-    nvgRect(core::VG,
-            dti.rect.x,
-            dti.rect.y,
-            dti.rect.w,
-            dti.rect.h);
-    nvgFill(core::VG);
-    */
   }
 
   Rect draw_rect;
@@ -270,11 +261,7 @@ void ToolWindowDragger::Render() {
   renderer->SetDrawColor(Color(0, 128, 128, kHoveringAlpha * 128));
   renderer->DrawFilledRect(draw_rect);
 #else
-  // Rect at draw_rect.
-  nvgBeginPath(core::VG);
-  nvgFillColor(core::VG, nvgRGBA(255, 255, 255, 64));
-  nvgRect(core::VG, draw_rect.x, draw_rect.y, draw_rect.w, draw_rect.h);
-  nvgFill(core::VG);
+  DrawSolidRect(draw_rect, nvgRGBA(255, 255, 255, 64));
 #endif
 
   // TODO(scottmg): Workspace::Invalidate();
