@@ -60,6 +60,7 @@ set(main_sources
   src/ui/skin.cc
   src/ui/text_edit.cc
   src/ui/tool_window_dragger.cc
+  src/ui/tree_grid.cc
 
   src/ui/source_view/cpp_lexer.cc
   src/ui/source_view/lexer.cc

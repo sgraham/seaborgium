@@ -13,6 +13,7 @@
 #include "ui/skin.h"
 #include "ui/solid_color.h"
 #include "ui/text_edit.h"
+#include "ui/tree_grid.h"
 
 #include "nanovg.h"
 
@@ -90,7 +91,7 @@ int Main(int argc, char** argv) {
       new DockingToolWindow(new SolidColor(cs.background()), "Watch");
 
   DockingToolWindow* breakpoints =
-      new DockingToolWindow(new SolidColor(cs.background()), "Breakpoints");
+      new DockingToolWindow(new TreeGrid(), "Breakpoints");
 
   TextEdit* command_contents = new TextEdit();
   DockingToolWindow* command =
