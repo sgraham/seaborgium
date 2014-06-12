@@ -23,6 +23,8 @@ void DrawWindow(const char* title,
   // Window
   nvgBeginPath(core::VG);
   nvgRoundedRect(core::VG, x, y, w, h, corner_radius);
+  // Want round top, but square content area.
+  nvgRect(core::VG, x, y + sk.title_bar_size(), w, h - sk.title_bar_size());
   nvgFillColor(core::VG, cs.background());
   nvgFill(core::VG);
 
@@ -58,8 +60,8 @@ void DrawWindow(const char* title,
   nvgFillPaint(core::VG, header_paint);
   nvgFill(core::VG);
   nvgBeginPath(core::VG);
-  nvgMoveTo(core::VG, x + 0.5f, y + 0.5f + sk.title_bar_size());
-  nvgLineTo(core::VG, x + 0.5f + w - 1, y + 0.5f + sk.title_bar_size());
+  nvgMoveTo(core::VG, x + 0.5f, y + sk.title_bar_size() - 1);
+  nvgLineTo(core::VG, x + 0.5f + w - 1, y + sk.title_bar_size() - 1);
   nvgStrokeColor(core::VG, cs.border());
   nvgStroke(core::VG);
 
@@ -67,12 +69,12 @@ void DrawWindow(const char* title,
   nvgFontFace(core::VG, "sans-bold");
   nvgTextAlign(core::VG, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
 
-  const float kFudgeTextLower = 1.f;  // Because of the 1 pixel divider.
+  const float kFudgeText = -1.f;  // Because of the 1 pixel divider.
   nvgFontBlur(core::VG, 2);
   nvgFillColor(core::VG, cs.title_bar_text_drop_shadow());
   nvgText(core::VG,
           x + w / 2,
-          y + sk.title_bar_size() / 2 + kFudgeTextLower + 1,
+          y + sk.title_bar_size() / 2 + kFudgeText + 1,
           title,
           NULL);
 
@@ -82,7 +84,7 @@ void DrawWindow(const char* title,
       active ? cs.title_bar_text_active() : cs.title_bar_text_inactive());
   nvgText(core::VG,
           x + w / 2,
-          y + sk.title_bar_size() / 2 + kFudgeTextLower,
+          y + sk.title_bar_size() / 2 + kFudgeText,
           title,
           NULL);
 
@@ -109,11 +111,29 @@ void DrawSolidRoundedRect(const Rect& rect,
   nvgRestore(core::VG);
 }
 
+void DrawVerticalLine(const NVGcolor& color, float x, float y0, float y1) {
+  nvgStrokeColor(core::VG, color);
+  nvgBeginPath(core::VG);
+  nvgMoveTo(core::VG, x, y0);
+  nvgLineTo(core::VG, x, y1);
+  nvgStroke(core::VG);
+}
+
+void DrawHorizontalLine(const NVGcolor& color, float x0, float x1, float y) {
+  nvgStrokeColor(core::VG, color);
+  nvgBeginPath(core::VG);
+  nvgMoveTo(core::VG, x0, y);
+  nvgLineTo(core::VG, x1, y);
+  nvgStroke(core::VG);
+}
+
 void DrawTextInRect(const Rect& rect,
                     const std::string& text,
+                    const NVGcolor& color,
                     float x_padding) {
   ScopedRenderOffset offset(rect, true);
   float line_height;
   nvgTextMetrics(core::VG, NULL, NULL, &line_height);
+  nvgFillColor(core::VG, color);
   nvgText(core::VG, x_padding, line_height, &text.data()[0], &text.data()[text.size()]);
 }

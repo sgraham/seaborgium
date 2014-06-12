@@ -39,12 +39,9 @@ void DockingToolWindow::SetScreenRect(const Rect& rect) {
   Dockable::SetScreenRect(rect);
   Rect contents_rect = rect;
   const Skin& skin = Skin::current();
-  contents_rect.x += static_cast<int>(skin.border_size());
-  contents_rect.y +=
-      static_cast<int>(skin.title_bar_size() + skin.border_size());
-  contents_rect.w -= static_cast<int>(skin.border_size() * 2);
-  contents_rect.h -=
-      static_cast<int>(skin.title_bar_size() + skin.border_size() * 2);
+  contents_rect.x += 0;
+  contents_rect.y += skin.title_bar_size();
+  contents_rect.h -= skin.title_bar_size();
   contents_->SetScreenRect(contents_rect);
 }
 

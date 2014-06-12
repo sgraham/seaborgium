@@ -96,7 +96,7 @@ void TreeGrid::Render() {
   DrawSolidRect(client_rect, cs.background());
 
   const float kMarginWidth = line_height - descender;
-  const float kHeaderHeight = kMarginWidth;
+  const float kHeaderHeight = kMarginWidth + 3;
   const float kPaddingFromMarginToBody = 3;
   const float kPaddingFromHeaderToBody = 3;
   const float kTitlePadding = 3;
@@ -113,25 +113,22 @@ void TreeGrid::Render() {
   DrawSolidRect(header, cs.margin());
 
   std::vector<float> column_widths = GetColumnWidths(body.w);
-  nvgFillColor(core::VG, cs.margin_text());
-  nvgStrokeColor(core::VG, cs.border());
   CORE_DCHECK(columns_.size() == column_widths.size(), "num columns broken");
   float last_x = 0;
-  nvgBeginPath(core::VG);
-  nvgMoveTo(core::VG, header.x + last_x, header.y);
-  nvgLineTo(core::VG, header.x + last_x, client_rect.h);
-  nvgStroke(core::VG);
+  DrawVerticalLine(cs.border(), header.x, header.y, client_rect.h);
   for (size_t i = 0; i < columns_.size(); ++i) {
     Rect header_column = header;
     header_column.x = header.x + last_x;
     header_column.w = column_widths[i];
-    DrawTextInRect(header_column, columns_[i]->GetCaption(), kTitlePadding);
+    DrawTextInRect(header_column,
+                   columns_[i]->GetCaption(),
+                   cs.margin_text(),
+                   kTitlePadding);
     last_x += column_widths[i];
-    nvgBeginPath(core::VG);
-    nvgMoveTo(core::VG, header.x + last_x, header.y);
-    nvgLineTo(core::VG, header.x + last_x, client_rect.h - header.y);
-    nvgStroke(core::VG);
+    DrawVerticalLine(
+        cs.border(), header.x + last_x, header.y, client_rect.h - header.y);
   }
+  DrawHorizontalLine(cs.border(), header.x, header.x + header.w, header.h);
 }
 
 std::vector<float> TreeGrid::GetColumnWidths(float layout_in_width) const {
