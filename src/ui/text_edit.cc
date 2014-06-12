@@ -28,17 +28,6 @@ struct TextControl {
   STB_TexteditState state;
 };
 
-struct ScopedTextSetup {
-  ScopedTextSetup() {
-    nvgSave(core::VG);
-    nvgFontSize(core::VG, 14.f);  // TODO(font)
-    nvgFontFace(core::VG, "mono");
-  }
-  ~ScopedTextSetup() {
-    nvgRestore(core::VG);
-  }
-};
-
 float CursorXFromIndex(NVGglyphPosition* positions, int count, int index) {
   CORE_CHECK(index <= count, "index out of range");
   if (index == 0)
@@ -50,7 +39,7 @@ float CursorXFromIndex(NVGglyphPosition* positions, int count, int index) {
 }
 
 void LayoutFunc(StbTexteditRow* row, STB_TEXTEDIT_STRING* str, int start_i) {
-  ScopedTextSetup text_setup;
+  ScopedMonoSetup text_setup;
 
   int remaining_chars = str->string_len - start_i;
   // Always single line.
@@ -93,7 +82,7 @@ int InsertChars(STB_TEXTEDIT_STRING* str,
 }
 
 float GetWidth(STB_TEXTEDIT_STRING* str, int n, int i) {
-  ScopedTextSetup text_setup;
+  ScopedMonoSetup text_setup;
   CORE_UNUSED(n);  // Single line only.
   std::unique_ptr<NVGglyphPosition[]> positions(
       new NVGglyphPosition[str->string_len]);
@@ -152,7 +141,7 @@ float GetWidth(STB_TEXTEDIT_STRING* str, int n, int i) {
 #endif
 
 #define STB_TEXTEDIT_IMPLEMENTATION
-#include "../third_party/stb/stb_textedit.h"
+#include "../third_party/stb/stb_textedit.h"  // NOLINT(build/include)
 
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -273,7 +262,7 @@ bool TextEdit::NotifyChar(int character) {
 }
 
 void TextEdit::Render() {
-  ScopedTextSetup text_setup;
+  ScopedMonoSetup text_setup;
 
   const ColorScheme& cs = Skin::current().GetColorScheme();
   const Rect& rect = GetClientRect();

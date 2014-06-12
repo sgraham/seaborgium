@@ -19,7 +19,7 @@ TreeGridNodeValueString::TreeGridNodeValueString(const std::string& value)
     : value_(value) {}
 
 void TreeGridNodeValueString::Render() {
-  // TODO: draw
+  // TODO(scottmg): draw
 }
 
 // --------------------------------------------------------------------
@@ -35,7 +35,7 @@ TreeGridNode::~TreeGridNode() {
        ++i) {
     delete i->second;
   }
-  // TODO: nodes_ cleanup.
+  // TODO(scottmg): nodes_ cleanup.
 }
 
 std::vector<TreeGridNode*>* TreeGridNode::Nodes() {
@@ -86,9 +86,7 @@ std::vector<TreeGridColumn*>* TreeGrid::Columns() {
 }
 
 void TreeGrid::Render() {
-  nvgSave(core::VG);
-  nvgFontSize(core::VG, 14.f);  // TODO(font)
-  nvgFontFace(core::VG, "sans");
+  ScopedSansSetup text_setup;
 
   float ascender, descender, line_height;
   nvgTextMetrics(core::VG, &ascender, &descender, &line_height);
@@ -124,29 +122,16 @@ void TreeGrid::Render() {
   nvgLineTo(core::VG, header.x + last_x, client_rect.h);
   nvgStroke(core::VG);
   for (size_t i = 0; i < columns_.size(); ++i) {
-    // TODO: clip
-    nvgText(core::VG,
-            header.x + last_x + kTitlePadding,
-            header.y + line_height,
-            columns_[i]->GetCaption().c_str(),
-            NULL);
+    Rect header_column = header;
+    header_column.x = header.x + last_x;
+    header_column.w = column_widths[i];
+    DrawTextInRect(header_column, columns_[i]->GetCaption(), kTitlePadding);
     last_x += column_widths[i];
     nvgBeginPath(core::VG);
     nvgMoveTo(core::VG, header.x + last_x, header.y);
     nvgLineTo(core::VG, header.x + last_x, client_rect.h - header.y);
     nvgStroke(core::VG);
   }
-
-  /*
-  nvgFillColor(core::VG, cs.text());
-  nvgText(core::VG,
-          body.x,
-          body.y + (line_height - descender),
-          "ui/stuff.cc, line 34",
-          NULL);
-          */
-
-  nvgRestore(core::VG);
 }
 
 std::vector<float> TreeGrid::GetColumnWidths(float layout_in_width) const {

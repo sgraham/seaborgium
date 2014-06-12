@@ -12,6 +12,12 @@ tools\regen Release
 ninja -C out && out\sg_test && out\sg
 
 
+Seaborgium is the element farthest below Chromium, and is intended to be a
+debugger suited to debugging that project. (Also, Tungsten is a frequently
+used name, and Molybdenum is too hard to spell.) Sadly, an observable amount
+of seaborgium has never been created, which may be a bad omen for a new
+project.
+
 
 CREDITS
 -------

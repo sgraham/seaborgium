@@ -108,3 +108,12 @@ void DrawSolidRoundedRect(const Rect& rect,
   nvgFill(core::VG);
   nvgRestore(core::VG);
 }
+
+void DrawTextInRect(const Rect& rect,
+                    const std::string& text,
+                    float x_padding) {
+  ScopedRenderOffset offset(rect, true);
+  float line_height;
+  nvgTextMetrics(core::VG, NULL, NULL, &line_height);
+  nvgText(core::VG, x_padding, line_height, &text.data()[0], &text.data()[text.size()]);
+}
