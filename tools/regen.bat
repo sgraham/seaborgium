@@ -11,6 +11,10 @@ set CXX=cl &&^
 cd out &&^
 cmake .. -G Ninja -DCMAKE_BUILD_TYPE=%1 &&^
 cd ..
+echo.
+echo Run "ninja -C out" to build.
+echo out\sg_test.exe for unittests.
+echo out\sg.exe for main binary.
 goto :EOF
 
 :bad
