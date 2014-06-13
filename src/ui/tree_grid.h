@@ -14,13 +14,13 @@
 class TreeGridNodeValue {
  public:
   virtual ~TreeGridNodeValue();
-  virtual void Render() = 0;
+  virtual void Render(const Rect& rect) const = 0;
 };
 
 class TreeGridNodeValueString : public TreeGridNodeValue {
  public:
   explicit TreeGridNodeValueString(const std::string& value);
-  void Render() override;
+  virtual void Render(const Rect& rect) const override;
 
  private:
   std::string value_;
@@ -42,10 +42,11 @@ class TreeGridNode {
 
   const TreeGridNode* Parent() const { return parent_; }
 
+  const std::vector<TreeGridNode*>* Nodes() const;
   std::vector<TreeGridNode*>* Nodes();
 
   void SetValue(int column, TreeGridNodeValue* value);
-  const TreeGridNodeValue* GetValue(int column);
+  const TreeGridNodeValue* GetValue(int column) const;
 
   const TreeGrid* GetTreeGrid() const { return tree_grid_; }
 
@@ -93,6 +94,12 @@ class TreeGrid : public Dockable {
   std::vector<float> GetColumnWidths(float layout_in_width) const;
 
  private:
+  void RenderNodes(const std::vector<TreeGridNode*>& nodes,
+                   const std::vector<float>& column_widths,
+                   const float depth_per_indent,
+                   float current_indent,
+                   float* y_position);
+
   std::vector<TreeGridNode*> nodes_;
   std::vector<TreeGridColumn*> columns_;
 

@@ -43,6 +43,10 @@ struct ScopedRenderOffset {
     nvgTranslate(core::VG, rect.x, rect.y);
     if (scissor)
       nvgScissor(core::VG, 0, 0, rect.w, rect.h);
+#if 0
+    NVGcolor random_color = nvgRGB(rand() % 255, rand() % 255, rand() % 255);
+    DrawSolidRect(Rect(0, 0, rect.w, rect.h), random_color);
+#endif
   }
 
   ScopedRenderOffset(float dx, float dy) {
@@ -68,6 +72,10 @@ struct ScopedMonoSetup : public ScopedTextSetup {
 
 struct ScopedSansSetup : public ScopedTextSetup {
   ScopedSansSetup() : ScopedTextSetup("sans", 14.f) {}
+};
+
+struct ScopedIconsSetup : public ScopedTextSetup {
+  ScopedIconsSetup() : ScopedTextSetup("icons", 28.f) {}
 };
 
 #endif  // UI_DRAWING_COMMON_H_

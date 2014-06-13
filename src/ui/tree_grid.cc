@@ -11,6 +11,10 @@
 #include "ui/drawing_common.h"
 #include "ui/skin.h"
 
+namespace {
+const float kTextPadding = 3;
+}
+
 TreeGridNodeValue::~TreeGridNodeValue() {
 }
 
@@ -18,15 +22,16 @@ TreeGridNodeValue::~TreeGridNodeValue() {
 TreeGridNodeValueString::TreeGridNodeValueString(const std::string& value)
     : value_(value) {}
 
-void TreeGridNodeValueString::Render() {
-  // TODO(scottmg): draw
+void TreeGridNodeValueString::Render(const Rect& rect) const {
+  const ColorScheme& cs = Skin::current().GetColorScheme();
+  DrawTextInRect(rect, value_, cs.text(), kTextPadding);
 }
 
 // --------------------------------------------------------------------
 TreeGridNode::TreeGridNode(TreeGrid* tree_grid, TreeGridNode* parent)
     : tree_grid_(tree_grid),
       parent_(parent),
-      expanded_(false),
+      expanded_(true),
       selected_(false) {}
 
 TreeGridNode::~TreeGridNode() {
@@ -36,6 +41,10 @@ TreeGridNode::~TreeGridNode() {
     delete i->second;
   }
   // TODO(scottmg): nodes_ cleanup.
+}
+
+const std::vector<TreeGridNode*>* TreeGridNode::Nodes() const {
+  return &nodes_;
 }
 
 std::vector<TreeGridNode*>* TreeGridNode::Nodes() {
@@ -49,8 +58,8 @@ void TreeGridNode::SetValue(int column, TreeGridNodeValue* value) {
   items_[column] = value;
 }
 
-const TreeGridNodeValue* TreeGridNode::GetValue(int column) {
-  std::map<int, TreeGridNodeValue*>::iterator i = items_.find(column);
+const TreeGridNodeValue* TreeGridNode::GetValue(int column) const {
+  std::map<int, TreeGridNodeValue*>::const_iterator i = items_.find(column);
   if (i == items_.end())
     return NULL;
   return i->second;
@@ -96,18 +105,15 @@ void TreeGrid::Render() {
   DrawSolidRect(client_rect, cs.background());
 
   const float kMarginWidth = line_height - descender;
-  const float kHeaderHeight = kMarginWidth + 3;
-  const float kPaddingFromMarginToBody = 3;
-  const float kPaddingFromHeaderToBody = 3;
-  const float kTitlePadding = 3;
+  const float kHeaderHeight = kMarginWidth + 5;
 
   Rect margin(0, kHeaderHeight, kMarginWidth, client_rect.h - kHeaderHeight);
   Rect header(kMarginWidth, 0, client_rect.w - kMarginWidth, kHeaderHeight);
 
-  Rect body(kMarginWidth + kPaddingFromMarginToBody,
-            kHeaderHeight + kPaddingFromHeaderToBody,
-            client_rect.w - (kMarginWidth + kPaddingFromMarginToBody),
-            client_rect.h - (kHeaderHeight + kPaddingFromHeaderToBody));
+  Rect body(kMarginWidth,
+            kHeaderHeight,
+            client_rect.w - kMarginWidth,
+            client_rect.h - kHeaderHeight);
 
   DrawSolidRect(margin, cs.margin());
   DrawSolidRect(header, cs.margin());
@@ -123,12 +129,63 @@ void TreeGrid::Render() {
     DrawTextInRect(header_column,
                    columns_[i]->GetCaption(),
                    cs.margin_text(),
-                   kTitlePadding);
+                   kTextPadding);
     last_x += column_widths[i];
     DrawVerticalLine(
         cs.border(), header.x + last_x, header.y, client_rect.h - header.y);
   }
   DrawHorizontalLine(cs.border(), header.x, header.x + header.w, header.h);
+
+  const float kIndentDepth = kMarginWidth;
+  float y_position = 0.f;
+  ScopedRenderOffset past_header_and_margin(body, true);
+  RenderNodes(*Nodes(), column_widths, kIndentDepth, 0.f, &y_position);
+}
+
+void TreeGrid::RenderNodes(const std::vector<TreeGridNode*>& nodes,
+                           const std::vector<float>& column_widths,
+                           const float depth_per_indent,
+                           float current_indent,
+                           float* y_position) {
+  const ColorScheme& cs = Skin::current().GetColorScheme();
+  float kLineHeight = depth_per_indent;  // TODO
+  for (size_t i = 0; i < nodes.size(); ++i) {
+    const TreeGridNode* node = nodes[i];
+    float last_x = 0.f;
+    for (size_t j = 0; j < column_widths.size(); ++j) {
+      float x = last_x;
+      if (j == 0) {
+        if (node->Nodes()->size() > 0) {
+          // Draw expansion indicator first.
+          ScopedIconsSetup icons;
+          const char* kSquaredPlus = "\xE2\x8A\x9E";
+          const char* kSquaredMinus = "\xE2\x8A\x9F";
+          nvgFillColor(core::VG, cs.text());
+          nvgText(core::VG,
+                  current_indent,
+                  kLineHeight + *y_position,
+                  node->Expanded() ? kSquaredMinus : kSquaredPlus,
+                  NULL);
+        }
+
+        // Then draw the text in the common case.
+        const float kIndicatorWidth = kLineHeight;
+        x = current_indent + kIndicatorWidth;
+      }
+      // -1 on width for column separator.
+      Rect box(x, *y_position, column_widths[j] - 1.f, kLineHeight);
+      last_x += column_widths[j];
+      node->GetValue(j)->Render(box);
+    }
+    *y_position += kLineHeight;
+    if (node->Expanded()) {
+      RenderNodes(*node->Nodes(),
+                  column_widths,
+                  depth_per_indent,
+                  current_indent + depth_per_indent,
+                  y_position);
+    }
+  }
 }
 
 std::vector<float> TreeGrid::GetColumnWidths(float layout_in_width) const {
