@@ -173,7 +173,8 @@ void TreeGrid::RenderNodes(const std::vector<TreeGridNode*>& nodes,
         x = current_indent + kIndicatorWidth;
       }
       // -1 on width for column separator.
-      Rect box(x, *y_position, column_widths[j] - 1.f, kLineHeight);
+      Rect box(
+          x, *y_position, column_widths[j] - 1.f - (x - last_x), kLineHeight);
       last_x += column_widths[j];
       node->GetValue(j)->Render(box);
     }

@@ -131,6 +131,8 @@ void DrawTextInRect(const Rect& rect,
                     const std::string& text,
                     const NVGcolor& color,
                     float x_padding) {
+  // TODO(scottmg): Might need to floor here to de-blur fonts, or probably at
+  // a higher level to avoid bad alignments.
   ScopedRenderOffset offset(rect, true);
   float line_height;
   nvgTextMetrics(core::VG, NULL, NULL, &line_height);
