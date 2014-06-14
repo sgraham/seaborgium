@@ -1,9 +1,9 @@
 @echo off
 setlocal
 if x%1==x goto bad
-set CLPATH=
+set CLPATH=""
 for %%i in (cl.exe) do set CLPATH="%%~$PATH:i"
-if x%CLPATH%==x goto nocl
+if x%CLPATH%==x"" goto nocl
 rmdir /s/q out &^
 mkdir out &&^
 set CC=cl &&^
