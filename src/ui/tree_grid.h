@@ -89,7 +89,13 @@ class TreeGrid : public Dockable {
   std::vector<TreeGridNode*>* Nodes();
   std::vector<TreeGridColumn*>* Columns();
 
-  void Render() override;
+  virtual void Render() override;
+
+  virtual bool NotifyMouseButton(int x,
+                                 int y,
+                                 core::MouseButton::Enum button,
+                                 bool down,
+                                 uint8_t modifiers) override;
 
   std::vector<float> GetColumnWidths(float layout_in_width) const;
 
@@ -102,6 +108,14 @@ class TreeGrid : public Dockable {
 
   std::vector<TreeGridNode*> nodes_;
   std::vector<TreeGridColumn*> columns_;
+
+  struct ExpansionBoxPosition {
+    ExpansionBoxPosition(const Rect& rect, TreeGridNode* node)
+        : rect(rect), node(node) {}
+    Rect rect;
+    TreeGridNode* node;
+  };
+  std::vector<ExpansionBoxPosition> expansion_boxes_;
 
   CORE_DISALLOW_COPY_AND_ASSIGN(TreeGrid);
 };

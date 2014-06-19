@@ -130,7 +130,9 @@ class InputHandler {
                                 int y,
                                 float delta,
                                 uint8_t modifiers) = 0;
-  virtual bool NotifyMouseButton(MouseButton::Enum button,
+  virtual bool NotifyMouseButton(int x,
+                                 int y,
+                                 MouseButton::Enum button,
                                  bool down,
                                  uint8_t modifiers) = 0;
   virtual bool NotifyKey(Key::Enum key, bool down, uint8_t modifiers) = 0;

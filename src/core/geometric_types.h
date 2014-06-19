@@ -34,6 +34,7 @@ class Point {
   Point Scale(float scale) const {
     return Point(x * scale, y * scale);
   }
+  Point RelativeTo(const Rect& rect) const;
   float x, y;
 };
 
@@ -42,6 +43,10 @@ inline bool Rect::Contains(const Point& point) const {
          point.x < x + w &&
          point.y >= y &&
          point.y < y + h;
+}
+
+inline Point Point::RelativeTo(const Rect& rect) const {
+  return Point(x - rect.x, y - rect.y);
 }
 
 #endif  // CORE_GEOMETRIC_TYPES_H_

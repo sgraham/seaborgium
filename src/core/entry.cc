@@ -590,8 +590,11 @@ bool ProcessEvents(uint32_t* width, uint32_t* height, InputHandler* handler) {
                                         mouse_event.modifiers);
             } else {
               // Button press.
-              handler->NotifyMouseButton(
-                  mouse_event.button, mouse_event.down, mouse_event.modifiers);
+              handler->NotifyMouseButton(mouse_event.mx,
+                                         mouse_event.my,
+                                         mouse_event.button,
+                                         mouse_event.down,
+                                         mouse_event.modifiers);
             }
           }
           break;

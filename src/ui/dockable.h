@@ -64,7 +64,9 @@ class Dockable : public core::InputHandler {
                                 uint8_t /*modifiers*/) override {
     return false;
   }
-  virtual bool NotifyMouseButton(core::MouseButton::Enum /*button*/,
+  virtual bool NotifyMouseButton(int /*x*/,
+                                 int /*y*/,
+                                 core::MouseButton::Enum /*button*/,
                                  bool /*down*/,
                                  uint8_t /*modifiers*/) override {
     return false;

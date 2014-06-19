@@ -211,9 +211,13 @@ bool TextEdit::NotifyMouseWheel(int x, int y, float delta, uint8_t modifiers) {
   return true;
 }
 
-bool TextEdit::NotifyMouseButton(core::MouseButton::Enum button,
+bool TextEdit::NotifyMouseButton(int x,
+                                 int y,
+                                 core::MouseButton::Enum button,
                                  bool down,
                                  uint8_t modifiers) {
+  CORE_UNUSED(x);
+  CORE_UNUSED(y);
   ScopedCursorAlphaReset reset(this);
   LOCAL_state();
   LOCAL_control();

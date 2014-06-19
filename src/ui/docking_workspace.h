@@ -43,7 +43,9 @@ class DockingWorkspace : public core::InputHandler {
   virtual bool NotifyMouseMoved(int x, int y, uint8_t modifiers) override;
   virtual bool NotifyMouseWheel(int x, int y, float delta, uint8_t modifiers)
       override;
-  virtual bool NotifyMouseButton(core::MouseButton::Enum button,
+  virtual bool NotifyMouseButton(int x,
+                                 int y,
+                                 core::MouseButton::Enum button,
                                  bool down,
                                  uint8_t modifiers) override;
   virtual bool NotifyKey(core::Key::Enum key,

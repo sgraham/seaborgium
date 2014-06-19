@@ -140,10 +140,19 @@ void TreeGrid::Render() {
   }
   DrawHorizontalLine(cs.border(), header.x, header.x + header.w, header.h);
 
+  expansion_boxes_.clear();
+
   const float kIndentDepth = kMarginWidth;
   float y_position = 0.f;
   ScopedRenderOffset past_header_and_margin(body, true);
   RenderNodes(*Nodes(), column_widths, kIndentDepth, 0.f, &y_position);
+
+  for (size_t i = 0; i < expansion_boxes_.size(); ++i) {
+    ExpansionBoxPosition& ebp = expansion_boxes_[i];
+    // Adjust to client-relative.
+    ebp.rect.x += body.x;
+    ebp.rect.y += body.y;
+  }
 }
 
 void TreeGrid::RenderNodes(const std::vector<TreeGridNode*>& nodes,
@@ -152,9 +161,10 @@ void TreeGrid::RenderNodes(const std::vector<TreeGridNode*>& nodes,
                            float current_indent,
                            float* y_position) {
   const ColorScheme& cs = Skin::current().GetColorScheme();
-  float kLineHeight = depth_per_indent;  // TODO
+  float kLineHeight = depth_per_indent;  // TODO(scottmg): Wrong height, just
+                                         // happens to be about right.
   for (size_t i = 0; i < nodes.size(); ++i) {
-    const TreeGridNode* node = nodes[i];
+    TreeGridNode* node = nodes[i];
     float last_x = 0.f;
     for (size_t j = 0; j < column_widths.size(); ++j) {
       float x = last_x;
@@ -170,6 +180,10 @@ void TreeGrid::RenderNodes(const std::vector<TreeGridNode*>& nodes,
                   kLineHeight + *y_position,
                   node->Expanded() ? kSquaredMinus : kSquaredPlus,
                   NULL);
+          // TODO(scottmg): Maybe measure text?
+          expansion_boxes_.push_back(ExpansionBoxPosition(
+              Rect(current_indent, *y_position, kLineHeight, kLineHeight),
+              node));
         }
 
         // Then draw the text in the common case.
@@ -195,6 +209,25 @@ void TreeGrid::RenderNodes(const std::vector<TreeGridNode*>& nodes,
                   y_position);
     }
   }
+}
+
+bool TreeGrid::NotifyMouseButton(int x,
+                                 int y,
+                                 core::MouseButton::Enum button,
+                                 bool down,
+                                 uint8_t modifiers) {
+  CORE_UNUSED(modifiers);
+  Point client_point = Point(static_cast<float>(x), static_cast<float>(y))
+                           .RelativeTo(GetScreenRect());
+  if (down && button == core::MouseButton::Left) {
+    for (const auto& ebp : expansion_boxes_) {
+      if (ebp.rect.Contains(client_point)) {
+        ebp.node->SetExpanded(!ebp.node->Expanded());
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 std::vector<float> TreeGrid::GetColumnWidths(float layout_in_width) const {

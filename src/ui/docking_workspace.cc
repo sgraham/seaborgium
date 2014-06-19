@@ -90,9 +90,13 @@ bool DockingWorkspace::NotifyMouseWheel(int x,
   return focused->NotifyMouseWheel(x, y, delta, modifiers);
 }
 
-bool DockingWorkspace::NotifyMouseButton(core::MouseButton::Enum button,
+bool DockingWorkspace::NotifyMouseButton(int x,
+                                         int y,
+                                         core::MouseButton::Enum button,
                                          bool down,
                                          uint8_t modifiers) {
+  CORE_UNUSED(x);
+  CORE_UNUSED(y);
   DragSetup drag_setup(mouse_position_, this);
   drag_setup.draggable = &draggable_;
   if (draggable_.get() && button == core::MouseButton::Left && !down) {
@@ -112,7 +116,11 @@ bool DockingWorkspace::NotifyMouseButton(core::MouseButton::Enum button,
       target->NotifyMouseMoved(static_cast<int>(mouse_position_.x),
                                static_cast<int>(mouse_position_.y),
                                modifiers);
-      target->NotifyMouseButton(button, down, modifiers);
+      target->NotifyMouseButton(static_cast<int>(mouse_position_.x),
+                                static_cast<int>(mouse_position_.y),
+                                button,
+                                down,
+                                modifiers);
       // TODO(scottmg): Invalidate();
     }
   }
