@@ -164,7 +164,20 @@ TreeGrid::LayoutData TreeGrid::CalculateLayout(const Rect& client_rect) {
                   client_rect.h - kHeaderHeight);
 
   ret.column_widths = GetColumnWidths(ret.body.w);
-  CORE_DCHECK(columns_.size() == ret.column_widths.size(), "num columns broken");
+  CORE_DCHECK(columns_.size() == ret.column_widths.size(),
+    "num columns broken");
+
+  float last_x = 0;
+  ret.column_splitters.clear();
+  for (size_t i = 0; i < columns_.size(); ++i) {
+    Rect header_column = ret.header;
+    header_column.x = ret.header.x + last_x;
+    header_column.w = ret.column_widths[i];
+    ret.header_columns.push_back(header_column);
+    last_x += ret.column_widths[i];
+    float splitter_x = ret.header.x + last_x;
+    ret.column_splitters.push_back(splitter_x);
+  }
 
   return ret;
 }
@@ -180,29 +193,21 @@ void TreeGrid::Render() {
   DrawSolidRect(layout_data_.margin, cs.margin());
   DrawSolidRect(layout_data_.header, cs.margin());
 
-  float last_x = 0;
   DrawVerticalLine(
       cs.border(), layout_data_.header.x, layout_data_.header.y, client_rect.h);
-  layout_data_.column_splitters.clear();
   for (size_t i = 0; i < columns_.size(); ++i) {
-    Rect header_column = layout_data_.header;
-    header_column.x = layout_data_.header.x + last_x;
-    header_column.w = layout_data_.column_widths[i];
-    last_x += layout_data_.column_widths[i];
     // nanovg doesn't clip if width of scissor is 0, so we have to not render
     // in that case.
-    if (header_column.w <= 1.f)
+    if (layout_data_.header_columns[i].w <= 1.f)
       continue;
-    DrawTextInRect(header_column,
+    DrawTextInRect(layout_data_.header_columns[i],
                    columns_[i]->GetCaption(),
                    cs.margin_text(),
                    kTextPadding);
-    float splitter_x = layout_data_.header.x + last_x;
     DrawVerticalLine(cs.border(),
-                     splitter_x,
+                     layout_data_.column_splitters[i],
                      layout_data_.header.y,
                      client_rect.h - layout_data_.header.y);
-    layout_data_.column_splitters.push_back(splitter_x);
   }
   DrawHorizontalLine(cs.border(),
                      layout_data_.header.x,

@@ -118,6 +118,7 @@ class TreeGrid : public Dockable {
     std::vector<RectAndNode> expansion_boxes;
     std::vector<float> column_splitters;
     std::vector<float> column_widths;
+    std::vector<Rect> header_columns;
     Rect margin;
     Rect header;
     Rect body;
