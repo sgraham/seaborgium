@@ -46,7 +46,7 @@ TEST(TreeGridTest, ColumnResizeWidth) {
   std::vector<float> width_two_col = tg.GetColumnWidths(100);
   EXPECT_EQ(50.f, width_two_col[0]);
   EXPECT_EQ(50.f, width_two_col[1]);
-  
+
   // Resize as if it was being dragged.
   c0->SetPercentageToMatchWidth(40.f, 100.f);
 
@@ -75,12 +75,50 @@ TEST(TreeGridTest, ColumnResizePosition) {
   EXPECT_EQ(50.f, widths[2]);
 
   // Resize as if it was being dragged.
- c1->SetPercentageToMatchPosition(40.f, 100.f);
+  c1->SetPercentageToMatchPosition(40.f, 100.f);
 
   widths = tg.GetColumnWidths(100);
   EXPECT_FLOAT_EQ(25.f, widths[0]);
   EXPECT_FLOAT_EQ(15.f, widths[1]);
   EXPECT_FLOAT_EQ(60.f, widths[2]);
+}
+
+TEST(TreeGridTest, ColumnResizePositionInvalid) {
+  TreeGrid tg;
+
+  TreeGridColumn* c0 = new TreeGridColumn(&tg, "col0");
+  tg.Columns()->push_back(c0);
+  c0->SetWidthPercentage(0.25f);
+  TreeGridColumn* c1 = new TreeGridColumn(&tg, "col1");
+  tg.Columns()->push_back(c1);
+  c1->SetWidthPercentage(0.25f);
+  TreeGridColumn* c2 = new TreeGridColumn(&tg, "col2");
+  tg.Columns()->push_back(c2);
+  c2->SetWidthPercentage(0.5f);
+  std::vector<float> widths = tg.GetColumnWidths(100);
+  EXPECT_EQ(25.f, widths[0]);
+  EXPECT_EQ(25.f, widths[1]);
+  EXPECT_EQ(50.f, widths[2]);
+
+  // If too small, clamp.
+  c1->SetPercentageToMatchPosition(20.f, 100.f);
+
+  // TODO(scottmg): 3 is the standard border width in the skin, but shouldn't
+  // be duplicated here.
+  const float kBorderWidth = 3.f;
+
+  widths = tg.GetColumnWidths(100);
+  EXPECT_FLOAT_EQ(25.f, widths[0]);
+  EXPECT_FLOAT_EQ(kBorderWidth, widths[1]);
+  EXPECT_FLOAT_EQ(75.f - kBorderWidth, widths[2]);
+
+  // If too large, clamp.
+  c1->SetPercentageToMatchPosition(110.f, 100.f);
+
+  widths = tg.GetColumnWidths(100);
+  EXPECT_FLOAT_EQ(25.f, widths[0]);
+  EXPECT_FLOAT_EQ(100.f - 25.f - kBorderWidth, widths[1]);
+  EXPECT_FLOAT_EQ(kBorderWidth, widths[2]);
 }
 
 namespace {

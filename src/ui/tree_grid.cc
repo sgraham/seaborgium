@@ -118,7 +118,13 @@ void TreeGridColumn::SetPercentageToMatchPosition(float splitter_position,
   float last_x = 0.f;
   for (size_t i = 0; i < self_index; ++i)
     last_x += column_widths[i];
-  SetPercentageToMatchWidth(splitter_position - last_x, whole_width);
+  float max_width = column_widths[self_index] + column_widths[self_index + 1] -
+                    Skin::current().border_size();
+  float new_width = std::min(
+      max_width,
+      std::max(Skin::current().border_size(), splitter_position - last_x));
+
+  SetPercentageToMatchWidth(new_width, whole_width);
 }
 
 // --------------------------------------------------------------------
