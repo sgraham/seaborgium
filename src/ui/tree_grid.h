@@ -71,6 +71,7 @@ class TreeGridColumn {
   void SetWidthPercentage(float fraction);
   float WidthPercentage() const { return width_fraction_; }
   void SetPercentageToMatchWidth(float width, float whole_width);
+  void SetPercentageToMatchPosition(float splitter_position, float whole_width);
 
  private:
   friend TreeGrid;
@@ -112,6 +113,7 @@ class TreeGrid : public Dockable {
   std::vector<TreeGridColumn*> columns_;
 
   std::vector<float> column_splitters_;
+  Rect last_body_;
 
   struct ExpansionBoxPosition {
     ExpansionBoxPosition(const Rect& rect, TreeGridNode* node)

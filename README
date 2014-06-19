@@ -61,6 +61,7 @@ tree grid:
   insert/delete top level items
   remove item at top level w/ delete
   edit items
+  split Render into Layout/Render so that interaction code can be less cache-y
 
 
 RANDOM MUTTERINGS

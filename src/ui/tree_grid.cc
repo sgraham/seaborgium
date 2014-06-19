@@ -105,6 +105,22 @@ void TreeGridColumn::SetPercentageToMatchWidth(float width, float whole_width) {
       two_column_total_fraction;
 }
 
+void TreeGridColumn::SetPercentageToMatchPosition(float splitter_position,
+                                                  float whole_width) {
+  std::vector<TreeGridColumn*>::iterator self = std::find(
+      tree_grid_->Columns()->begin(), tree_grid_->Columns()->end(), this);
+  CORE_CHECK(self != tree_grid_->Columns()->end(), "couldn't find column");
+  size_t self_index = self - tree_grid_->Columns()->begin();
+  CORE_CHECK(self_index < tree_grid_->Columns()->size() - 1,
+             "shouldn't be used on the last column");
+  std::vector<float> column_widths = tree_grid_->GetColumnWidths(whole_width);
+
+  float last_x = 0.f;
+  for (size_t i = 0; i < self_index; ++i)
+    last_x += column_widths[i];
+  SetPercentageToMatchWidth(splitter_position - last_x, whole_width);
+}
+
 // --------------------------------------------------------------------
 TreeGrid::TreeGrid() {
 }
@@ -148,6 +164,7 @@ void TreeGrid::Render() {
   CORE_DCHECK(columns_.size() == column_widths.size(), "num columns broken");
   float last_x = 0;
   DrawVerticalLine(cs.border(), header.x, header.y, client_rect.h);
+  last_body_ = body;
   column_splitters_.clear();
   for (size_t i = 0; i < columns_.size(); ++i) {
     Rect header_column = header;
@@ -242,21 +259,27 @@ void TreeGrid::RenderNodes(const std::vector<TreeGridNode*>& nodes,
 
 class ColumnDragHelper : public Draggable {
  public:
-  ColumnDragHelper(TreeGrid* tree_grid, int column, float initial_position)
+  ColumnDragHelper(TreeGrid* tree_grid,
+                   int column,
+                   float initial_position,
+                   const Rect& body)
       : tree_grid_(tree_grid),
         column_(column),
-        initial_position_(initial_position) {}
+        initial_position_(initial_position),
+        body_(body) {}
 
   virtual void Drag(const Point& screen_position) override {
     Point client_point =
         screen_position.RelativeTo(tree_grid_->GetScreenRect());
+    Point body_point = client_point.RelativeTo(body_);
     // N columns have N-1 draggable sizers:
     //
     // I   c0   |      c1       |    c2    I
     //          ^               ^
     // When dragging column sizer N, it's enough to modify the width of the
     // Nth column.
-    tree_grid_->Columns()->at(column_)->SetWidthPercentage(0.4f);
+    tree_grid_->Columns()->at(column_)->SetPercentageToMatchPosition(
+        body_point.x, body_.w);
   }
 
   virtual void CancelDrag() override {
@@ -269,6 +292,7 @@ class ColumnDragHelper : public Draggable {
   TreeGrid* tree_grid_;
   int column_;
   float initial_position_;
+  Rect body_;
 
   CORE_DISALLOW_COPY_AND_ASSIGN(ColumnDragHelper);
 };
@@ -282,8 +306,10 @@ bool TreeGrid::CouldStartDrag(DragSetup* drag_setup) {
         client_point.x <= column_x + half_width) {
       // TODO(scottmg): Should this only be in the header?
       drag_setup->drag_direction = kDragDirectionLeftRight;
-      if (drag_setup->draggable)
-        drag_setup->draggable->reset(new ColumnDragHelper(this, i, column_x));
+      if (drag_setup->draggable) {
+        drag_setup->draggable->reset(
+            new ColumnDragHelper(this, i, column_x, last_body_));
+      }
       return true;
     }
   }
