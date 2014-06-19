@@ -44,7 +44,8 @@ struct ScopedRenderOffset {
     if (scissor)
       nvgScissor(core::VG, 0, 0, rect.w, rect.h);
 #if 0
-    NVGcolor random_color = nvgRGB(rand() % 255, rand() % 255, rand() % 255);
+    NVGcolor random_color =
+        nvgRGBA(rand() % 255, rand() % 255, rand() % 255, 64);
     DrawSolidRect(Rect(0, 0, rect.w, rect.h), random_color);
 #endif
   }

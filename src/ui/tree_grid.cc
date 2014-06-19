@@ -126,11 +126,15 @@ void TreeGrid::Render() {
     Rect header_column = header;
     header_column.x = header.x + last_x;
     header_column.w = column_widths[i];
+    last_x += column_widths[i];
+    // nanovg doesn't clip if width of scissor is 0, so we have to not render
+    // in that case.
+    if (header_column.w <= 1.f)
+      continue;
     DrawTextInRect(header_column,
                    columns_[i]->GetCaption(),
                    cs.margin_text(),
                    kTextPadding);
-    last_x += column_widths[i];
     DrawVerticalLine(
         cs.border(), header.x + last_x, header.y, client_rect.h - header.y);
   }
@@ -173,9 +177,13 @@ void TreeGrid::RenderNodes(const std::vector<TreeGridNode*>& nodes,
         x = current_indent + kIndicatorWidth;
       }
       // -1 on width for column separator.
-      Rect box(
-          x, *y_position, column_widths[j] - 1.f - (x - last_x), kLineHeight);
+      float adjusted_width = column_widths[j] - 1.f - (x - last_x);
       last_x += column_widths[j];
+      // nanovg doesn't actually clip if width of scissor is 0, so we have to
+      // make sure not to render here.
+      if (adjusted_width <= 1.f)
+        continue;
+      Rect box(x, *y_position, adjusted_width, kLineHeight);
       node->GetValue(j)->Render(box);
     }
     *y_position += kLineHeight;
