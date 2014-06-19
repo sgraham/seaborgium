@@ -54,7 +54,6 @@ http://opensource.org/licenses/BSD-3-Clause
 PENDING
 -------
 tree grid:
-  column resize
   selection
   u/d to move
   l/r to expand contract
