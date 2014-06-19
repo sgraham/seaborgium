@@ -142,41 +142,53 @@ std::vector<TreeGridColumn*>* TreeGrid::Columns() {
   return &columns_;
 }
 
-void TreeGrid::Render() {
+TreeGrid::LayoutData TreeGrid::CalculateLayout(const Rect& client_rect) {
+  TreeGrid::LayoutData ret;
+
   ScopedSansSetup text_setup;
 
   float ascender, descender, line_height;
   nvgTextMetrics(core::VG, &ascender, &descender, &line_height);
 
-  const Rect& client_rect = GetClientRect();
-  const ColorScheme& cs = Skin::current().GetColorScheme();
-  DrawSolidRect(client_rect, cs.background());
-
   const float kMarginWidth = line_height - descender;
   const float kHeaderHeight = kMarginWidth + 5;
 
-  Rect margin(0, kHeaderHeight, kMarginWidth, client_rect.h - kHeaderHeight);
-  Rect header(kMarginWidth, 0, client_rect.w - kMarginWidth, kHeaderHeight);
+  ret.margin =
+      Rect(0, kHeaderHeight, kMarginWidth, client_rect.h - kHeaderHeight);
+  ret.header =
+      Rect(kMarginWidth, 0, client_rect.w - kMarginWidth, kHeaderHeight);
 
-  Rect body(kMarginWidth,
-            kHeaderHeight,
-            client_rect.w - kMarginWidth,
-            client_rect.h - kHeaderHeight);
+  ret.body = Rect(kMarginWidth,
+                  kHeaderHeight,
+                  client_rect.w - kMarginWidth,
+                  client_rect.h - kHeaderHeight);
 
-  DrawSolidRect(margin, cs.margin());
-  DrawSolidRect(header, cs.margin());
+  ret.column_widths = GetColumnWidths(ret.body.w);
+  CORE_DCHECK(columns_.size() == ret.column_widths.size(), "num columns broken");
 
-  std::vector<float> column_widths = GetColumnWidths(body.w);
-  CORE_DCHECK(columns_.size() == column_widths.size(), "num columns broken");
+  return ret;
+}
+
+void TreeGrid::Render() {
+  ScopedSansSetup text_setup;
+  const Rect& client_rect = GetClientRect();
+  layout_data_ = CalculateLayout(client_rect);
+
+  const ColorScheme& cs = Skin::current().GetColorScheme();
+  DrawSolidRect(client_rect, cs.background());
+
+  DrawSolidRect(layout_data_.margin, cs.margin());
+  DrawSolidRect(layout_data_.header, cs.margin());
+
   float last_x = 0;
-  DrawVerticalLine(cs.border(), header.x, header.y, client_rect.h);
-  last_body_ = body;
-  column_splitters_.clear();
+  DrawVerticalLine(
+      cs.border(), layout_data_.header.x, layout_data_.header.y, client_rect.h);
+  layout_data_.column_splitters.clear();
   for (size_t i = 0; i < columns_.size(); ++i) {
-    Rect header_column = header;
-    header_column.x = header.x + last_x;
-    header_column.w = column_widths[i];
-    last_x += column_widths[i];
+    Rect header_column = layout_data_.header;
+    header_column.x = layout_data_.header.x + last_x;
+    header_column.w = layout_data_.column_widths[i];
+    last_x += layout_data_.column_widths[i];
     // nanovg doesn't clip if width of scissor is 0, so we have to not render
     // in that case.
     if (header_column.w <= 1.f)
@@ -185,25 +197,31 @@ void TreeGrid::Render() {
                    columns_[i]->GetCaption(),
                    cs.margin_text(),
                    kTextPadding);
-    float splitter_x = header.x + last_x;
-    DrawVerticalLine(
-        cs.border(), splitter_x, header.y, client_rect.h - header.y);
-    column_splitters_.push_back(splitter_x);
+    float splitter_x = layout_data_.header.x + last_x;
+    DrawVerticalLine(cs.border(),
+                     splitter_x,
+                     layout_data_.header.y,
+                     client_rect.h - layout_data_.header.y);
+    layout_data_.column_splitters.push_back(splitter_x);
   }
-  DrawHorizontalLine(cs.border(), header.x, header.x + header.w, header.h);
+  DrawHorizontalLine(cs.border(),
+                     layout_data_.header.x,
+                     layout_data_.header.x + layout_data_.header.w,
+                     layout_data_.header.h);
 
-  expansion_boxes_.clear();
+  layout_data_.expansion_boxes.clear();
 
-  const float kIndentDepth = kMarginWidth;
+  const float kIndentDepth = 20.f; // TODO
   float y_position = 0.f;
-  ScopedRenderOffset past_header_and_margin(body, true);
-  RenderNodes(*Nodes(), column_widths, kIndentDepth, 0.f, &y_position);
+  ScopedRenderOffset past_header_and_margin(layout_data_.body, true);
+  RenderNodes(
+      *Nodes(), layout_data_.column_widths, kIndentDepth, 0.f, &y_position);
 
-  for (size_t i = 0; i < expansion_boxes_.size(); ++i) {
-    ExpansionBoxPosition& ebp = expansion_boxes_[i];
+  for (size_t i = 0; i < layout_data_.expansion_boxes.size(); ++i) {
+    auto& ebp = layout_data_.expansion_boxes[i];
     // Adjust to client-relative.
-    ebp.rect.x += body.x;
-    ebp.rect.y += body.y;
+    ebp.rect.x += layout_data_.body.x;
+    ebp.rect.y += layout_data_.body.y;
   }
 }
 
@@ -233,7 +251,7 @@ void TreeGrid::RenderNodes(const std::vector<TreeGridNode*>& nodes,
                   node->Expanded() ? kSquaredMinus : kSquaredPlus,
                   NULL);
           // TODO(scottmg): Maybe measure text?
-          expansion_boxes_.push_back(ExpansionBoxPosition(
+          layout_data_.expansion_boxes.push_back(LayoutData::RectAndNode(
               Rect(current_indent, *y_position, kLineHeight, kLineHeight),
               node));
         }
@@ -306,19 +324,26 @@ class ColumnDragHelper : public Draggable {
 bool TreeGrid::CouldStartDrag(DragSetup* drag_setup) {
   Point client_point = drag_setup->screen_position.RelativeTo(GetScreenRect());
   float half_width = Skin::current().border_size() / 2.f;
-  for (size_t i = 0; i < column_splitters_.size(); ++i) {
-    float column_x = column_splitters_[i];
+  for (size_t i = 0; i < layout_data_.column_splitters.size(); ++i) {
+    float column_x = layout_data_.column_splitters[i];
     if (client_point.x > column_x - half_width &&
         client_point.x <= column_x + half_width) {
       // TODO(scottmg): Should this only be in the header?
       drag_setup->drag_direction = kDragDirectionLeftRight;
       if (drag_setup->draggable) {
         drag_setup->draggable->reset(
-            new ColumnDragHelper(this, i, column_x, last_body_));
+            new ColumnDragHelper(this, i, column_x, layout_data_.body));
       }
       return true;
     }
   }
+  return false;
+}
+
+bool TreeGrid::NotifyKey(core::Key::Enum key, bool down, uint8_t modifiers) {
+  CORE_UNUSED(key);
+  CORE_UNUSED(down);
+  CORE_UNUSED(modifiers);
   return false;
 }
 
@@ -331,13 +356,14 @@ bool TreeGrid::NotifyMouseButton(int x,
   Point client_point = Point(static_cast<float>(x), static_cast<float>(y))
                            .RelativeTo(GetScreenRect());
   if (down && button == core::MouseButton::Left) {
-    for (const auto& ebp : expansion_boxes_) {
+    for (const auto& ebp : layout_data_.expansion_boxes) {
       if (ebp.rect.Contains(client_point)) {
         ebp.node->SetExpanded(!ebp.node->Expanded());
         return true;
       }
     }
   }
+
   return false;
 }
 

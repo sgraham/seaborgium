@@ -94,6 +94,9 @@ class TreeGrid : public Dockable {
 
   virtual bool CouldStartDrag(DragSetup* drag_setup) override;
 
+  virtual bool NotifyKey(core::Key::Enum key,
+                         bool down,
+                         uint8_t modifiers) override;
   virtual bool NotifyMouseButton(int x,
                                  int y,
                                  core::MouseButton::Enum button,
@@ -103,6 +106,25 @@ class TreeGrid : public Dockable {
   std::vector<float> GetColumnWidths(float layout_in_width) const;
 
  private:
+  struct LayoutData {
+    struct RectAndNode {
+      RectAndNode(const Rect& rect, TreeGridNode* node)
+          : rect(rect), node(node) {}
+      Rect rect;
+      TreeGridNode* node;
+    };
+
+    std::vector<RectAndNode> rows;
+    std::vector<RectAndNode> expansion_boxes;
+    std::vector<float> column_splitters;
+    std::vector<float> column_widths;
+    Rect margin;
+    Rect header;
+    Rect body;
+  } layout_data_;
+
+  LayoutData CalculateLayout(const Rect& client_rect);
+
   void RenderNodes(const std::vector<TreeGridNode*>& nodes,
                    const std::vector<float>& column_widths,
                    const float depth_per_indent,
@@ -111,17 +133,6 @@ class TreeGrid : public Dockable {
 
   std::vector<TreeGridNode*> nodes_;
   std::vector<TreeGridColumn*> columns_;
-
-  std::vector<float> column_splitters_;
-  Rect last_body_;
-
-  struct ExpansionBoxPosition {
-    ExpansionBoxPosition(const Rect& rect, TreeGridNode* node)
-        : rect(rect), node(node) {}
-    Rect rect;
-    TreeGridNode* node;
-  };
-  std::vector<ExpansionBoxPosition> expansion_boxes_;
 
   CORE_DISALLOW_COPY_AND_ASSIGN(TreeGrid);
 };
