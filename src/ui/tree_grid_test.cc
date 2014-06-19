@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-TEST(TreeGridTest, ColumnSizing) {
+TEST(TreeGridTest, ColumnLayout) {
   TreeGrid tg;
 
   // Basics.
@@ -24,21 +24,37 @@ TEST(TreeGridTest, ColumnSizing) {
   EXPECT_EQ(50.f, width_two_col[0]);
   EXPECT_EQ(50.f, width_two_col[1]);
 
-  // Fixed width.
+  // Over 1.0 sized.
   TreeGridColumn* c2 = new TreeGridColumn(&tg, "col2");
   tg.Columns()->push_back(c2);
-  c2->SetWidthFixed(40);
+  c2->SetWidthPercentage(1.f);
   std::vector<float> width_three_col = tg.GetColumnWidths(100);
-  EXPECT_EQ(30.f, width_three_col[0]);
-  EXPECT_EQ(30.f, width_three_col[1]);
-  EXPECT_EQ(40.f, width_three_col[2]);
+  EXPECT_EQ(25.f, width_three_col[0]);
+  EXPECT_EQ(25.f, width_three_col[1]);
+  EXPECT_EQ(50.f, width_three_col[2]);
+}
 
-  // Overflow clamps.
-  c2->SetWidthFixed(110);
-  width_three_col = tg.GetColumnWidths(100);
-  EXPECT_EQ(0.f, width_three_col[0]);
-  EXPECT_EQ(0.f, width_three_col[1]);
-  EXPECT_EQ(100.f, width_three_col[2]);
+TEST(TreeGridTest, ColumnResize) {
+  TreeGrid tg;
+
+  TreeGridColumn* c0 = new TreeGridColumn(&tg, "col0");
+  tg.Columns()->push_back(c0);
+  c0->SetWidthPercentage(0.5f);
+  TreeGridColumn* c1 = new TreeGridColumn(&tg, "col1");
+  tg.Columns()->push_back(c1);
+  c1->SetWidthPercentage(0.5f);
+  std::vector<float> width_two_col = tg.GetColumnWidths(100);
+  EXPECT_EQ(50.f, width_two_col[0]);
+  EXPECT_EQ(50.f, width_two_col[1]);
+  
+  // Resize as if it was being dragged.
+  c0->SetPercentageToMatchWidth(40.f, 100.f);
+
+  EXPECT_FLOAT_EQ(0.4f, c0->WidthPercentage());
+
+  width_two_col = tg.GetColumnWidths(100);
+  EXPECT_FLOAT_EQ(40.f, width_two_col[0]);
+  EXPECT_FLOAT_EQ(60.f, width_two_col[1]);
 }
 
 namespace {
@@ -63,7 +79,7 @@ void FillWatchWithSampleData(TreeGrid* watch) {
   watch->Columns()->push_back(type_column);
   name_column->SetWidthPercentage(0.3f);
   value_column->SetWidthPercentage(0.7f);
-  type_column->SetWidthFixed(100);
+  type_column->SetWidthPercentage(0.4f);
 
   TreeGridNode* root0 = new TreeGridNode(watch, NULL);
   watch->Nodes()->push_back(root0);

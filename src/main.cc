@@ -39,9 +39,9 @@ void FillWatchWithSampleData(TreeGrid* watch) {
   watch->Columns()->push_back(name_column);
   watch->Columns()->push_back(value_column);
   watch->Columns()->push_back(type_column);
-  name_column->SetWidthPercentage(0.3f);
-  value_column->SetWidthPercentage(0.7f);
-  type_column->SetWidthFixed(100);
+  name_column->SetWidthPercentage(0.25f);
+  value_column->SetWidthPercentage(0.5f);
+  type_column->SetWidthPercentage(0.25f);
 
   TreeGridNode* root0 = new TreeGridNode(watch, NULL);
   watch->Nodes()->push_back(root0);

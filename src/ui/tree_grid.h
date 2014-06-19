@@ -69,7 +69,8 @@ class TreeGridColumn {
   void SetCaption(const std::string& caption) { caption_ = caption; }
 
   void SetWidthPercentage(float fraction);
-  void SetWidthFixed(int size);
+  float WidthPercentage() const { return width_fraction_; }
+  void SetPercentageToMatchWidth(float width, float whole_width);
 
  private:
   friend TreeGrid;
@@ -77,7 +78,6 @@ class TreeGridColumn {
   std::string caption_;
 
   float width_fraction_;
-  int width_fixed_;
 };
 
 // Hierarchical view, with columns.

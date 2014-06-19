@@ -72,12 +72,37 @@ TreeGridColumn::TreeGridColumn(TreeGrid* tree_grid, const std::string& caption)
 
 void TreeGridColumn::SetWidthPercentage(float fraction) {
   width_fraction_ = fraction;
-  width_fixed_ = -1;
 }
 
-void TreeGridColumn::SetWidthFixed(int size) {
-  width_fraction_ = 0.f;
-  width_fixed_ = size;
+void TreeGridColumn::SetPercentageToMatchWidth(float width, float whole_width) {
+  // Not really wrong, but doesn't do anything when percentage-based.
+  if (tree_grid_->Columns()->size() == 1)
+    return;
+  std::vector<TreeGridColumn*>::iterator self = std::find(
+      tree_grid_->Columns()->begin(), tree_grid_->Columns()->end(), this);
+  CORE_CHECK(self != tree_grid_->Columns()->end(), "couldn't find column");
+  size_t self_index = self - tree_grid_->Columns()->begin();
+  CORE_CHECK(self_index < tree_grid_->Columns()->size() - 1,
+             "shouldn't be used on the last column");
+  std::vector<float> column_widths = tree_grid_->GetColumnWidths(whole_width);
+
+  // Add/remove the width to our neighbour.
+  float delta = column_widths[self_index] - width;
+  column_widths[self_index] = width;
+  column_widths[self_index + 1] += delta;
+
+  // And rebalance the two percentages for this column and the neighbour based
+  // on those new widths.
+  float two_column_total_fraction =
+      width_fraction_ +
+      tree_grid_->Columns()->at(self_index + 1)->width_fraction_;
+  float two_column_total_width =
+      column_widths[self_index] + column_widths[self_index + 1];
+  width_fraction_ = column_widths[self_index] / two_column_total_width *
+                    two_column_total_fraction;
+  tree_grid_->Columns()->at(self_index + 1)->width_fraction_ =
+      column_widths[self_index + 1] / two_column_total_width *
+      two_column_total_fraction;
 }
 
 // --------------------------------------------------------------------
@@ -225,9 +250,12 @@ class ColumnDragHelper : public Draggable {
   virtual void Drag(const Point& screen_position) override {
     Point client_point =
         screen_position.RelativeTo(tree_grid_->GetScreenRect());
-    // XXX todo, something sensible. I guess to maintain percentage and fixed
-    // it'll have to reverse engineer what the percentage should be. Perhaps
-    // just get rid of percentage instead.
+    // N columns have N-1 draggable sizers:
+    //
+    // I   c0   |      c1       |    c2    I
+    //          ^               ^
+    // When dragging column sizer N, it's enough to modify the width of the
+    // Nth column.
     tree_grid_->Columns()->at(column_)->SetWidthPercentage(0.4f);
   }
 
@@ -284,25 +312,14 @@ bool TreeGrid::NotifyMouseButton(int x,
 std::vector<float> TreeGrid::GetColumnWidths(float layout_in_width) const {
   float total_fraction = 0.f;
   std::vector<float> ret(columns_.size());
-  float remaining_width = layout_in_width;
   for (size_t j = 0; j < columns_.size(); ++j) {
     TreeGridColumn* i = columns_[j];
-    if (i->width_fixed_ == -1) {
-      total_fraction += i->width_fraction_;
-    } else {
-      remaining_width -= i->width_fixed_;
-      ret[j] = std::min(layout_in_width, static_cast<float>(i->width_fixed_));
-    }
+    total_fraction += i->width_fraction_;
   }
 
-  if (remaining_width < 0)
-    remaining_width = 0;
-
   for (size_t j = 0; j < columns_.size(); ++j) {
     TreeGridColumn* i = columns_[j];
-    if (i->width_fixed_ == -1) {
-      ret[j] = (i->width_fraction_ / total_fraction) * remaining_width;
-    }
+    ret[j] = (i->width_fraction_ / total_fraction) * layout_in_width;
   }
   return ret;
 }
