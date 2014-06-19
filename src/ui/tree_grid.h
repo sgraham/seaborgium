@@ -91,6 +91,8 @@ class TreeGrid : public Dockable {
 
   virtual void Render() override;
 
+  virtual bool CouldStartDrag(DragSetup* drag_setup) override;
+
   virtual bool NotifyMouseButton(int x,
                                  int y,
                                  core::MouseButton::Enum button,
@@ -108,6 +110,8 @@ class TreeGrid : public Dockable {
 
   std::vector<TreeGridNode*> nodes_;
   std::vector<TreeGridColumn*> columns_;
+
+  std::vector<float> column_splitters_;
 
   struct ExpansionBoxPosition {
     ExpansionBoxPosition(const Rect& rect, TreeGridNode* node)

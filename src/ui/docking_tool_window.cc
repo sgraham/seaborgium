@@ -52,7 +52,7 @@ bool DockingToolWindow::CouldStartDrag(DragSetup* drag_setup) {
       drag_setup->draggable->reset(new ToolWindowDragger(this, drag_setup));
     return true;
   }
-  return false;
+  return contents_->CouldStartDrag(drag_setup);
 }
 
 Dockable* DockingToolWindow::FindTopMostUnderPoint(const Point& point) {

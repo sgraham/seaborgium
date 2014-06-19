@@ -8,6 +8,7 @@
 
 #include "core/gfx.h"
 #include "nanovg.h"
+#include "ui/draggable.h"
 #include "ui/drawing_common.h"
 #include "ui/skin.h"
 
@@ -122,6 +123,7 @@ void TreeGrid::Render() {
   CORE_DCHECK(columns_.size() == column_widths.size(), "num columns broken");
   float last_x = 0;
   DrawVerticalLine(cs.border(), header.x, header.y, client_rect.h);
+  column_splitters_.clear();
   for (size_t i = 0; i < columns_.size(); ++i) {
     Rect header_column = header;
     header_column.x = header.x + last_x;
@@ -135,8 +137,10 @@ void TreeGrid::Render() {
                    columns_[i]->GetCaption(),
                    cs.margin_text(),
                    kTextPadding);
+    float splitter_x = header.x + last_x;
     DrawVerticalLine(
-        cs.border(), header.x + last_x, header.y, client_rect.h - header.y);
+        cs.border(), splitter_x, header.y, client_rect.h - header.y);
+    column_splitters_.push_back(splitter_x);
   }
   DrawHorizontalLine(cs.border(), header.x, header.x + header.w, header.h);
 
@@ -209,6 +213,53 @@ void TreeGrid::RenderNodes(const std::vector<TreeGridNode*>& nodes,
                   y_position);
     }
   }
+}
+
+class ColumnDragHelper : public Draggable {
+ public:
+  ColumnDragHelper(TreeGrid* tree_grid, int column, float initial_position)
+      : tree_grid_(tree_grid),
+        column_(column),
+        initial_position_(initial_position) {}
+
+  virtual void Drag(const Point& screen_position) override {
+    Point client_point =
+        screen_position.RelativeTo(tree_grid_->GetScreenRect());
+    // XXX todo, something sensible. I guess to maintain percentage and fixed
+    // it'll have to reverse engineer what the percentage should be. Perhaps
+    // just get rid of percentage instead.
+    tree_grid_->Columns()->at(column_)->SetWidthPercentage(0.4f);
+  }
+
+  virtual void CancelDrag() override {
+  }
+
+  virtual void Render() override {
+  }
+
+ private:
+  TreeGrid* tree_grid_;
+  int column_;
+  float initial_position_;
+
+  CORE_DISALLOW_COPY_AND_ASSIGN(ColumnDragHelper);
+};
+
+bool TreeGrid::CouldStartDrag(DragSetup* drag_setup) {
+  Point client_point = drag_setup->screen_position.RelativeTo(GetScreenRect());
+  float half_width = Skin::current().border_size() / 2.f;
+  for (size_t i = 0; i < column_splitters_.size(); ++i) {
+    float column_x = column_splitters_[i];
+    if (client_point.x > column_x - half_width &&
+        client_point.x <= column_x + half_width) {
+      // TODO(scottmg): Should this only be in the header?
+      drag_setup->drag_direction = kDragDirectionLeftRight;
+      if (drag_setup->draggable)
+        drag_setup->draggable->reset(new ColumnDragHelper(this, i, column_x));
+      return true;
+    }
+  }
+  return false;
 }
 
 bool TreeGrid::NotifyMouseButton(int x,
