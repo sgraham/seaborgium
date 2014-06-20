@@ -205,8 +205,7 @@ int Main(int argc, char** argv) {
     nvgBeginFrame(core::VG,
                   static_cast<int>(width / core::GetDpiScale()),
                   static_cast<int>(height / core::GetDpiScale()),
-                  core::GetDpiScale(),
-                  NVG_STRAIGHT_ALPHA);
+                  core::GetDpiScale());
 
     main_area.Render();
 

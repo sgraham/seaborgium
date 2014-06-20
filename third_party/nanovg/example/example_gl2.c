@@ -74,7 +74,7 @@ int main()
 	glfwWindowHint(GLFW_SAMPLES, 4);
 #endif
 
-    window = glfwCreateWindow(1000, 600, "NanoVG", NULL, NULL);
+	window = glfwCreateWindow(1000, 600, "NanoVG", NULL, NULL);
 //	window = glfwCreateWindow(1000, 600, "NanoVG", glfwGetPrimaryMonitor(), NULL);
 	if (!window) {
 		glfwTerminate();
@@ -92,9 +92,9 @@ int main()
 #endif
 
 #ifdef DEMO_MSAA
-	vg = nvgCreateGL2(512, 512, 0);
+	vg = nvgCreateGL2(512, 512, NVG_STENCIL_STROKES);
 #else
-	vg = nvgCreateGL2(512, 512, NVG_ANTIALIAS);
+	vg = nvgCreateGL2(512, 512, NVG_ANTIALIAS | NVG_STENCIL_STROKES);
 #endif
 	if (vg == NULL) {
 		printf("Could not init nanovg.\n");
@@ -136,7 +136,7 @@ int main()
 			glClearColor(0.3f, 0.3f, 0.32f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 
-		nvgBeginFrame(vg, winWidth, winHeight, pxRatio, premult ? NVG_PREMULTIPLIED_ALPHA : NVG_STRAIGHT_ALPHA);
+		nvgBeginFrame(vg, winWidth, winHeight, pxRatio);
 
 		renderDemo(vg, mx,my, winWidth,winHeight, t, blowup, &data);
 		renderGraph(vg, 5,5, &fps);

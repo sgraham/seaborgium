@@ -22,6 +22,7 @@
 #include "nanovg.h"
 #define NANOVG_GLES2_IMPLEMENTATION
 #include "nanovg_gl.h"
+#include "nanovg_gl_utils.h"
 #include "demo.h"
 #include "perf.h"
 
@@ -81,7 +82,7 @@ int main()
 
 	glfwMakeContextCurrent(window);
 
-	vg = nvgCreateGLES2(512, 512, NVG_ANTIALIAS);
+	vg = nvgCreateGLES2(512, 512, NVG_ANTIALIAS | NVG_STENCIL_STROKES);
 	if (vg == NULL) {
 		printf("Could not init nanovg.\n");
 		return -1;
@@ -126,7 +127,7 @@ int main()
 		glEnable(GL_CULL_FACE);
 		glDisable(GL_DEPTH_TEST);
 
-		nvgBeginFrame(vg, winWidth, winHeight, pxRatio, premult ? NVG_PREMULTIPLIED_ALPHA : NVG_STRAIGHT_ALPHA);
+		nvgBeginFrame(vg, winWidth, winHeight, pxRatio);
 
 		renderDemo(vg, mx,my, winWidth,winHeight, t, blowup, &data);
 		renderGraph(vg, 5,5, &fps);
