@@ -114,7 +114,15 @@ class TreeGrid : public Dockable {
       TreeGridNode* node;
     };
 
-    std::vector<RectAndNode> rows;
+    struct RectNodeAndIndex {
+      RectNodeAndIndex(const Rect& rect, TreeGridNode* node, int index)
+          : rect(rect), node(node), index(index) {}
+      Rect rect;
+      TreeGridNode* node;
+      int index;
+    };
+
+    std::vector<RectNodeAndIndex> cells;
     std::vector<RectAndNode> expansion_boxes;
     std::vector<float> column_splitters;
     std::vector<float> column_widths;
@@ -125,12 +133,12 @@ class TreeGrid : public Dockable {
   } layout_data_;
 
   LayoutData CalculateLayout(const Rect& client_rect);
-
-  void RenderNodes(const std::vector<TreeGridNode*>& nodes,
-                   const std::vector<float>& column_widths,
-                   const float depth_per_indent,
-                   float current_indent,
-                   float* y_position);
+  void CalculateLayoutNodes(const std::vector<TreeGridNode*>& nodes,
+                            const std::vector<float>& column_widths,
+                            const float depth_per_indent,
+                            float current_indent,
+                            float* y_position,
+                            TreeGrid::LayoutData* layout_data);
 
   std::vector<TreeGridNode*> nodes_;
   std::vector<TreeGridColumn*> columns_;

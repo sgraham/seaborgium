@@ -165,10 +165,9 @@ TreeGrid::LayoutData TreeGrid::CalculateLayout(const Rect& client_rect) {
 
   ret.column_widths = GetColumnWidths(ret.body.w);
   CORE_DCHECK(columns_.size() == ret.column_widths.size(),
-    "num columns broken");
+              "num columns broken");
 
   float last_x = 0;
-  ret.column_splitters.clear();
   for (size_t i = 0; i < columns_.size(); ++i) {
     Rect header_column = ret.header;
     header_column.x = ret.header.x + last_x;
@@ -179,63 +178,19 @@ TreeGrid::LayoutData TreeGrid::CalculateLayout(const Rect& client_rect) {
     ret.column_splitters.push_back(splitter_x);
   }
 
+  float y_position = 0.f;
+  CalculateLayoutNodes(
+      *Nodes(), ret.column_widths, kMarginWidth, 0.f, &y_position, &ret);
+
   return ret;
 }
 
-void TreeGrid::Render() {
-  ScopedSansSetup text_setup;
-  const Rect& client_rect = GetClientRect();
-  layout_data_ = CalculateLayout(client_rect);
-
-  const ColorScheme& cs = Skin::current().GetColorScheme();
-  DrawSolidRect(client_rect, cs.background());
-
-  DrawSolidRect(layout_data_.margin, cs.margin());
-  DrawSolidRect(layout_data_.header, cs.margin());
-
-  DrawVerticalLine(
-      cs.border(), layout_data_.header.x, layout_data_.header.y, client_rect.h);
-  for (size_t i = 0; i < columns_.size(); ++i) {
-    // nanovg doesn't clip if width of scissor is 0, so we have to not render
-    // in that case.
-    if (layout_data_.header_columns[i].w <= 1.f)
-      continue;
-    DrawTextInRect(layout_data_.header_columns[i],
-                   columns_[i]->GetCaption(),
-                   cs.margin_text(),
-                   kTextPadding);
-    DrawVerticalLine(cs.border(),
-                     layout_data_.column_splitters[i],
-                     layout_data_.header.y,
-                     client_rect.h - layout_data_.header.y);
-  }
-  DrawHorizontalLine(cs.border(),
-                     layout_data_.header.x,
-                     layout_data_.header.x + layout_data_.header.w,
-                     layout_data_.header.h);
-
-  layout_data_.expansion_boxes.clear();
-
-  const float kIndentDepth = 20.f; // TODO
-  float y_position = 0.f;
-  ScopedRenderOffset past_header_and_margin(layout_data_.body, true);
-  RenderNodes(
-      *Nodes(), layout_data_.column_widths, kIndentDepth, 0.f, &y_position);
-
-  for (size_t i = 0; i < layout_data_.expansion_boxes.size(); ++i) {
-    auto& ebp = layout_data_.expansion_boxes[i];
-    // Adjust to client-relative.
-    ebp.rect.x += layout_data_.body.x;
-    ebp.rect.y += layout_data_.body.y;
-  }
-}
-
-void TreeGrid::RenderNodes(const std::vector<TreeGridNode*>& nodes,
-                           const std::vector<float>& column_widths,
-                           const float depth_per_indent,
-                           float current_indent,
-                           float* y_position) {
-  const ColorScheme& cs = Skin::current().GetColorScheme();
+void TreeGrid::CalculateLayoutNodes(const std::vector<TreeGridNode*>& nodes,
+                                    const std::vector<float>& column_widths,
+                                    const float depth_per_indent,
+                                    float current_indent,
+                                    float* y_position,
+                                    TreeGrid::LayoutData* layout_data) {
   float kLineHeight = depth_per_indent;  // TODO(scottmg): Wrong height, just
                                          // happens to be about right.
   for (size_t i = 0; i < nodes.size(); ++i) {
@@ -245,43 +200,88 @@ void TreeGrid::RenderNodes(const std::vector<TreeGridNode*>& nodes,
       float x = last_x;
       if (j == 0) {
         if (node->Nodes()->size() > 0) {
-          // Draw expansion indicator first.
-          ScopedIconsSetup icons;
-          const char* kSquaredPlus = "\xE2\x8A\x9E";
-          const char* kSquaredMinus = "\xE2\x8A\x9F";
-          nvgFillColor(core::VG, cs.text());
-          nvgText(core::VG,
-                  current_indent,
-                  kLineHeight + *y_position,
-                  node->Expanded() ? kSquaredMinus : kSquaredPlus,
-                  NULL);
-          // TODO(scottmg): Maybe measure text?
-          layout_data_.expansion_boxes.push_back(LayoutData::RectAndNode(
-              Rect(current_indent, *y_position, kLineHeight, kLineHeight),
+          layout_data->expansion_boxes.push_back(LayoutData::RectAndNode(
+              Rect(current_indent + layout_data->margin.w,
+                   *y_position + layout_data->header.h,
+                   kLineHeight,
+                   kLineHeight),
               node));
         }
 
-        // Then draw the text in the common case.
+        // Then space for the text.
         const float kIndicatorWidth = kLineHeight;
         x = current_indent + kIndicatorWidth;
       }
       // -1 on width for column separator.
       float adjusted_width = column_widths[j] - 1.f - (x - last_x);
       last_x += column_widths[j];
-      // nanovg doesn't actually clip if width of scissor is 0, so we have to
-      // make sure not to render here.
-      if (adjusted_width <= 1.f)
-        continue;
-      Rect box(x, *y_position, adjusted_width, kLineHeight);
-      node->GetValue(j)->Render(box);
+      Rect box(x + layout_data->margin.w,
+               *y_position + layout_data->header.h,
+               adjusted_width,
+               kLineHeight);
+      layout_data->cells.push_back(LayoutData::RectNodeAndIndex(box, node, j));
     }
     *y_position += kLineHeight;
     if (node->Expanded()) {
-      RenderNodes(*node->Nodes(),
-                  column_widths,
-                  depth_per_indent,
-                  current_indent + depth_per_indent,
-                  y_position);
+      CalculateLayoutNodes(*node->Nodes(),
+                           column_widths,
+                           depth_per_indent,
+                           current_indent + depth_per_indent,
+                           y_position,
+                           layout_data);
+    }
+  }
+}
+
+void TreeGrid::Render() {
+  ScopedSansSetup text_setup;
+  const Rect& client_rect = GetClientRect();
+  const LayoutData& ld = CalculateLayout(client_rect);
+  layout_data_ = ld;  // TODO(scottmg): Don't do this.
+
+  const ColorScheme& cs = Skin::current().GetColorScheme();
+  DrawSolidRect(client_rect, cs.background());
+
+  DrawSolidRect(ld.margin, cs.margin());
+  DrawSolidRect(ld.header, cs.margin());
+
+  DrawVerticalLine(cs.border(), ld.header.x, ld.header.y, client_rect.h);
+  for (size_t i = 0; i < columns_.size(); ++i) {
+    // nanovg doesn't clip if width of scissor is 0, so we have to not render
+    // in that case.
+    if (ld.header_columns[i].w <= 1.f)
+      continue;
+    DrawTextInRect(ld.header_columns[i],
+                   columns_[i]->GetCaption(),
+                   cs.margin_text(),
+                   kTextPadding);
+    DrawVerticalLine(cs.border(),
+                     ld.column_splitters[i],
+                     ld.header.y,
+                     client_rect.h - ld.header.y);
+  }
+  DrawHorizontalLine(
+      cs.border(), ld.header.x, ld.header.x + ld.header.w, ld.header.h);
+
+  for (const auto& cell : layout_data_.cells) {
+    // nanovg doesn't actually clip if width of scissor is 0, so we have to
+    // make sure not to render here.
+    if (cell.rect.w < 1.f)
+      continue;
+    cell.node->GetValue(cell.index)->Render(cell.rect);
+  }
+
+  {
+    ScopedIconsSetup icons;
+    nvgFillColor(core::VG, cs.text());
+    const char* kSquaredPlus = "\xE2\x8A\x9E";
+    const char* kSquaredMinus = "\xE2\x8A\x9F";
+    for (const auto& button : layout_data_.expansion_boxes) {
+      nvgText(core::VG,
+              button.rect.x,
+              button.rect.y + button.rect.h,
+              button.node->Expanded() ? kSquaredMinus : kSquaredPlus,
+              NULL);
     }
   }
 }
