@@ -54,9 +54,6 @@ http://opensource.org/licenses/BSD-3-Clause
 PENDING
 -------
 tree grid:
-  selection
-  u/d to move
-  l/r to expand contract
   insert/delete top level items
   remove item at top level w/ delete
   edit items
