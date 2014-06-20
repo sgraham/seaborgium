@@ -72,7 +72,7 @@ struct ScopedMonoSetup : public ScopedTextSetup {
 };
 
 struct ScopedSansSetup : public ScopedTextSetup {
-  ScopedSansSetup() : ScopedTextSetup("sans", 14.f) {}
+  ScopedSansSetup() : ScopedTextSetup("sans", 16.f) {}
 };
 
 struct ScopedIconsSetup : public ScopedTextSetup {
