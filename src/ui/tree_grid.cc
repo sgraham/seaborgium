@@ -485,6 +485,21 @@ void TreeGrid::MoveFocusByDirection(FocusDirection direction) {
   if (!focused_node_)
     return;
 
-  if (direction == kFocusUp || direction == kFocusDown)
+  if (direction == kFocusUp || direction == kFocusDown) {
     focused_node_ = GetNextVisibleInDirection(focused_node_, direction);
+  } else if (direction == kFocusLeft) {
+    // Contract ourselves, or move to our parent on left.
+    if (!focused_node_->Nodes()->empty() && focused_node_->Expanded()) {
+      focused_node_->SetExpanded(false);
+    } else if (focused_node_->Parent()) {
+      focused_node_ = focused_node_->Parent();
+    }
+  } else if (direction == kFocusRight) {
+    // On leaf, does nothing. Otherwise, set expanded. VS does something like
+    // "next in traversal" when expanded, but it's non-intuitive so we don't
+    // emulate it here.
+    if (!focused_node_->Nodes()->empty()) {
+      focused_node_->SetExpanded(true);
+    }
+  }
 }

@@ -278,5 +278,61 @@ TEST(TreeGridTest, FocusMovementUpWithExpansions) {
   EXPECT_EQ("mouse_position_", tg.GetFocusedNode()->GetValue(0)->AsString());
 }
 
+TEST(TreeGridTest, FocusMovementLeft) {
+  TreeGrid tg;
+  FillWatchWithSampleData(&tg);
+  // Expand all and move into a deep down child.
+  tg.Nodes()->at(0)->SetExpanded(true);
+  tg.Nodes()->at(0)->Nodes()->at(2)->SetExpanded(true);
+  for (int i = 0; i < 6; ++i)
+    tg.MoveFocusByDirection(TreeGrid::kFocusDown);
+  EXPECT_EQ("y", tg.GetFocusedNode()->GetValue(0)->AsString());
+
+  // First, we're on a leaf, move to parent.
+  tg.MoveFocusByDirection(TreeGrid::kFocusLeft);
+  EXPECT_EQ("mouse_position_", tg.GetFocusedNode()->GetValue(0)->AsString());
+  EXPECT_TRUE(tg.GetFocusedNode()->Expanded());
+
+  // Next left should close this node, and not move.
+  tg.MoveFocusByDirection(TreeGrid::kFocusLeft);
+  EXPECT_EQ("mouse_position_", tg.GetFocusedNode()->GetValue(0)->AsString());
+  EXPECT_FALSE(tg.GetFocusedNode()->Expanded());
+
+  // Then move up to top level.
+  tg.MoveFocusByDirection(TreeGrid::kFocusLeft);
+  EXPECT_EQ("this", tg.GetFocusedNode()->GetValue(0)->AsString());
+  EXPECT_TRUE(tg.GetFocusedNode()->Expanded());
+
+  // And then close that one.
+  tg.MoveFocusByDirection(TreeGrid::kFocusLeft);
+  EXPECT_EQ("this", tg.GetFocusedNode()->GetValue(0)->AsString());
+  EXPECT_FALSE(tg.GetFocusedNode()->Expanded());
+}
+
+TEST(TreeGridTest, FocusMovementRight) {
+  TreeGrid tg;
+  FillWatchWithSampleData(&tg);
+  tg.MoveFocusByDirection(TreeGrid::kFocusDown);
+  EXPECT_EQ("this", tg.GetFocusedNode()->GetValue(0)->AsString());
+  EXPECT_FALSE(tg.GetFocusedNode()->Expanded());
+
+  // Expand top level.
+  tg.MoveFocusByDirection(TreeGrid::kFocusRight);
+  EXPECT_EQ("this", tg.GetFocusedNode()->GetValue(0)->AsString());
+  EXPECT_TRUE(tg.GetFocusedNode()->Expanded());
+
+  // Again does nothing.
+  tg.MoveFocusByDirection(TreeGrid::kFocusRight);
+  EXPECT_EQ("this", tg.GetFocusedNode()->GetValue(0)->AsString());
+  EXPECT_TRUE(tg.GetFocusedNode()->Expanded());
+
+  // On leaf does nothing.
+  tg.MoveFocusByDirection(TreeGrid::kFocusDown);
+  tg.MoveFocusByDirection(TreeGrid::kFocusDown);
+  EXPECT_EQ("root_", tg.GetFocusedNode()->GetValue(0)->AsString());
+  tg.MoveFocusByDirection(TreeGrid::kFocusRight);
+  EXPECT_EQ("root_", tg.GetFocusedNode()->GetValue(0)->AsString());
+}
+
 
 // TODO: Leakiness test.
