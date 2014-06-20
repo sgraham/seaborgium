@@ -52,6 +52,7 @@ void FillWatchWithSampleData(TreeGrid* watch) {
               "{direction_=kSplitHorizontal (2) fraction_=0.69999999999999996 "
               "left_=unique_ptr ...} ...} ...}",
               "DockingWorkspace *");
+  root0->SetExpanded(true);
 
   TreeGridNode* child0 = new TreeGridNode(watch, root0);
   root0->Nodes()->push_back(child0);

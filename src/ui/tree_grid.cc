@@ -32,7 +32,7 @@ void TreeGridNodeValueString::Render(const Rect& rect) const {
 TreeGridNode::TreeGridNode(TreeGrid* tree_grid, TreeGridNode* parent)
     : tree_grid_(tree_grid),
       parent_(parent),
-      expanded_(true),
+      expanded_(false),
       selected_(false) {}
 
 TreeGridNode::~TreeGridNode() {
@@ -128,7 +128,7 @@ void TreeGridColumn::SetPercentageToMatchPosition(float splitter_position,
 }
 
 // --------------------------------------------------------------------
-TreeGrid::TreeGrid() {
+TreeGrid::TreeGrid() : focused_node_(NULL) {
 }
 
 TreeGrid::~TreeGrid() {
@@ -382,4 +382,46 @@ std::vector<float> TreeGrid::GetColumnWidths(float layout_in_width) const {
     ret[j] = (i->width_fraction_ / total_fraction) * layout_in_width;
   }
   return ret;
+}
+
+TreeGridNode* TreeGrid::GetSibling(TreeGridNode* node, int direction) {
+  // This is kind of ugly. Maybe a dummy TreeGridNode at the root would be
+  // nicer.
+  CORE_DCHECK(direction == -1 || direction == 1, "bad direction");
+  std::vector<TreeGridNode*>* parent_nodes;
+  if (!node->Parent())
+    parent_nodes = Nodes();
+  else
+    parent_nodes = node->Parent()->Nodes();
+
+  std::vector<TreeGridNode*>::iterator it =
+      std::find(parent_nodes->begin(), parent_nodes->end(), node);
+  if (it == parent_nodes->end())
+    return NULL;
+  if (it == parent_nodes->begin() && direction < 0)
+    return node;
+  if (it == parent_nodes->end() - 1 && direction > 0)
+    return node;
+  return *(it + direction);
+}
+
+void TreeGrid::MoveFocusByDirection(FocusDirection direction) {
+  if (!focused_node_ && (direction == kFocusDown || direction == kFocusLeft) &&
+      !Nodes()->empty()) {
+    focused_node_ = Nodes()->front();
+    return;
+  } else if (!focused_node_ &&
+             (direction == kFocusUp || direction == kFocusRight) &&
+             !Nodes()->empty()) {
+    focused_node_ = Nodes()->back();
+    return;
+  }
+
+  if (!focused_node_)
+    return;
+
+  if (direction == kFocusDown)
+    focused_node_ = GetSibling(focused_node_, 1);
+  else if (direction == kFocusUp)
+    focused_node_ = GetSibling(focused_node_, -1);
 }

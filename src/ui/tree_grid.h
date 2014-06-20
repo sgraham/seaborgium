@@ -41,6 +41,7 @@ class TreeGridNode {
   void SetSelected(bool selected) { selected_ = selected; }
 
   const TreeGridNode* Parent() const { return parent_; }
+  TreeGridNode* Parent() { return parent_; }
 
   const std::vector<TreeGridNode*>* Nodes() const;
   std::vector<TreeGridNode*>* Nodes();
@@ -105,6 +106,17 @@ class TreeGrid : public Dockable {
 
   std::vector<float> GetColumnWidths(float layout_in_width) const;
 
+  enum FocusDirection {
+    kFocusUp,
+    kFocusDown,
+    kFocusLeft,
+    kFocusRight,
+  };
+  void MoveFocusByDirection(FocusDirection direction);
+
+  const TreeGridNode* GetFocusedNode() const { return focused_node_; }
+  TreeGridNode* GetFocusedNode() { return focused_node_; }
+
  private:
   struct LayoutData {
     struct RectAndNode {
@@ -132,6 +144,8 @@ class TreeGrid : public Dockable {
     Rect body;
   };
 
+  TreeGridNode* focused_node_;
+
   LayoutData CalculateLayout(const Rect& client_rect);
   void CalculateLayoutNodes(const std::vector<TreeGridNode*>& nodes,
                             const std::vector<float>& column_widths,
@@ -139,6 +153,8 @@ class TreeGrid : public Dockable {
                             float current_indent,
                             float* y_position,
                             TreeGrid::LayoutData* layout_data);
+
+  TreeGridNode* GetSibling(TreeGridNode* node, int direction);
 
   std::vector<TreeGridNode*> nodes_;
   std::vector<TreeGridColumn*> columns_;

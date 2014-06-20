@@ -200,10 +200,44 @@ void FillWatchWithSampleData(TreeGrid* watch) {
 
 }  // namespace
 
-TEST(TreeGridTest, SomeStuff) {
+TEST(TreeGridTest, FocusMovementOnEmptyTree) {
+  TreeGrid tg;
+  tg.MoveFocusByDirection(TreeGrid::kFocusDown);
+  // Mostly that iterator debugging doesn't assert.
+  EXPECT_EQ(NULL, tg.GetFocusedNode());
+}
+
+TEST(TreeGridTest, FocusMovementNoneThenDown) {
   TreeGrid tg;
   FillWatchWithSampleData(&tg);
+  tg.MoveFocusByDirection(TreeGrid::kFocusDown);
+  EXPECT_EQ(tg.Nodes()->at(0), tg.GetFocusedNode());
+}
+
+TEST(TreeGridTest, FocusMovementNoneThenUp) {
+  TreeGrid tg;
+  FillWatchWithSampleData(&tg);
+  tg.MoveFocusByDirection(TreeGrid::kFocusUp);
+  EXPECT_EQ(tg.Nodes()->at(1), tg.GetFocusedNode());
+}
+
+TEST(TreeGridTest, FocusMovementDownTwice) {
+  TreeGrid tg;
+  FillWatchWithSampleData(&tg);
+  tg.MoveFocusByDirection(TreeGrid::kFocusDown);
+  tg.MoveFocusByDirection(TreeGrid::kFocusDown);
+  EXPECT_EQ(tg.Nodes()->at(1), tg.GetFocusedNode());
+}
+
+TEST(TreeGridTest, FocusMovementDownPastBottomClamps) {
+  TreeGrid tg;
+  FillWatchWithSampleData(&tg);
+  tg.MoveFocusByDirection(TreeGrid::kFocusDown);
+  tg.MoveFocusByDirection(TreeGrid::kFocusDown);
+  tg.MoveFocusByDirection(TreeGrid::kFocusDown);
+  tg.MoveFocusByDirection(TreeGrid::kFocusDown);
+  EXPECT_EQ(tg.Nodes()->at(1), tg.GetFocusedNode());
 }
 
 
-// TODO: Leaky.
+// TODO: Leakiness test.
