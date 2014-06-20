@@ -236,7 +236,41 @@ TEST(TreeGridTest, FocusMovementDownPastBottomClamps) {
   tg.MoveFocusByDirection(TreeGrid::kFocusDown);
   tg.MoveFocusByDirection(TreeGrid::kFocusDown);
   tg.MoveFocusByDirection(TreeGrid::kFocusDown);
+  tg.MoveFocusByDirection(TreeGrid::kFocusDown);
   EXPECT_EQ(tg.Nodes()->at(1), tg.GetFocusedNode());
+}
+
+TEST(TreeGridTest, FocusMovementDownWithExpansions) {
+  TreeGrid tg;
+  FillWatchWithSampleData(&tg);
+  tg.Nodes()->at(0)->SetExpanded(true);
+  tg.Nodes()->at(0)->Nodes()->at(2)->SetExpanded(true);
+  tg.MoveFocusByDirection(TreeGrid::kFocusDown);
+  tg.MoveFocusByDirection(TreeGrid::kFocusDown);
+  tg.MoveFocusByDirection(TreeGrid::kFocusDown);
+  tg.MoveFocusByDirection(TreeGrid::kFocusDown);
+  tg.MoveFocusByDirection(TreeGrid::kFocusDown);
+  EXPECT_EQ("x", tg.GetFocusedNode()->GetValue(0)->AsString());
+}
+
+TEST(TreeGridTest, FocusMovementUpWithExpansions) {
+  TreeGrid tg;
+  FillWatchWithSampleData(&tg);
+  // Down to end.
+  tg.MoveFocusByDirection(TreeGrid::kFocusDown);
+  tg.MoveFocusByDirection(TreeGrid::kFocusDown);
+  // Expand.
+  tg.Nodes()->at(0)->SetExpanded(true);
+  tg.Nodes()->at(0)->Nodes()->at(2)->SetExpanded(true);
+  // Move back up and walk to children.
+  tg.MoveFocusByDirection(TreeGrid::kFocusUp);
+  EXPECT_EQ("draggable_", tg.GetFocusedNode()->GetValue(0)->AsString());
+  tg.MoveFocusByDirection(TreeGrid::kFocusUp);
+  EXPECT_EQ("y", tg.GetFocusedNode()->GetValue(0)->AsString());
+  tg.MoveFocusByDirection(TreeGrid::kFocusUp);
+  EXPECT_EQ("x", tg.GetFocusedNode()->GetValue(0)->AsString());
+  tg.MoveFocusByDirection(TreeGrid::kFocusUp);
+  EXPECT_EQ("mouse_position_", tg.GetFocusedNode()->GetValue(0)->AsString());
 }
 
 

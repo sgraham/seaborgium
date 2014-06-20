@@ -405,6 +405,38 @@ TreeGridNode* TreeGrid::GetSibling(TreeGridNode* node, int direction) {
   return *(it + direction);
 }
 
+TreeGridNode* TreeGrid::GetLastVisibleChild(TreeGridNode* root) {
+  if (!root->Nodes()->empty() && root->Expanded())
+    return GetLastVisibleChild(root->Nodes()->back());
+  else
+    return root;
+}
+
+TreeGridNode* TreeGrid::GetNextVisibleInDirection(TreeGridNode* node,
+                                                  FocusDirection direction) {
+  if (direction == kFocusDown) {
+    // If we have children, and we're expanded, go to the first child.
+    // Otherwise, to our sibling.
+    if (node->Expanded() && !node->Nodes()->empty())
+      return node->Nodes()->at(0);
+    else
+      return GetSibling(node, 1);
+  } else if (direction == kFocusUp) {
+    // This one's more tricky, we want our previous sibling's deepest visible
+    // child.
+    TreeGridNode* prev_sibling = GetSibling(node, -1);
+    if (prev_sibling == node) {
+      if (node->Parent())
+        return node->Parent();
+      return node;
+    }
+    return GetLastVisibleChild(prev_sibling);
+  }
+  CORE_CHECK(direction == kFocusDown || direction == kFocusUp,
+             "should only be used for up and down");
+  return NULL;
+}
+
 void TreeGrid::MoveFocusByDirection(FocusDirection direction) {
   if (!focused_node_ && (direction == kFocusDown || direction == kFocusLeft) &&
       !Nodes()->empty()) {
@@ -420,8 +452,6 @@ void TreeGrid::MoveFocusByDirection(FocusDirection direction) {
   if (!focused_node_)
     return;
 
-  if (direction == kFocusDown)
-    focused_node_ = GetSibling(focused_node_, 1);
-  else if (direction == kFocusUp)
-    focused_node_ = GetSibling(focused_node_, -1);
+  if (direction == kFocusUp || direction == kFocusDown)
+    focused_node_ = GetNextVisibleInDirection(focused_node_, direction);
 }

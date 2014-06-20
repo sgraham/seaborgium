@@ -15,12 +15,16 @@ class TreeGridNodeValue {
  public:
   virtual ~TreeGridNodeValue();
   virtual void Render(const Rect& rect) const = 0;
+  virtual std::string AsString() const = 0;
 };
 
 class TreeGridNodeValueString : public TreeGridNodeValue {
  public:
   explicit TreeGridNodeValueString(const std::string& value);
   virtual void Render(const Rect& rect) const override;
+  virtual std::string AsString() const override {
+    return value_;
+  }
 
  private:
   std::string value_;
@@ -154,6 +158,9 @@ class TreeGrid : public Dockable {
                             float* y_position,
                             TreeGrid::LayoutData* layout_data);
 
+  TreeGridNode* GetLastVisibleChild(TreeGridNode* root);
+  TreeGridNode* GetNextVisibleInDirection(TreeGridNode* node,
+                                          FocusDirection direction);
   TreeGridNode* GetSibling(TreeGridNode* node, int direction);
 
   std::vector<TreeGridNode*> nodes_;
