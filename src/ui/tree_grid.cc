@@ -238,7 +238,6 @@ void TreeGrid::Render() {
   ScopedSansSetup text_setup;
   const Rect& client_rect = GetClientRect();
   const LayoutData& ld = CalculateLayout(client_rect);
-  layout_data_ = ld;  // TODO(scottmg): Don't do this.
 
   const ColorScheme& cs = Skin::current().GetColorScheme();
   DrawSolidRect(client_rect, cs.background());
@@ -260,7 +259,7 @@ void TreeGrid::Render() {
   DrawHorizontalLine(
       cs.border(), ld.header.x, ld.header.x + ld.header.w, ld.header.h);
 
-  for (const auto& cell : layout_data_.cells)
+  for (const auto& cell : ld.cells)
     cell.node->GetValue(cell.index)->Render(cell.rect);
 
   {
@@ -268,7 +267,7 @@ void TreeGrid::Render() {
     nvgFillColor(core::VG, cs.text());
     const char* kSquaredPlus = "\xE2\x8A\x9E";
     const char* kSquaredMinus = "\xE2\x8A\x9F";
-    for (const auto& button : layout_data_.expansion_boxes) {
+    for (const auto& button : ld.expansion_boxes) {
       nvgText(core::VG,
               button.rect.x,
               button.rect.y + button.rect.h,
@@ -319,17 +318,21 @@ class ColumnDragHelper : public Draggable {
 };
 
 bool TreeGrid::CouldStartDrag(DragSetup* drag_setup) {
+  // This layout calculation is pretty expensive (or would be for many nodes).
+  // Removing the cache for now, but it could also be saved off in Render and
+  // just reused here.
+  const LayoutData& layout_data = CalculateLayout(GetClientRect());
   Point client_point = drag_setup->screen_position.RelativeTo(GetScreenRect());
   float half_width = Skin::current().border_size() / 2.f;
-  for (size_t i = 0; i < layout_data_.column_splitters.size(); ++i) {
-    float column_x = layout_data_.column_splitters[i];
+  for (size_t i = 0; i < layout_data.column_splitters.size(); ++i) {
+    float column_x = layout_data.column_splitters[i];
     if (client_point.x > column_x - half_width &&
         client_point.x <= column_x + half_width) {
       // TODO(scottmg): Should this only be in the header?
       drag_setup->drag_direction = kDragDirectionLeftRight;
       if (drag_setup->draggable) {
         drag_setup->draggable->reset(
-            new ColumnDragHelper(this, i, column_x, layout_data_.body));
+            new ColumnDragHelper(this, i, column_x, layout_data.body));
       }
       return true;
     }
@@ -349,13 +352,15 @@ bool TreeGrid::NotifyMouseButton(int x,
                                  core::MouseButton::Enum button,
                                  bool down,
                                  uint8_t modifiers) {
+  // See CouldStartDrag (this could be cached).
+  const LayoutData& layout_data = CalculateLayout(GetClientRect());
   CORE_UNUSED(modifiers);
   Point client_point = Point(static_cast<float>(x), static_cast<float>(y))
                            .RelativeTo(GetScreenRect());
   if (down && button == core::MouseButton::Left) {
-    for (const auto& ebp : layout_data_.expansion_boxes) {
-      if (ebp.rect.Contains(client_point)) {
-        ebp.node->SetExpanded(!ebp.node->Expanded());
+    for (const auto& eb : layout_data.expansion_boxes) {
+      if (eb.rect.Contains(client_point)) {
+        eb.node->SetExpanded(!eb.node->Expanded());
         return true;
       }
     }

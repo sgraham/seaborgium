@@ -130,7 +130,7 @@ class TreeGrid : public Dockable {
     Rect margin;
     Rect header;
     Rect body;
-  } layout_data_;
+  };
 
   LayoutData CalculateLayout(const Rect& client_rect);
   void CalculateLayoutNodes(const std::vector<TreeGridNode*>& nodes,
