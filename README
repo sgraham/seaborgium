@@ -54,6 +54,7 @@ http://opensource.org/licenses/BSD-3-Clause
 PENDING
 -------
 tree grid:
+  selection (multiple for deleting, etc.)
   insert/delete top level items
   remove item at top level w/ delete
   edit items

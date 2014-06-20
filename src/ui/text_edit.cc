@@ -265,6 +265,17 @@ bool TextEdit::NotifyChar(int character) {
   return true;
 }
 
+void TextEdit::SetText(const std::string& value) {
+  LOCAL_state();
+  LOCAL_control();
+  control->string = static_cast<char*>(realloc(control->string, value.size()));
+  memcpy(control->string, value.data(), value.size());
+  control->string_len = value.size();
+  state->cursor = 0;
+  state->select_start = 0;
+  state->select_end = 0;
+}
+
 void TextEdit::Render() {
   ScopedMonoSetup text_setup;
 

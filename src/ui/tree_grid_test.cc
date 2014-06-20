@@ -334,5 +334,27 @@ TEST(TreeGridTest, FocusMovementRight) {
   EXPECT_EQ("root_", tg.GetFocusedNode()->GetValue(0)->AsString());
 }
 
+namespace {
+
+class AllowAllEditObserver : public TreeGridEditObserver {
+  virtual bool NodeWillRemove(TreeGridNode* /*node*/) override { return true; }
+  virtual bool NodeWillStartEdit(TreeGridNode* /*node*/) override {
+    return true;
+  }
+  virtual bool NodeWillCompleteEdit(TreeGridNode* /*node*/) override {
+    return true;
+  }
+  virtual bool NodeWillInsert(TreeGridNode* /*node*/) override { return true; }
+  virtual void NodeInserted(TreeGridNode* /*node*/) override {}
+};
+
+}  // namespace
+
+/*
+TEST(TreeGridTest, RemoveNode) {
+  TreeGrid tg;
+  FillWatchWithSampleData(&tg);
+}
+*/
 
 // TODO: Leakiness test.

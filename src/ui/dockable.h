@@ -44,9 +44,10 @@ class Dockable : public core::InputHandler {
   Rect GetClientRect() {
     return Rect(0, 0, GetScreenRect().w, GetScreenRect().h);
   }
-  Point ToClient(const Point& point) {
+  Point ScreenToClient(const Point& point) {
     return Point(point.x - GetScreenRect().x, point.y - GetScreenRect().y);
   }
+  Rect ClientToScreen(const Rect& rect);
 
   // Find the Dockable in the tree that's top-most in the stacking order (or
   // equivalently lowest in the tree).

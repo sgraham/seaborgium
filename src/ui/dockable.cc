@@ -27,6 +27,14 @@ const Rect& Dockable::GetScreenRect() const {
   return rect_;
 }
 
+Rect Dockable::ClientToScreen(const Rect& rect) {
+  CORE_CHECK(parent(), "can't convert unparented to screen");
+  return Rect(rect.x + parent()->GetScreenRect().x,
+              rect.y + parent()->GetScreenRect().y,
+              rect.w,
+              rect.h);
+}
+
 void Dockable::Invalidate() {
 #pragma message("todo!")
   // Workspace::Invalidate();

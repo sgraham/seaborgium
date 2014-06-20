@@ -11,6 +11,8 @@
 
 #include "ui/dockable.h"
 
+class TextEdit;
+
 class TreeGridNodeValue {
  public:
   virtual ~TreeGridNodeValue();
@@ -86,6 +88,25 @@ class TreeGridColumn {
   float width_fraction_;
 };
 
+class TreeGridEditObserver {
+ public:
+  virtual ~TreeGridEditObserver() {}
+
+  // Node will be removed from the tree. Returning false cancels removal.
+  // There is no removal notification as it's delete'd on removal.
+  virtual bool NodeWillRemove(TreeGridNode* node) = 0;
+
+  // Returning false disallows editing. Only column 0 is editable.
+  virtual bool NodeWillStartEdit(TreeGridNode* node) = 0;
+  // Returning false reverts to original text. Only column 0 is editable.
+  virtual bool NodeWillCompleteEdit(TreeGridNode* node) = 0;
+
+  // false disallows insert.
+  virtual bool NodeWillInsert(TreeGridNode* node) = 0;
+  // Notification only.
+  virtual void NodeInserted(TreeGridNode* node) = 0;
+};
+
 // Hierarchical view, with columns.
 class TreeGrid : public Dockable {
  public:
@@ -112,6 +133,9 @@ class TreeGrid : public Dockable {
 
   std::vector<float> GetColumnWidths(float layout_in_width) const;
 
+  // Unset is read-only.
+  void SetEditObserver(std::unique_ptr<TreeGridEditObserver> observer);
+
   enum FocusDirection {
     kFocusUp,
     kFocusDown,
@@ -119,6 +143,9 @@ class TreeGrid : public Dockable {
     kFocusRight,
   };
   void MoveFocusByDirection(FocusDirection direction);
+
+  // Always focused node.
+  void TryStartEdit();
 
   const TreeGridNode* GetFocusedNode() const { return focused_node_; }
   TreeGridNode* GetFocusedNode() { return focused_node_; }
@@ -152,6 +179,10 @@ class TreeGrid : public Dockable {
   };
 
   TreeGridNode* focused_node_;
+
+  std::unique_ptr<TreeGridEditObserver> edit_observer_;
+  // TODO(scottmg): This should eventually be a pluggable thing.
+  std::unique_ptr<TextEdit> inline_edit_;
 
   LayoutData CalculateLayout(const Rect& client_rect);
   void CalculateLayoutNodes(const std::vector<TreeGridNode*>& nodes,

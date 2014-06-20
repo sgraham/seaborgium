@@ -12,6 +12,7 @@
 #include "ui/drawing_common.h"
 #include "ui/focus.h"
 #include "ui/skin.h"
+#include "ui/text_edit.h"
 
 namespace {
 const float kTextPadding = 3;
@@ -128,9 +129,23 @@ void TreeGridColumn::SetPercentageToMatchPosition(float splitter_position,
   SetPercentageToMatchWidth(new_width, whole_width);
 }
 
+class ReadOnlyTreeGridEditObserver : public TreeGridEditObserver {
+ public:
+  virtual bool NodeWillRemove(TreeGridNode* /*node*/) override { return false; }
+  virtual bool NodeWillStartEdit(TreeGridNode* /*node*/) override {
+    return false;
+  }
+  virtual bool NodeWillCompleteEdit(TreeGridNode* /*node*/) override {
+    return false;
+  }
+  virtual bool NodeWillInsert(TreeGridNode* /*node*/) override { return false; }
+  virtual void NodeInserted(TreeGridNode* /*node*/) override {}
+};
+
+
 // --------------------------------------------------------------------
-TreeGrid::TreeGrid() : focused_node_(NULL) {
-}
+TreeGrid::TreeGrid()
+    : focused_node_(NULL), edit_observer_(new ReadOnlyTreeGridEditObserver) {}
 
 TreeGrid::~TreeGrid() {
 }
@@ -279,9 +294,18 @@ void TreeGrid::Render() {
     }
   }
 
+  // TODO(scottmg): lost focus should cancel or commit edit
   if (ld.focus.IsValid()) {
-    if (GetFocusedContents() == this)
-      DrawSolidRoundedRect(ld.focus, cs.text_selection(), 3.f);
+    if (GetFocusedContents() == this) {
+      if (inline_edit_) {
+        DrawOutlineRoundedRect(ld.focus, cs.text_selection(), 3.f);
+        inline_edit_->SetScreenRect(ClientToScreen(ld.focus));
+        ScopedRenderOffset text_edit_offset(this, inline_edit_.get(), false);
+        inline_edit_->Render();
+      } else {
+        DrawSolidRoundedRect(ld.focus, cs.text_selection(), 3.f);
+      }
+    }
     else
       DrawOutlineRoundedRect(ld.focus, cs.text_selection(), 3.f);
   }
@@ -367,6 +391,10 @@ bool TreeGrid::NotifyKey(core::Key::Enum key, bool down, uint8_t modifiers) {
         return true;
       }
     }
+    if (key == core::Key::F2) {
+      TryStartEdit();
+      return true;
+    }
   }
   return false;
 }
@@ -399,6 +427,10 @@ bool TreeGrid::NotifyMouseButton(int x,
   }
 
   return false;
+}
+
+void TreeGrid::SetEditObserver(std::unique_ptr<TreeGridEditObserver> observer) {
+  edit_observer_ = std::move(observer);
 }
 
 std::vector<float> TreeGrid::GetColumnWidths(float layout_in_width) const {
@@ -514,4 +546,14 @@ void TreeGrid::MoveFocusByDirection(FocusDirection direction) {
       focused_node_->SetExpanded(true);
     }
   }
+}
+
+void TreeGrid::TryStartEdit() {
+  if (!focused_node_)
+    return;
+  /*if (!edit_observer_->NodeWillStartEdit(focused_node_))
+    return;*/
+  inline_edit_.reset(new TextEdit);
+  //inline_edit_->set_parent(this);
+  inline_edit_->SetText(focused_node_->GetValue(0)->AsString());
 }

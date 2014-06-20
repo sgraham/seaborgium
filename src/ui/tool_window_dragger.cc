@@ -136,7 +136,7 @@ ToolWindowDragger::ToolWindowDragger(
     : on_drop_target_(NULL),
       docking_workspace_(drag_setup->docking_workspace) {
   ScopedIcon state;
-  pick_up_offset_ = dragging->ToClient(drag_setup->screen_position);
+  pick_up_offset_ = dragging->ScreenToClient(drag_setup->screen_position);
   initial_screen_rect_ = dragging->GetScreenRect();
   current_position_ = drag_setup->screen_position;
 

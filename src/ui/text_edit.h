@@ -8,6 +8,8 @@
 #include "nanovg.h"
 #include "ui/dockable.h"
 
+#include <string>
+
 // Single line text edit control.
 class TextEdit : public Dockable {
  public:
@@ -30,6 +32,8 @@ class TextEdit : public Dockable {
                          bool down,
                          uint8_t modifiers) override;
   virtual bool NotifyChar(int character) override;
+
+  void SetText(const std::string& value);
 
   // Implementation of Dockable:
   void Render() override;

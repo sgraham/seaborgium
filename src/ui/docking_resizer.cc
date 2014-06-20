@@ -22,7 +22,7 @@ DockingResizer::~DockingResizer() {
 }
 
 void DockingResizer::Drag(const Point& screen_point) {
-  Point point_in_parent = resizing_->ToClient(screen_point);
+  Point point_in_parent = resizing_->ScreenToClient(screen_point);
   float parent_size = ParentSize();
   float clamped = std::min(
       std::max(ComponentForDirection(point_in_parent), 0.f), parent_size);

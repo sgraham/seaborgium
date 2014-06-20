@@ -160,7 +160,7 @@ void DockingSplitContainer::Render() {
 }
 
 bool DockingSplitContainer::CouldStartDrag(DragSetup* drag_setup) {
-  Point client_position = ToClient(drag_setup->screen_position);
+  Point client_position = ScreenToClient(drag_setup->screen_position);
   if (GetRectForSplitter().Contains(client_position)) {
     if (drag_setup->draggable)
       drag_setup->draggable->reset(new DockingResizer(this));
