@@ -221,6 +221,8 @@ void TreeGrid::CalculateLayoutNodes(const std::vector<TreeGridNode*>& nodes,
                adjusted_width,
                kLineHeight);
       layout_data->cells.push_back(LayoutData::RectNodeAndIndex(box, node, j));
+      if (j == 0 && node == focused_node_)
+        layout_data->focus = box;
     }
     *y_position += kLineHeight;
     if (node->Expanded()) {
@@ -274,6 +276,10 @@ void TreeGrid::Render() {
               button.node->Expanded() ? kSquaredMinus : kSquaredPlus,
               NULL);
     }
+  }
+
+  if (ld.focus.IsValid()) {
+    DrawSolidRect(ld.focus, cs.text_selection());
   }
 }
 
@@ -341,9 +347,23 @@ bool TreeGrid::CouldStartDrag(DragSetup* drag_setup) {
 }
 
 bool TreeGrid::NotifyKey(core::Key::Enum key, bool down, uint8_t modifiers) {
-  CORE_UNUSED(key);
-  CORE_UNUSED(down);
-  CORE_UNUSED(modifiers);
+  static struct {
+    core::Key::Enum key;
+    FocusDirection direction;
+  } mappings[] = {
+    { core::Key::Up, kFocusUp },
+    { core::Key::Down, kFocusDown },
+    { core::Key::Left, kFocusLeft },
+    { core::Key::Right, kFocusRight },
+  };
+  if (down && modifiers == 0) {  // TODO(scottmg): Shift-move for selection.
+    for (const auto& mapping : mappings) {
+      if (mapping.key == key) {
+        MoveFocusByDirection(mapping.direction);
+        return true;
+      }
+    }
+  }
   return false;
 }
 
@@ -416,14 +436,27 @@ TreeGridNode* TreeGrid::GetNextVisibleInDirection(TreeGridNode* node,
                                                   FocusDirection direction) {
   if (direction == kFocusDown) {
     // If we have children, and we're expanded, go to the first child.
-    // Otherwise, to our sibling.
+    // Otherwise, to our sibling. If we have no next sibling, check to see if
+    // our parent does, recursively.
     if (node->Expanded() && !node->Nodes()->empty())
       return node->Nodes()->at(0);
-    else
-      return GetSibling(node, 1);
+    else {
+      TreeGridNode* next_sibling = GetSibling(node, 1);
+      if (next_sibling == node) {
+        TreeGridNode* cur = node->Parent();
+        while (cur) {
+          next_sibling = GetSibling(cur, 1);
+          if (cur != next_sibling)
+            return next_sibling;
+          cur = cur->Parent();
+        }
+        return node;
+      }
+      return next_sibling;
+    }
   } else if (direction == kFocusUp) {
-    // This one's more tricky, we want our previous sibling's deepest visible
-    // child.
+    // We want our previous sibling's deepest visible child, or our parent if
+    // we have none.
     TreeGridNode* prev_sibling = GetSibling(node, -1);
     if (prev_sibling == node) {
       if (node->Parent())

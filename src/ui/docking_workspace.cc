@@ -113,14 +113,16 @@ bool DockingWorkspace::NotifyMouseButton(int x,
     if (target) {
       if (down)
         SetFocusedContents(target);
-      target->NotifyMouseMoved(static_cast<int>(mouse_position_.x),
-                               static_cast<int>(mouse_position_.y),
-                               modifiers);
-      target->NotifyMouseButton(static_cast<int>(mouse_position_.x),
-                                static_cast<int>(mouse_position_.y),
-                                button,
-                                down,
-                                modifiers);
+      if (target->WantMouseEvents()) {
+        target->NotifyMouseMoved(static_cast<int>(mouse_position_.x),
+                                 static_cast<int>(mouse_position_.y),
+                                 modifiers);
+        target->NotifyMouseButton(static_cast<int>(mouse_position_.x),
+                                  static_cast<int>(mouse_position_.y),
+                                  button,
+                                  down,
+                                  modifiers);
+      }
       // TODO(scottmg): Invalidate();
     }
   }

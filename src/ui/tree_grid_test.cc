@@ -251,6 +251,11 @@ TEST(TreeGridTest, FocusMovementDownWithExpansions) {
   tg.MoveFocusByDirection(TreeGrid::kFocusDown);
   tg.MoveFocusByDirection(TreeGrid::kFocusDown);
   EXPECT_EQ("x", tg.GetFocusedNode()->GetValue(0)->AsString());
+  tg.MoveFocusByDirection(TreeGrid::kFocusDown);
+  tg.MoveFocusByDirection(TreeGrid::kFocusDown);
+  EXPECT_EQ("draggable_", tg.GetFocusedNode()->GetValue(0)->AsString());
+  tg.MoveFocusByDirection(TreeGrid::kFocusDown);
+  EXPECT_EQ("target", tg.GetFocusedNode()->GetValue(0)->AsString());
 }
 
 TEST(TreeGridTest, FocusMovementUpWithExpansions) {

@@ -99,6 +99,8 @@ class TreeGrid : public Dockable {
 
   virtual bool CouldStartDrag(DragSetup* drag_setup) override;
 
+  virtual bool WantMouseEvents() override { return true; }
+  virtual bool WantKeyEvents() override { return true; }
   virtual bool NotifyKey(core::Key::Enum key,
                          bool down,
                          uint8_t modifiers) override;
@@ -146,6 +148,7 @@ class TreeGrid : public Dockable {
     Rect margin;
     Rect header;
     Rect body;
+    Rect focus;
   };
 
   TreeGridNode* focused_node_;

@@ -21,6 +21,7 @@ class Rect {
   Rect RelativeTo(const Rect& other) const {
     return Rect(x - other.x, y - other.y, w, h);
   }
+  bool IsValid() const { return w != -1; }
   float x, y, w, h;
 };
 
