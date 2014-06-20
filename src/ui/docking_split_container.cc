@@ -42,7 +42,8 @@ void DockingSplitContainer::SplitChild(
     to_replace = &left_;
   else
     to_replace = &right_;
-  DockingSplitContainer* previous_parent = (*to_replace)->parent();
+  DockingSplitContainer* previous_parent =
+      (*to_replace)->parent()->AsDockingSplitContainer();
   Rect previous_rect = (*to_replace)->GetScreenRect();
   to_replace->release();  // We're going re-own this pointer on the next line.
   DockingSplitContainer* replacement =
@@ -56,20 +57,20 @@ void DockingSplitContainer::SplitChild(
 
 void DockingSplitContainer::DeleteChild(Widget* child) {
   if (left_.get() == child)
-    parent()->Replace(this, right_.release());
+    parent()->AsDockingSplitContainer()->Replace(this, right_.release());
   else if (right_.get() == child)
-    parent()->Replace(this, left_.release());
+    parent()->AsDockingSplitContainer()->Replace(this, left_.release());
 }
 
 Widget* DockingSplitContainer::ReleaseChild(Widget* child) {
   Widget* result = NULL;
   if (left_.get() == child) {
     result = left_.release();
-    parent()->Replace(this, right_.release());
+    parent()->AsDockingSplitContainer()->Replace(this, right_.release());
     // |this| has been deleted here.
   } else if (right_.get() == child) {
     result = right_.release();
-    parent()->Replace(this, left_.release());
+    parent()->AsDockingSplitContainer()->Replace(this, left_.release());
     // |this| has been deleted here.
   }
   if (result)

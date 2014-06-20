@@ -15,7 +15,7 @@ Widget::~Widget() {
 }
 
 DockingSplitContainer* Widget::AsDockingSplitContainer() {
-  CORE_CHECK(IsContainer(), "Expected container");
+  CORE_CHECK(IsDockingSplitContainer(), "Expected DockingSplitContainer");
   return reinterpret_cast<DockingSplitContainer*>(this);
 }
 

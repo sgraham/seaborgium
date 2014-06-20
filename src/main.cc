@@ -179,17 +179,21 @@ int Main(int argc, char** argv) {
   SetFocusedContents(command_contents);
 
   main_area.SetRoot(source_view);
-  source_view->parent()->SplitChild(kSplitHorizontal, source_view, command);
-  source_view->parent()->SetFraction(0.7f);
+  source_view->parent()->AsDockingSplitContainer()->SplitChild(
+      kSplitHorizontal, source_view, command);
+  source_view->parent()->AsDockingSplitContainer()->SetFraction(0.7f);
 
-  source_view->parent()->SplitChild(kSplitVertical, source_view, stack);
-  source_view->parent()->SetFraction(0.4f);
+  source_view->parent()->AsDockingSplitContainer()->SplitChild(
+      kSplitVertical, source_view, stack);
+  source_view->parent()->AsDockingSplitContainer()->SetFraction(0.4f);
 
-  stack->parent()->SplitChild(kSplitVertical, stack, watch);
-  stack->parent()->SetFraction(0.5f);
+  stack->parent()->AsDockingSplitContainer()->SplitChild(
+      kSplitVertical, stack, watch);
+  stack->parent()->AsDockingSplitContainer()->SetFraction(0.5f);
 
-  stack->parent()->SplitChild(kSplitHorizontal, stack, breakpoints);
-  stack->parent()->SetFraction(0.7f);
+  stack->parent()->AsDockingSplitContainer()->SplitChild(
+      kSplitHorizontal, stack, breakpoints);
+  stack->parent()->AsDockingSplitContainer()->SetFraction(0.7f);
 
   uint32_t prev_width = 0, prev_height = 0;
   uint32_t width, height;

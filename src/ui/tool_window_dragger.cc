@@ -141,13 +141,14 @@ ToolWindowDragger::ToolWindowDragger(
   current_position_ = drag_setup->screen_position;
 
   // Save sibling, split direction, and fraction for cancel.
-  cancel_sibling_ = dragging->parent()->GetSiblingOf(dragging);
-  cancel_direction_ = dragging->parent()->direction();
-  cancel_fraction_ = dragging->parent()->fraction();
-  cancel_was_primary_ = dragging->parent()->left() == dragging;
+  DockingSplitContainer* dragging_parent_as_container = dragging->parent()->AsDockingSplitContainer();
+  cancel_sibling_ = dragging_parent_as_container->GetSiblingOf(dragging);
+  cancel_direction_ = dragging_parent_as_container->direction();
+  cancel_fraction_ = dragging_parent_as_container->fraction();
+  cancel_was_primary_ = dragging_parent_as_container->left() == dragging;
 
   // Remove from tree
-  dragging->parent()->ReleaseChild(dragging);
+  dragging_parent_as_container->ReleaseChild(dragging);
   dragging_.reset(dragging);
 
   RefreshTargets();
@@ -186,7 +187,8 @@ void ToolWindowDragger::Drag(const Point& screen_point) {
   // though.
 
   if (on_drop_target_) {
-    dragging_->parent()->ReleaseChild(dragging_.get());
+    dragging_->parent()->AsDockingSplitContainer()->ReleaseChild(
+        dragging_.get());
     on_drop_target_ = NULL;
     dragging_->SetScreenRect(initial_screen_rect_);
   }
@@ -199,7 +201,8 @@ void ToolWindowDragger::Drag(const Point& screen_point) {
       Widget* secondary = dragging_.get();
       if (!dti.this_dockable_first)
         std::swap(primary, secondary);
-      dti.dockable->parent()->SplitChild(dti.direction, primary, secondary);
+      dti.dockable->parent()->AsDockingSplitContainer()->SplitChild(
+          dti.direction, primary, secondary);
       // Splitting/inserting sets the screen rect for us.
       break;
     }
@@ -212,8 +215,10 @@ void ToolWindowDragger::CancelDrag() {
   Widget* secondary = dragging_.release();
   if (cancel_was_primary_)
     std::swap(primary, secondary);
-  cancel_sibling_->parent()->SplitChild(cancel_direction_, primary, secondary);
-  cancel_sibling_->parent()->SetFraction(cancel_fraction_);
+  cancel_sibling_->parent()->AsDockingSplitContainer()->SplitChild(
+      cancel_direction_, primary, secondary);
+  cancel_sibling_->parent()->AsDockingSplitContainer()->SetFraction(
+      cancel_fraction_);
 }
 
 void ToolWindowDragger::Render() {

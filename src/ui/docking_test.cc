@@ -12,13 +12,9 @@
 namespace {
 
 class MainDocument : public Widget {
- public:
-  bool CanUndock() const override { return false; }
 };
 
 class ContentPane : public Widget {
- public:
-  bool CanUndock() const override { return true; }
 };
 
 std::string RectAsString(const Rect &r) {
@@ -40,7 +36,7 @@ class DockingTest : public LeakCheckTest {
 TEST_F(DockingTest, Creation) {
   DockingWorkspace workspace;
   workspace.SetRoot(new MainDocument);
-  EXPECT_FALSE(workspace.GetRoot()->IsContainer());
+  EXPECT_FALSE(workspace.GetRoot()->IsDockingSplitContainer());
   // Just checking for no leaks.
 }
 
@@ -49,8 +45,9 @@ TEST_F(DockingTest, AddVerticalSplit) {
   MainDocument* main = new MainDocument;
   workspace.SetRoot(main);
   ContentPane* pane = new ContentPane;
-  main->parent()->SplitChild(kSplitVertical, main, pane);
-  EXPECT_TRUE(workspace.GetRoot()->IsContainer());
+  main->parent()->AsDockingSplitContainer()->SplitChild(
+      kSplitVertical, main, pane);
+  EXPECT_TRUE(workspace.GetRoot()->IsDockingSplitContainer());
   EXPECT_EQ(main, workspace.GetRoot()->AsDockingSplitContainer()->left());
   EXPECT_EQ(pane, workspace.GetRoot()->AsDockingSplitContainer()->right());
   EXPECT_EQ(0.5, workspace.GetRoot()->AsDockingSplitContainer()->fraction());
@@ -63,8 +60,9 @@ TEST_F(DockingTest, AddVerticalSplitOtherOrder) {
   MainDocument* main = new MainDocument;
   workspace.SetRoot(main);
   ContentPane* pane = new ContentPane;
-  main->parent()->SplitChild(kSplitVertical, pane, main);
-  EXPECT_TRUE(workspace.GetRoot()->IsContainer());
+  main->parent()->AsDockingSplitContainer()->SplitChild(
+      kSplitVertical, pane, main);
+  EXPECT_TRUE(workspace.GetRoot()->IsDockingSplitContainer());
   EXPECT_EQ(pane, workspace.GetRoot()->AsDockingSplitContainer()->left());
   EXPECT_EQ(main, workspace.GetRoot()->AsDockingSplitContainer()->right());
   EXPECT_EQ(0.5, workspace.GetRoot()->AsDockingSplitContainer()->fraction());
@@ -77,8 +75,9 @@ TEST_F(DockingTest, AddHorizontalSplit) {
   MainDocument* main = new MainDocument;
   workspace.SetRoot(main);
   ContentPane* pane = new ContentPane;
-  main->parent()->SplitChild(kSplitHorizontal, main, pane);
-  EXPECT_TRUE(workspace.GetRoot()->IsContainer());
+  main->parent()->AsDockingSplitContainer()->SplitChild(
+      kSplitHorizontal, main, pane);
+  EXPECT_TRUE(workspace.GetRoot()->IsDockingSplitContainer());
   EXPECT_EQ(main, workspace.GetRoot()->AsDockingSplitContainer()->left());
   EXPECT_EQ(pane, workspace.GetRoot()->AsDockingSplitContainer()->right());
   EXPECT_EQ(0.5, workspace.GetRoot()->AsDockingSplitContainer()->fraction());
@@ -92,13 +91,15 @@ TEST_F(DockingTest, SubSplit) {
   workspace.SetRoot(main);
   ContentPane* pane1 = new ContentPane;
   ContentPane* pane2 = new ContentPane;
-  main->parent()->SplitChild(kSplitVertical, main, pane1);
-  pane1->parent()->SplitChild(kSplitHorizontal, pane1, pane2);
-  EXPECT_TRUE(workspace.GetRoot()->IsContainer());
+  main->parent()->AsDockingSplitContainer()->SplitChild(
+      kSplitVertical, main, pane1);
+  pane1->parent()->AsDockingSplitContainer()->SplitChild(
+      kSplitHorizontal, pane1, pane2);
+  EXPECT_TRUE(workspace.GetRoot()->IsDockingSplitContainer());
   DockingSplitContainer* root_as_container =
       workspace.GetRoot()->AsDockingSplitContainer();
   EXPECT_EQ(main, root_as_container->left());
-  EXPECT_TRUE(root_as_container->right()->IsContainer());
+  EXPECT_TRUE(root_as_container->right()->IsDockingSplitContainer());
   DockingSplitContainer* subtree =
       root_as_container->right()->AsDockingSplitContainer();
   EXPECT_EQ(pane1, subtree->left());
@@ -113,7 +114,8 @@ TEST_F(DockingTest, SetSizes) {
   MainDocument* main = new MainDocument;
   workspace.SetRoot(main);
   ContentPane* pane = new ContentPane;
-  main->parent()->SplitChild(kSplitVertical, main, pane);
+  main->parent()->AsDockingSplitContainer()->SplitChild(
+      kSplitVertical, main, pane);
   DockingSplitContainer* root = workspace.GetRoot()->AsDockingSplitContainer();
   EXPECT_EQ(root->left(), main);
   EXPECT_EQ("0,0 498x1000", RectAsString(root->left()->GetScreenRect()));
@@ -128,7 +130,8 @@ TEST_F(DockingTest, DragSplitter) {
   MainDocument* main = new MainDocument;
   workspace.SetRoot(main);
   ContentPane* pane = new ContentPane;
-  main->parent()->SplitChild(kSplitVertical, main, pane);
+  main->parent()->AsDockingSplitContainer()->SplitChild(
+      kSplitVertical, main, pane);
   DockingSplitContainer* root = workspace.GetRoot()->AsDockingSplitContainer();
   DockingResizer resizer(root);
   resizer.Drag(CalculateDragPoint(resizer, -200, 10));
@@ -145,7 +148,8 @@ TEST_F(DockingTest, DragLeftAndThenRight) {
   MainDocument* main = new MainDocument;
   workspace.SetRoot(main);
   ContentPane* pane = new ContentPane;
-  main->parent()->SplitChild(kSplitVertical, main, pane);
+  main->parent()->AsDockingSplitContainer()->SplitChild(
+      kSplitVertical, main, pane);
   DockingSplitContainer* root = workspace.GetRoot()->AsDockingSplitContainer();
   DockingResizer resizer(root);
   resizer.Drag(CalculateDragPoint(resizer, -200, 10));
@@ -163,7 +167,8 @@ TEST_F(DockingTest, DragCancel) {
   MainDocument* main = new MainDocument;
   workspace.SetRoot(main);
   ContentPane* pane = new ContentPane;
-  main->parent()->SplitChild(kSplitVertical, main, pane);
+  main->parent()->AsDockingSplitContainer()->SplitChild(
+      kSplitVertical, main, pane);
   DockingSplitContainer* root = workspace.GetRoot()->AsDockingSplitContainer();
   DockingResizer resizer(root);
   resizer.Drag(CalculateDragPoint(resizer, -200, 10));
@@ -182,7 +187,8 @@ TEST_F(DockingTest, DragPastLeftEdge) {
   MainDocument* main = new MainDocument;
   workspace.SetRoot(main);
   ContentPane* pane = new ContentPane;
-  main->parent()->SplitChild(kSplitVertical, main, pane);
+  main->parent()->AsDockingSplitContainer()->SplitChild(
+      kSplitVertical, main, pane);
   DockingSplitContainer* root = workspace.GetRoot()->AsDockingSplitContainer();
   DockingResizer resizer(root);
   resizer.Drag(CalculateDragPoint(resizer, -600, 10));
@@ -201,7 +207,8 @@ TEST_F(DockingTest, DragPastRightEdge) {
   MainDocument* main = new MainDocument;
   workspace.SetRoot(main);
   ContentPane* pane = new ContentPane;
-  main->parent()->SplitChild(kSplitVertical, main, pane);
+  main->parent()->AsDockingSplitContainer()->SplitChild(
+      kSplitVertical, main, pane);
   DockingSplitContainer* root = workspace.GetRoot()->AsDockingSplitContainer();
   DockingResizer resizer(root);
   // Not past right edge.
@@ -219,7 +226,8 @@ TEST_F(DockingTest, DragUpDown) {
   MainDocument* main = new MainDocument;
   workspace.SetRoot(main);
   ContentPane* pane = new ContentPane;
-  main->parent()->SplitChild(kSplitHorizontal, main, pane);
+  main->parent()->AsDockingSplitContainer()->SplitChild(
+      kSplitHorizontal, main, pane);
   DockingSplitContainer* root = workspace.GetRoot()->AsDockingSplitContainer();
   DockingResizer resizer(root);
   resizer.Drag(CalculateDragPoint(resizer, 10, 100));
@@ -236,15 +244,16 @@ TEST_F(DockingTest, AddAndDelete) {
   MainDocument* main = new MainDocument;
   workspace.SetRoot(main);
   ContentPane* pane = new ContentPane;
-  main->parent()->SplitChild(kSplitVertical, main, pane);
+  main->parent()->AsDockingSplitContainer()->SplitChild(
+      kSplitVertical, main, pane);
   DockingSplitContainer* root = workspace.GetRoot()->AsDockingSplitContainer();
   EXPECT_EQ(root->left(), main);
   EXPECT_EQ("0,0 498x1000", RectAsString(root->left()->GetScreenRect()));
   EXPECT_EQ(root->right(), pane);
   EXPECT_EQ("502,0 498x1000", RectAsString(root->right()->GetScreenRect()));
 
-  pane->parent()->DeleteChild(pane);
-  EXPECT_FALSE(workspace.GetRoot()->IsContainer());
+  pane->parent()->AsDockingSplitContainer()->DeleteChild(pane);
+  EXPECT_FALSE(workspace.GetRoot()->IsDockingSplitContainer());
   EXPECT_EQ(main, workspace.GetRoot());
   EXPECT_EQ("0,0 1000x1000",
             RectAsString(workspace.GetRoot()->GetScreenRect()));
@@ -257,16 +266,18 @@ TEST_F(DockingTest, AddAndRelease) {
   MainDocument* main = new MainDocument;
   workspace.SetRoot(main);
   ContentPane* pane = new ContentPane;
-  main->parent()->SplitChild(kSplitVertical, main, pane);
+  main->parent()->AsDockingSplitContainer()->SplitChild(
+      kSplitVertical, main, pane);
   DockingSplitContainer* root = workspace.GetRoot()->AsDockingSplitContainer();
   EXPECT_EQ(root->left(), main);
   EXPECT_EQ("0,0 498x1000", RectAsString(root->left()->GetScreenRect()));
   EXPECT_EQ(root->right(), pane);
   EXPECT_EQ("502,0 498x1000", RectAsString(root->right()->GetScreenRect()));
 
-  std::unique_ptr<Widget> result(pane->parent()->ReleaseChild(pane));
+  std::unique_ptr<Widget> result(
+      pane->parent()->AsDockingSplitContainer()->ReleaseChild(pane));
   EXPECT_EQ(NULL, result->parent());
-  EXPECT_FALSE(workspace.GetRoot()->IsContainer());
+  EXPECT_FALSE(workspace.GetRoot()->IsDockingSplitContainer());
   EXPECT_EQ(main, workspace.GetRoot());
   EXPECT_EQ("0,0 1000x1000",
             RectAsString(workspace.GetRoot()->GetScreenRect()));
@@ -281,9 +292,12 @@ TEST_F(DockingTest, SubSplitRectSize) {
   ContentPane* pane1 = new ContentPane;
   ContentPane* pane2 = new ContentPane;
   ContentPane* pane3 = new ContentPane;
-  main->parent()->SplitChild(kSplitVertical, main, pane1);
-  pane1->parent()->SplitChild(kSplitVertical, pane1, pane2);
-  pane1->parent()->SplitChild(kSplitHorizontal, pane1, pane3);
+  main->parent()->AsDockingSplitContainer()->SplitChild(
+      kSplitVertical, main, pane1);
+  pane1->parent()->AsDockingSplitContainer()->SplitChild(
+      kSplitVertical, pane1, pane2);
+  pane1->parent()->AsDockingSplitContainer()->SplitChild(
+      kSplitHorizontal, pane1, pane3);
 
   EXPECT_EQ("0,0 500x1000", RectAsString(main->GetScreenRect()));
   EXPECT_EQ("500,0 250x500", RectAsString(pane1->GetScreenRect()));
@@ -299,8 +313,11 @@ TEST_F(DockingTest, SiblingRetrieval) {
   workspace.SetRoot(main);
   ContentPane* pane1 = new ContentPane;
   ContentPane* pane2 = new ContentPane;
-  main->parent()->SplitChild(kSplitVertical, main, pane1);
-  pane1->parent()->SplitChild(kSplitVertical, pane1, pane2);
+  main->parent()->AsDockingSplitContainer()->SplitChild(
+      kSplitVertical, main, pane1);
+  pane1->parent()->AsDockingSplitContainer()->SplitChild(
+      kSplitVertical, pane1, pane2);
   EXPECT_EQ(pane1->parent(), pane2->parent());
-  EXPECT_EQ(pane2, pane1->parent()->GetSiblingOf(pane1));
+  EXPECT_EQ(pane2,
+            pane1->parent()->AsDockingSplitContainer()->GetSiblingOf(pane1));
 }

@@ -23,7 +23,7 @@ class DockingSplitContainer : public Widget {
   static void SetSplitterWidth(float width);
   static float GetSplitterWidth();
 
-  virtual bool IsContainer() const { return true; }
+  virtual bool IsDockingSplitContainer() const override { return true; }
 
   // Finds left or right in its children, and replaces that child with a new
   // container split in |direction| containing |left| and |right| in that

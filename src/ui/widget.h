@@ -20,16 +20,11 @@ class Widget : public core::InputHandler {
   Widget();
   virtual ~Widget();
 
-  virtual bool CanUndock() const { return false; }
-  virtual bool IsContainer() const { return false; }
-  // TODO(scottmg): This needs to go.
-  virtual DockingSplitContainer* AsDockingSplitContainer();
-
   virtual void SetScreenRect(const Rect& rect);
   const Rect& GetScreenRect() const;
 
-  void set_parent(DockingSplitContainer* parent) { parent_ = parent; }
-  DockingSplitContainer* parent() { return parent_; }
+  void set_parent(Widget* parent) { parent_ = parent; }
+  Widget* parent() { return parent_; }
 
   virtual void Render() {}
   virtual void Invalidate();
@@ -84,8 +79,13 @@ class Widget : public core::InputHandler {
   virtual bool WantMouseEvents() { return false; }
   virtual bool WantKeyEvents() { return false; }
 
+  // TODO(scottmg): This kind of sucks, but so does inventing some sort of
+  // RTTI just for this.
+  virtual bool IsDockingSplitContainer() const { return false; }
+  virtual DockingSplitContainer* AsDockingSplitContainer();
+
  private:
-  DockingSplitContainer* parent_;
+  Widget* parent_;
   Rect rect_;
 
   CORE_DISALLOW_COPY_AND_ASSIGN(Widget);

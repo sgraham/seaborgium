@@ -153,15 +153,11 @@ bool DockingWorkspace::NotifyChar(int character) {
   return false;
 }
 
-void DockingWorkspace::GetDockTargets(
-    Widget* root, std::vector<Widget*>* into) {
-  // TODO(scottmg): This is crappy. DockingToolWindow claims that it's not
-  // IsContainer, which happens to make this work, but is false obviously.
-  // See also AsDockingSplitContainer, which is kind of what IsContainer
-  // means, so it's not so bad. Sort of.
+void DockingWorkspace::GetDockTargets(Widget* root,
+                                      std::vector<Widget*>* into) {
   if (!root)
     return;
-  if (!root->IsContainer()) {
+  if (!root->IsDockingSplitContainer()) {
     into->push_back(root);
   } else {
     GetDockTargets(root->AsDockingSplitContainer()->left(), into);
