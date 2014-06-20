@@ -102,28 +102,29 @@ void PlaceIndicatorsAtCenter(
   const Skin& skin = Skin::current();
   float cx = rect.x + rect.w / 2;
   float cy = rect.y + rect.h / 2;
+  float offset = IconWidth(skin.dock_top_icon());
   into->push_back(IndicatorAt(dockable,
                               skin.dock_top_icon(),
-                              cx - IconWidth(skin.dock_top_icon()) / 2,
-                              cy - IconHeight(skin.dock_top_icon()) * 2,
+                              cx - offset / 2,
+                              cy - offset * 2,
                               kSplitHorizontal,
                               false));
   into->push_back(IndicatorAt(dockable,
                               skin.dock_left_icon(),
-                              cx - IconHeight(skin.dock_left_icon()) * 2,
-                              cy - IconHeight(skin.dock_left_icon()) / 2,
+                              cx - offset * 2,
+                              cy - offset / 2,
                               kSplitVertical,
                               false));
   into->push_back(IndicatorAt(dockable,
                               skin.dock_right_icon(),
-                              cx + IconWidth(skin.dock_right_icon()),
-                              cy - IconHeight(skin.dock_right_icon()) / 2,
+                              cx + offset,
+                              cy - offset / 2,
                               kSplitVertical,
                               true));
   into->push_back(IndicatorAt(dockable,
                               skin.dock_bottom_icon(),
-                              cx - IconWidth(skin.dock_bottom_icon()) / 2,
-                              cy + IconHeight(skin.dock_bottom_icon()),
+                              cx - offset / 2,
+                              cy + offset,
                               kSplitHorizontal,
                               true));
 }
@@ -238,12 +239,14 @@ void ToolWindowDragger::Render() {
 
   for (size_t i = 0; i < targets_.size(); ++i) {
     const DropTargetIndicator& dti = targets_[i];
+    nvgTextAlign(core::VG, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
     nvgTextBox(core::VG,
                dti.rect.x,
-               dti.rect.y + IconHeight(dti.icon),
+               dti.rect.y + IconHeight(dti.icon) / 2,
                dti.rect.w,
                dti.icon,
                NULL);
+    //DrawSolidRect(dti.rect, nvgRGBA(255, 255, 0, 64));
   }
 
   Rect draw_rect;
