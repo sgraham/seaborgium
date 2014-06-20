@@ -5,9 +5,9 @@
 #ifndef UI_FOCUS_H_
 #define UI_FOCUS_H_
 
-class Dockable;
+class Widget;
 
-Dockable* GetFocusedContents();
-void SetFocusedContents(Dockable* contents);
+Widget* GetFocusedContents();
+void SetFocusedContents(Widget* contents);
 
 #endif  // UI_FOCUS_H_

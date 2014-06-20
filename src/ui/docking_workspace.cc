@@ -11,7 +11,7 @@
 #include "ui/focus.h"
 
 // TODO(scottmg):
-// This whole file sucks. Maybe it should just be a Dockable/Container too.
+// This whole file sucks. Maybe it should just be a Widget/Container too.
 
 DockingWorkspace::DockingWorkspace() {
   root_.reset(new DockingSplitContainer(kSplitNoneRoot, NULL, NULL));
@@ -30,12 +30,12 @@ void DockingWorkspace::Render() {
     draggable_->Render();
 }
 
-void DockingWorkspace::SetRoot(Dockable* root) {
+void DockingWorkspace::SetRoot(Widget* root) {
   root_->ReplaceLeft(root);
   root->set_parent(root_.get());
 }
 
-Dockable* DockingWorkspace::GetRoot() {
+Widget* DockingWorkspace::GetRoot() {
   return root_->left();
 }
 
@@ -51,15 +51,15 @@ bool DockingWorkspace::CouldStartDrag(DragSetup* drag_setup) {
   return root_->CouldStartDrag(drag_setup);
 }
 
-std::vector<Dockable*> DockingWorkspace::GetAllDockTargets() {
-  std::vector<Dockable*> into;
+std::vector<Widget*> DockingWorkspace::GetAllDockTargets() {
+  std::vector<Widget*> into;
   GetDockTargets(root_.get(), &into);
   std::sort(into.begin(), into.end());
   std::unique(into.begin(), into.end());
   return into;
 }
 
-Dockable* DockingWorkspace::FindTopMostUnderPoint(const Point& point) {
+Widget* DockingWorkspace::FindTopMostUnderPoint(const Point& point) {
   return root_->left()->FindTopMostUnderPoint(point);
 }
 
@@ -72,7 +72,7 @@ bool DockingWorkspace::NotifyMouseMoved(int x, int y, uint8_t modifiers) {
     return true;
   }
   UpdateCursorForLocation();
-  Dockable* focused = GetFocusedContents();
+  Widget* focused = GetFocusedContents();
   if (!focused || !focused->WantMouseEvents())
     return false;
   return focused->NotifyMouseMoved(x, y, modifiers);
@@ -84,7 +84,7 @@ bool DockingWorkspace::NotifyMouseWheel(int x,
                                         uint8_t modifiers) {
   mouse_position_.x = static_cast<float>(x);
   mouse_position_.y = static_cast<float>(y);
-  Dockable* focused = GetFocusedContents();
+  Widget* focused = GetFocusedContents();
   if (!focused || !focused->WantMouseEvents())
     return false;
   return focused->NotifyMouseWheel(x, y, delta, modifiers);
@@ -109,7 +109,7 @@ bool DockingWorkspace::NotifyMouseButton(int x,
     // TODO(scottmg): Invalidate();
     return true;
   } else if (button == core::MouseButton::Left) {
-    Dockable* target = root_->left()->FindTopMostUnderPoint(mouse_position_);
+    Widget* target = root_->left()->FindTopMostUnderPoint(mouse_position_);
     if (target) {
       if (down)
         SetFocusedContents(target);
@@ -132,7 +132,7 @@ bool DockingWorkspace::NotifyMouseButton(int x,
 bool DockingWorkspace::NotifyKey(core::Key::Enum key,
                                  bool down,
                                  uint8_t modifiers) {
-  Dockable* focused = GetFocusedContents();
+  Widget* focused = GetFocusedContents();
   if (!focused)
     return false;
   if (focused->WantKeyEvents() && focused->NotifyKey(key, down, modifiers))
@@ -143,7 +143,7 @@ bool DockingWorkspace::NotifyKey(core::Key::Enum key,
 }
 
 bool DockingWorkspace::NotifyChar(int character) {
-  Dockable* focused = GetFocusedContents();
+  Widget* focused = GetFocusedContents();
   if (!focused)
     return false;
   if (focused->WantKeyEvents() && focused->NotifyChar(character))
@@ -154,7 +154,7 @@ bool DockingWorkspace::NotifyChar(int character) {
 }
 
 void DockingWorkspace::GetDockTargets(
-    Dockable* root, std::vector<Dockable*>* into) {
+    Widget* root, std::vector<Widget*>* into) {
   // TODO(scottmg): This is crappy. DockingToolWindow claims that it's not
   // IsContainer, which happens to make this work, but is false obviously.
   // See also AsDockingSplitContainer, which is kind of what IsContainer

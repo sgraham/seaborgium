@@ -6,12 +6,12 @@
 #define UI_TEXT_EDIT_H_
 
 #include "nanovg.h"
-#include "ui/dockable.h"
+#include "ui/widget.h"
 
 #include <string>
 
 // Single line text edit control.
-class TextEdit : public Dockable {
+class TextEdit : public Widget {
  public:
   TextEdit();
   virtual ~TextEdit();
@@ -35,7 +35,7 @@ class TextEdit : public Dockable {
 
   void SetText(const std::string& value);
 
-  // Implementation of Dockable:
+  // Implementation of Widget:
   void Render() override;
 
  private:

@@ -6,7 +6,7 @@
 #define UI_DOCKING_SPLIT_CONTAINER_H_
 
 #include <memory>
-#include "ui/dockable.h"
+#include "ui/widget.h"
 
 enum DockingSplitDirection {
   kSplitNoneRoot,
@@ -14,10 +14,10 @@ enum DockingSplitDirection {
   kSplitHorizontal,
 };
 
-class DockingSplitContainer : public Dockable {
+class DockingSplitContainer : public Widget {
  public:
   DockingSplitContainer(DockingSplitDirection direction,
-                        Dockable* left, Dockable* right);
+                        Widget* left, Widget* right);
   virtual ~DockingSplitContainer();
 
   static void SetSplitterWidth(float width);
@@ -29,19 +29,19 @@ class DockingSplitContainer : public Dockable {
   // container split in |direction| containing |left| and |right| in that
   // order.
   void SplitChild(DockingSplitDirection direction,
-                  Dockable* left,
-                  Dockable* right);
+                  Widget* left,
+                  Widget* right);
 
   // Both of these remove |child| and replace |this| with the sibling of
   // |child|. Delete cleans the child up, Release gives ownership to the
   // caller.
-  void DeleteChild(Dockable* child);
-  Dockable* ReleaseChild(Dockable* child);
+  void DeleteChild(Widget* child);
+  Widget* ReleaseChild(Widget* child);
 
   // Replaces either left or right child matching |target|, with |with|.
-  void Replace(Dockable* target, Dockable* with);
+  void Replace(Widget* target, Widget* with);
 
-  Dockable* GetSiblingOf(Dockable* child);
+  Widget* GetSiblingOf(Widget* child);
 
   void SetScreenRect(const Rect& rect) override;
   void Render() override;
@@ -49,15 +49,15 @@ class DockingSplitContainer : public Dockable {
 
   DockingSplitDirection direction() const { return direction_; }
   float fraction() const { return fraction_; }
-  Dockable* left() { return left_.get(); }
-  Dockable* right() { return right_.get(); }
+  Widget* left() { return left_.get(); }
+  Widget* right() { return right_.get(); }
 
   void SetFraction(float fraction);
 
   // Hokey method only used for DockingWorkspace that uses left as root.
-  void ReplaceLeft(Dockable* left);
+  void ReplaceLeft(Widget* left);
 
-  virtual Dockable* FindTopMostUnderPoint(const Point& point) override;
+  virtual Widget* FindTopMostUnderPoint(const Point& point) override;
 
  private:
   Rect GetRectForSplitter();
@@ -67,8 +67,8 @@ class DockingSplitContainer : public Dockable {
 
   // Named left/right for simplicity, but "left" is also "top" if the split is
   // horizontal rather than vertical.
-  std::unique_ptr<Dockable> left_;
-  std::unique_ptr<Dockable> right_;
+  std::unique_ptr<Widget> left_;
+  std::unique_ptr<Widget> right_;
 };
 
 #endif  // UI_DOCKING_SPLIT_CONTAINER_H_

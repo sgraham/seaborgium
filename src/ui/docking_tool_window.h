@@ -8,23 +8,23 @@
 #include <string>
 
 #include "core/core.h"
-#include "ui/dockable.h"
+#include "ui/widget.h"
 
 // Renders window decoration, handles drag/re-dock interaction.
-class DockingToolWindow : public Dockable {
+class DockingToolWindow : public Widget {
  public:
-  DockingToolWindow(Dockable* dockable, const std::string& title);
+  DockingToolWindow(Widget* dockable, const std::string& title);
   virtual ~DockingToolWindow();
 
   virtual void Render() override;
   virtual void SetScreenRect(const Rect& rect) override;
   virtual bool CouldStartDrag(DragSetup* drag_setup) override;
-  virtual Dockable* FindTopMostUnderPoint(const Point& point) override;
+  virtual Widget* FindTopMostUnderPoint(const Point& point) override;
 
  private:
   Rect RectForTitleBar();
 
-  Dockable* contents_;
+  Widget* contents_;
   std::string title_;
 };
 

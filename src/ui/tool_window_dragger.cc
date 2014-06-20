@@ -45,7 +45,7 @@ float IconHeight(const char* icon) {
   return bounds[3] - bounds[1];
 }
 
-DropTargetIndicator IndicatorAt(Dockable* dockable,
+DropTargetIndicator IndicatorAt(Widget* dockable,
                                 const char* icon,
                                 float x,
                                 float y,
@@ -63,7 +63,7 @@ DropTargetIndicator IndicatorAt(Dockable* dockable,
 void PlaceIndicatorsAroundEdge(
     const Rect& rect,
     std::vector<DropTargetIndicator>* into,
-    Dockable* dockable) {
+    Widget* dockable) {
   const Skin& skin = Skin::current();
   into->push_back(
       IndicatorAt(dockable,
@@ -98,7 +98,7 @@ void PlaceIndicatorsAroundEdge(
 void PlaceIndicatorsAtCenter(
     const Rect& rect,
     std::vector<DropTargetIndicator>* into,
-    Dockable* dockable) {
+    Widget* dockable) {
   const Skin& skin = Skin::current();
   float cx = rect.x + rect.w / 2;
   float cy = rect.y + rect.h / 2;
@@ -160,7 +160,7 @@ void ToolWindowDragger::RefreshTargets() {
   Rect workspace_rect = docking_workspace_->GetScreenRect();
   PlaceIndicatorsAroundEdge(
       workspace_rect, &targets_, docking_workspace_->GetRoot());
-  std::vector<Dockable*> dock_targets =
+  std::vector<Widget*> dock_targets =
       docking_workspace_->GetAllDockTargets();
   for (size_t i = 0; i < dock_targets.size(); ++i) {
     if (dock_targets[i] != dragging_.get()) {
@@ -195,8 +195,8 @@ void ToolWindowDragger::Drag(const Point& screen_point) {
     DropTargetIndicator& dti = targets_[i];
     if (dti.rect.Contains(current_position_)) {
       on_drop_target_ = &dti;
-      Dockable* primary = dti.dockable;
-      Dockable* secondary = dragging_.get();
+      Widget* primary = dti.dockable;
+      Widget* secondary = dragging_.get();
       if (!dti.this_dockable_first)
         std::swap(primary, secondary);
       dti.dockable->parent()->SplitChild(dti.direction, primary, secondary);
@@ -208,8 +208,8 @@ void ToolWindowDragger::Drag(const Point& screen_point) {
 
 void ToolWindowDragger::CancelDrag() {
   // Reinsert at "old" location, based on saved information.
-  Dockable* primary = cancel_sibling_;
-  Dockable* secondary = dragging_.release();
+  Widget* primary = cancel_sibling_;
+  Widget* secondary = dragging_.release();
   if (cancel_was_primary_)
     std::swap(primary, secondary);
   cancel_sibling_->parent()->SplitChild(cancel_direction_, primary, secondary);

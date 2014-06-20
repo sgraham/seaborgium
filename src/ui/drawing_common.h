@@ -5,9 +5,9 @@
 #ifndef UI_DRAWING_COMMON_H_
 #define UI_DRAWING_COMMON_H_
 
-#include "ui/dockable.h"
 #include "core/gfx.h"
 #include "nanovg.h"
+#include "ui/widget.h"
 
 #include <string>
 
@@ -33,7 +33,7 @@ void DrawTextInRect(const Rect& rect,
                     float x_padding = 0.f);
 
 struct ScopedRenderOffset {
-  ScopedRenderOffset(Dockable* parent, Dockable* child, bool scissor) {
+  ScopedRenderOffset(Widget* parent, Widget* child, bool scissor) {
     nvgSave(core::VG);
     Rect relative = child->GetScreenRect().RelativeTo(parent->GetScreenRect());
     nvgTranslate(core::VG, relative.x, relative.y);

@@ -12,7 +12,7 @@
 #include "ui/docking_split_container.h"
 #include "ui/draggable.h"
 
-class Dockable;
+class Widget;
 class DockingToolWindow;
 class DockingWorkspace;
 class DragSetup;
@@ -20,7 +20,7 @@ class Texture;
 class Workspace;
 
 struct DropTargetIndicator {
-  Dockable* dockable;
+  Widget* dockable;
   const char* icon;
   Rect rect;
   DockingSplitDirection direction;
@@ -49,7 +49,7 @@ class ToolWindowDragger : public Draggable {
   DockingWorkspace* docking_workspace_;
   std::vector<DropTargetIndicator> targets_;
 
-  Dockable* cancel_sibling_;
+  Widget* cancel_sibling_;
   DockingSplitDirection cancel_direction_;
   float cancel_fraction_;
   bool cancel_was_primary_;

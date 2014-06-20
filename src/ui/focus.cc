@@ -6,16 +6,16 @@
 
 namespace {
 
-Dockable* g_focused;
+Widget* g_focused;
 
 }  // namespace
 
 // TODO(focus): Probably some sort of OnFocus/OnBlur?
 
-Dockable* GetFocusedContents() {
+Widget* GetFocusedContents() {
   return g_focused;
 }
 
-void SetFocusedContents(Dockable* contents) {
+void SetFocusedContents(Widget* contents) {
   g_focused = contents;
 }

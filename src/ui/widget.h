@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef UI_DOCKABLE_H_
-#define UI_DOCKABLE_H_
+#ifndef UI_WIDGET_H_
+#define UI_WIDGET_H_
 
 #include "core/core.h"
 #include "core/entry.h"
@@ -15,13 +15,14 @@ class Draggable;
 class Renderer;
 class Workspace;
 
-class Dockable : public core::InputHandler {
+class Widget : public core::InputHandler {
  public:
-  Dockable();
-  virtual ~Dockable();
+  Widget();
+  virtual ~Widget();
 
   virtual bool CanUndock() const { return false; }
   virtual bool IsContainer() const { return false; }
+  // TODO(scottmg): This needs to go.
   virtual DockingSplitContainer* AsDockingSplitContainer();
 
   virtual void SetScreenRect(const Rect& rect);
@@ -49,9 +50,9 @@ class Dockable : public core::InputHandler {
   }
   Rect ClientToScreen(const Rect& rect);
 
-  // Find the Dockable in the tree that's top-most in the stacking order (or
+  // Find the Widget in the tree that's top-most in the stacking order (or
   // equivalently lowest in the tree).
-  virtual Dockable* FindTopMostUnderPoint(const Point& point);
+  virtual Widget* FindTopMostUnderPoint(const Point& point);
 
   // Default implementation of core::InputHandler.
   virtual bool NotifyMouseMoved(int /*x*/,
@@ -87,7 +88,7 @@ class Dockable : public core::InputHandler {
   DockingSplitContainer* parent_;
   Rect rect_;
 
-  CORE_DISALLOW_COPY_AND_ASSIGN(Dockable);
+  CORE_DISALLOW_COPY_AND_ASSIGN(Widget);
 };
 
-#endif  // UI_DOCKABLE_H_
+#endif  // UI_WIDGET_H_

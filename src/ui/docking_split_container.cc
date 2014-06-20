@@ -25,7 +25,7 @@ float DockingSplitContainer::GetSplitterWidth() {
 }
 
 DockingSplitContainer::DockingSplitContainer(
-    DockingSplitDirection direction, Dockable* left, Dockable* right)
+    DockingSplitDirection direction, Widget* left, Widget* right)
     : direction_(direction),
       fraction_(0.5),
       left_(left),
@@ -36,8 +36,8 @@ DockingSplitContainer::~DockingSplitContainer() {
 }
 
 void DockingSplitContainer::SplitChild(
-    DockingSplitDirection direction, Dockable* left, Dockable* right) {
-  std::unique_ptr<Dockable>* to_replace;
+    DockingSplitDirection direction, Widget* left, Widget* right) {
+  std::unique_ptr<Widget>* to_replace;
   if (left_.get() == left || left_.get() == right)
     to_replace = &left_;
   else
@@ -54,15 +54,15 @@ void DockingSplitContainer::SplitChild(
   replacement->SetScreenRect(previous_rect);
 }
 
-void DockingSplitContainer::DeleteChild(Dockable* child) {
+void DockingSplitContainer::DeleteChild(Widget* child) {
   if (left_.get() == child)
     parent()->Replace(this, right_.release());
   else if (right_.get() == child)
     parent()->Replace(this, left_.release());
 }
 
-Dockable* DockingSplitContainer::ReleaseChild(Dockable* child) {
-  Dockable* result = NULL;
+Widget* DockingSplitContainer::ReleaseChild(Widget* child) {
+  Widget* result = NULL;
   if (left_.get() == child) {
     result = left_.release();
     parent()->Replace(this, right_.release());
@@ -77,7 +77,7 @@ Dockable* DockingSplitContainer::ReleaseChild(Dockable* child) {
   return result;
 }
 
-void DockingSplitContainer::Replace(Dockable* target, Dockable* with) {
+void DockingSplitContainer::Replace(Widget* target, Widget* with) {
   if (left_.get() == target) {
     left_.reset(with);
     left_->set_parent(this);
@@ -90,7 +90,7 @@ void DockingSplitContainer::Replace(Dockable* target, Dockable* with) {
   SetScreenRect(GetScreenRect());
 }
 
-Dockable* DockingSplitContainer::GetSiblingOf(Dockable* child) {
+Widget* DockingSplitContainer::GetSiblingOf(Widget* child) {
   if (left_.get() == child)
     return right_.get();
   else if (right_.get() == child)
@@ -101,7 +101,7 @@ Dockable* DockingSplitContainer::GetSiblingOf(Dockable* child) {
 }
 
 void DockingSplitContainer::SetScreenRect(const Rect& rect) {
-  Dockable::SetScreenRect(rect);
+  Widget::SetScreenRect(rect);
   if (direction_ == kSplitVertical) {
     float width = GetScreenRect().w - gSplitterWidth;
     float width_for_left = width * fraction_;
@@ -186,20 +186,20 @@ void DockingSplitContainer::SetFraction(float fraction) {
   SetScreenRect(GetScreenRect());
 }
 
-void DockingSplitContainer::ReplaceLeft(Dockable* left) {
+void DockingSplitContainer::ReplaceLeft(Widget* left) {
   CORE_CHECK(direction_ == kSplitNoneRoot && !right_.get(),
              "Can only use on root");
   left_.reset(left);
-  left->SetScreenRect(Dockable::GetScreenRect());
+  left->SetScreenRect(Widget::GetScreenRect());
 }
 
-Dockable* DockingSplitContainer::FindTopMostUnderPoint(const Point& point) {
+Widget* DockingSplitContainer::FindTopMostUnderPoint(const Point& point) {
   if (!GetScreenRect().Contains(point))
     return NULL;
-  Dockable* left_contains = left_->FindTopMostUnderPoint(point);
+  Widget* left_contains = left_->FindTopMostUnderPoint(point);
   if (left_contains)
     return left_contains;
-  Dockable* right_contains = right_->FindTopMostUnderPoint(point);
+  Widget* right_contains = right_->FindTopMostUnderPoint(point);
   if (right_contains)
     return right_contains;
   CORE_NOTREACHED();

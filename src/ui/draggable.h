@@ -5,6 +5,8 @@
 #ifndef UI_DRAGGABLE_H_
 #define UI_DRAGGABLE_H_
 
+#include "core/geometric_types.h"
+
 class Draggable {
  public:
   virtual ~Draggable() {}

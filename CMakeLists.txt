@@ -50,7 +50,6 @@ include_directories(src
 set(main_sources
   src/core/gfx.cc
 
-  src/ui/dockable.cc
   src/ui/docking_resizer.cc
   src/ui/docking_split_container.cc
   src/ui/docking_tool_window.cc
@@ -61,6 +60,7 @@ set(main_sources
   src/ui/text_edit.cc
   src/ui/tool_window_dragger.cc
   src/ui/tree_grid.cc
+  src/ui/widget.cc
 
   src/ui/source_view/cpp_lexer.cc
   src/ui/source_view/lexer.cc

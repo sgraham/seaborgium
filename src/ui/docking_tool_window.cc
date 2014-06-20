@@ -16,8 +16,7 @@ const int kTitleOffset = 3;
 
 }  // namespace
 
-DockingToolWindow::DockingToolWindow(Dockable* contents,
-                                     const std::string& title)
+DockingToolWindow::DockingToolWindow(Widget* contents, const std::string& title)
     : contents_(contents), title_(title) {}
 
 DockingToolWindow::~DockingToolWindow() {
@@ -36,7 +35,7 @@ void DockingToolWindow::Render() {
 }
 
 void DockingToolWindow::SetScreenRect(const Rect& rect) {
-  Dockable::SetScreenRect(rect);
+  Widget::SetScreenRect(rect);
   Rect contents_rect = rect;
   const Skin& skin = Skin::current();
   contents_rect.x += 0;
@@ -55,7 +54,7 @@ bool DockingToolWindow::CouldStartDrag(DragSetup* drag_setup) {
   return contents_->CouldStartDrag(drag_setup);
 }
 
-Dockable* DockingToolWindow::FindTopMostUnderPoint(const Point& point) {
+Widget* DockingToolWindow::FindTopMostUnderPoint(const Point& point) {
   // We never want to return ourselves.
   return contents_->FindTopMostUnderPoint(point);
 }

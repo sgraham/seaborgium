@@ -4,10 +4,10 @@
 #define UI_SOLID_COLOR_H_
 
 #include "core/gfx.h"
-#include "ui/dockable.h"
 #include "ui/drawing_common.h"
+#include "ui/widget.h"
 
-class SolidColor : public Dockable {
+class SolidColor : public Widget {
  public:
   explicit SolidColor(const NVGcolor& color)
       : color_(color) {

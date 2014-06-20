@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-#include "ui/dockable.h"
+#include "ui/widget.h"
 
 class TextEdit;
 
@@ -108,7 +108,7 @@ class TreeGridEditObserver {
 };
 
 // Hierarchical view, with columns.
-class TreeGrid : public Dockable {
+class TreeGrid : public Widget {
  public:
   TreeGrid();
   virtual ~TreeGrid();

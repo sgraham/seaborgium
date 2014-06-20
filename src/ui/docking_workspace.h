@@ -9,13 +9,13 @@
 #include <vector>
 
 #include "core/entry.h"
-#include "ui/dockable.h"
 #include "ui/drag_direction.h"
 #include "ui/draggable.h"
+#include "ui/widget.h"
 
 class DockingSplitContainer;
 
-// Top level container holding a tree of |Dockable|s.
+// Top level container holding a tree of |Widget|s.
 class DockingWorkspace : public core::InputHandler {
  public:
   DockingWorkspace();
@@ -25,17 +25,17 @@ class DockingWorkspace : public core::InputHandler {
   bool CouldStartDrag(DragSetup* drag_setup);
 
   // Takes ownership.
-  void SetRoot(Dockable* root);
-  Dockable* GetRoot();
+  void SetRoot(Widget* root);
+  Widget* GetRoot();
 
   void SetScreenRect(const Rect& rect);
   const Rect& GetScreenRect() const;
 
   // All non-container children that have an immediate parent of a
   // DockingSplitContainer. I think.
-  std::vector<Dockable*> GetAllDockTargets();
+  std::vector<Widget*> GetAllDockTargets();
 
-  Dockable* FindTopMostUnderPoint(const Point& point);
+  Widget* FindTopMostUnderPoint(const Point& point);
 
   // Implementation of core::InputHandler:
   virtual bool WantMouseEvents() override { return true; }
@@ -54,7 +54,7 @@ class DockingWorkspace : public core::InputHandler {
   virtual bool NotifyChar(int character) override;
 
  private:
-  void GetDockTargets(Dockable* root, std::vector<Dockable*>* into);
+  void GetDockTargets(Widget* root, std::vector<Widget*>* into);
 
   void UpdateCursorForLocation();
 

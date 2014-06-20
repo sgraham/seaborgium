@@ -11,12 +11,12 @@
 
 namespace {
 
-class MainDocument : public Dockable {
+class MainDocument : public Widget {
  public:
   bool CanUndock() const override { return false; }
 };
 
-class ContentPane : public Dockable {
+class ContentPane : public Widget {
  public:
   bool CanUndock() const override { return true; }
 };
@@ -264,7 +264,7 @@ TEST_F(DockingTest, AddAndRelease) {
   EXPECT_EQ(root->right(), pane);
   EXPECT_EQ("502,0 498x1000", RectAsString(root->right()->GetScreenRect()));
 
-  std::unique_ptr<Dockable> result(pane->parent()->ReleaseChild(pane));
+  std::unique_ptr<Widget> result(pane->parent()->ReleaseChild(pane));
   EXPECT_EQ(NULL, result->parent());
   EXPECT_FALSE(workspace.GetRoot()->IsContainer());
   EXPECT_EQ(main, workspace.GetRoot());
