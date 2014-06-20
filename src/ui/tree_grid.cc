@@ -10,6 +10,7 @@
 #include "nanovg.h"
 #include "ui/draggable.h"
 #include "ui/drawing_common.h"
+#include "ui/focus.h"
 #include "ui/skin.h"
 
 namespace {
@@ -279,7 +280,10 @@ void TreeGrid::Render() {
   }
 
   if (ld.focus.IsValid()) {
-    DrawSolidRect(ld.focus, cs.text_selection());
+    if (GetFocusedContents() == this)
+      DrawSolidRoundedRect(ld.focus, cs.text_selection(), 3.f);
+    else
+      DrawOutlineRoundedRect(ld.focus, cs.text_selection(), 3.f);
   }
 }
 
@@ -381,6 +385,14 @@ bool TreeGrid::NotifyMouseButton(int x,
     for (const auto& eb : layout_data.expansion_boxes) {
       if (eb.rect.Contains(client_point)) {
         eb.node->SetExpanded(!eb.node->Expanded());
+        focused_node_ = eb.node;
+        return true;
+      }
+    }
+
+    for (const auto& cell : layout_data.cells) {
+      if (cell.rect.Contains(client_point)) {
+        focused_node_ = cell.node;
         return true;
       }
     }

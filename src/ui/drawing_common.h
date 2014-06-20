@@ -22,6 +22,9 @@ void DrawSolidRect(const Rect& rect, const NVGcolor& color);
 void DrawSolidRoundedRect(const Rect& rect,
                           const NVGcolor& color,
                           float radius);
+void DrawOutlineRoundedRect(const Rect& rect,
+                            const NVGcolor& color,
+                            float radius);
 void DrawVerticalLine(const NVGcolor& color, float x, float y0, float y1);
 void DrawHorizontalLine(const NVGcolor& color, float x0, float x1, float y);
 void DrawTextInRect(const Rect& rect,

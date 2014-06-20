@@ -111,6 +111,17 @@ void DrawSolidRoundedRect(const Rect& rect,
   nvgRestore(core::VG);
 }
 
+void DrawOutlineRoundedRect(const Rect& rect,
+                            const NVGcolor& color,
+                            float radius) {
+  nvgSave(core::VG);
+  nvgBeginPath(core::VG);
+  nvgRoundedRect(core::VG, rect.x, rect.y, rect.w, rect.h, radius);
+  nvgStrokeColor(core::VG, color);
+  nvgStroke(core::VG);
+  nvgRestore(core::VG);
+}
+
 void DrawVerticalLine(const NVGcolor& color, float x, float y0, float y1) {
   nvgStrokeColor(core::VG, color);
   nvgBeginPath(core::VG);

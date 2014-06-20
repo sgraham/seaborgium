@@ -167,6 +167,8 @@ int Main(int argc, char** argv) {
   DockingToolWindow* watch = new DockingToolWindow(watch_contents, "Watch");
 
   FillWatchWithSampleData(watch_contents);
+  // TODO(scottmg): Figure out who's responsible for dealing on mutate.
+  watch_contents->MoveFocusByDirection(TreeGrid::kFocusDown);
 
   DockingToolWindow* breakpoints =
       new DockingToolWindow(new TreeGrid(), "Breakpoints");
