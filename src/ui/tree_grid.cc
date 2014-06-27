@@ -133,7 +133,7 @@ class ReadOnlyTreeGridEditObserver : public TreeGridEditObserver {
  public:
   virtual bool NodeWillRemove(TreeGridNode* /*node*/) override { return false; }
   virtual bool NodeWillStartEdit(TreeGridNode* /*node*/) override {
-    return false;
+    return true;
   }
   virtual bool NodeWillCompleteEdit(TreeGridNode* /*node*/) override {
     return false;
@@ -296,18 +296,16 @@ void TreeGrid::Render() {
 
   // TODO(scottmg): lost focus should cancel or commit edit
   if (ld.focus.IsValid()) {
-    if (GetFocusedContents() == this) {
-      if (inline_edit_) {
-        DrawOutlineRoundedRect(ld.focus, cs.text_selection(), 3.f);
-        inline_edit_->SetScreenRect(ClientToScreen(ld.focus));
-        ScopedRenderOffset text_edit_offset(this, inline_edit_.get(), false);
-        inline_edit_->Render();
-      } else {
-        DrawSolidRoundedRect(ld.focus, cs.text_selection(), 3.f);
-      }
-    }
-    else
+    if (GetFocusedContents() == inline_edit_.get()) {
       DrawOutlineRoundedRect(ld.focus, cs.text_selection(), 3.f);
+      inline_edit_->SetScreenRect(ClientToScreen(ld.focus));
+      ScopedRenderOffset text_edit_offset(this, inline_edit_.get(), false);
+      inline_edit_->Render();
+    } else if (GetFocusedContents() == this) {
+      DrawSolidRoundedRect(ld.focus, cs.text_selection(), 3.f);
+    } else {
+      DrawOutlineRoundedRect(ld.focus, cs.text_selection(), 3.f);
+    }
   }
 }
 
@@ -551,9 +549,10 @@ void TreeGrid::MoveFocusByDirection(FocusDirection direction) {
 void TreeGrid::TryStartEdit() {
   if (!focused_node_)
     return;
-  /*if (!edit_observer_->NodeWillStartEdit(focused_node_))
-    return;*/
+  if (!edit_observer_->NodeWillStartEdit(focused_node_))
+    return;
   inline_edit_.reset(new TextEdit);
-  //inline_edit_->set_parent(this);
+  inline_edit_->set_parent(this);
+  SetFocusedContents(inline_edit_.get());
   inline_edit_->SetText(focused_node_->GetValue(0)->AsString());
 }

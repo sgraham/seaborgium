@@ -17,7 +17,9 @@ const int kTitleOffset = 3;
 }  // namespace
 
 DockingToolWindow::DockingToolWindow(Widget* contents, const std::string& title)
-    : contents_(contents), title_(title) {}
+    : contents_(contents), title_(title) {
+  contents->set_parent(this);
+}
 
 DockingToolWindow::~DockingToolWindow() {
 }

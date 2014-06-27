@@ -142,11 +142,40 @@ void DrawTextInRect(const Rect& rect,
                     const std::string& text,
                     const NVGcolor& color,
                     float x_padding) {
-  // TODO(scottmg): Might need to floor here to de-blur fonts, or probably at
-  // a higher level to avoid bad alignments.
   ScopedRenderOffset offset(rect, true);
   float line_height;
   nvgTextMetrics(core::VG, NULL, NULL, &line_height);
   nvgFillColor(core::VG, color);
-  nvgText(core::VG, x_padding, line_height, &text.data()[0], &text.data()[text.size()]);
+  static bool snap = true;
+  if (snap) {
+    nvgSave(core::VG);
+    float current_transform[6];
+    nvgCurrentTransform(core::VG, current_transform);
+    CORE_DCHECK(current_transform[0] == 1.f && current_transform[1] == 0.f &&
+                    current_transform[2] == 0.f && current_transform[3] == 1.f,
+                "expecting no scale skew");
+    nvgResetTransform(core::VG);
+    nvgTransform(
+        core::VG,
+        1,
+        0,
+        0,
+        1,
+        std::round((current_transform[4] + x_padding) / core::GetDpiScale()) *
+            core::GetDpiScale(),
+        std::round((current_transform[5] + line_height) / core::GetDpiScale()) *
+            core::GetDpiScale());
+    nvgText(core::VG,
+            0,
+            0,
+            &text.data()[0],
+            &text.data()[text.size()]);
+    nvgRestore(core::VG);
+  } else {
+    nvgText(core::VG,
+            x_padding,
+            line_height,
+            &text.data()[0],
+            &text.data()[text.size()]);
+  }
 }
