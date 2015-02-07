@@ -1,0 +1,59 @@
+# Copyright 2014 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# Assumes clang (3.5.0 at time of writing) is installed in
+# "C:\Program Files (x86)\LLVM". It does not need to be added to the system PATH
+# during installation.
+
+ar = "C:/Program Files (x86)/LLVM/bin/clang++.exe"
+cc = "C:/Program Files (x86)/LLVM/bin/clang.exe"
+cxx = "C:/Program Files (x86)/LLVM/bin/clang++.exe"
+ld = cxx
+
+toolchain("clang_win") {
+  tool("cc") {
+    depfile = "{{output}}.d"
+    command = "$cc -MMD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} -c {{source}} -o {{output}}"
+    depsformat = "gcc"
+    description = "CC {{output}}"
+    outputs = [
+      "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.obj",
+    ]
+  }
+  tool("cxx") {
+    depfile = "{{output}}.d"
+    command = "$cxx -MMD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} -c {{source}} -o {{output}}"
+    depsformat = "gcc"
+    description = "CXX {{output}}"
+    outputs = [
+      "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.obj",
+    ]
+  }
+  tool("alink") {
+    command = "rm -f {{output}} && $ar rcs {{output}} {{inputs}}"
+    description = "AR {{output}}"
+    outputs = [
+      "{{target_out_dir}}/{{target_output_name}}{{output_extension}}",
+    ]
+    default_output_extension = ".lib"
+    output_prefix = ""
+  }
+  tool("link") {
+    outputs = [
+      "{{root_out_dir}}/{{target_output_name}}{{output_extension}}",
+    ]
+    command = "$ld {{ldflags}} -o {{output}} {{inputs}} {{solibs}} {{libs}}"
+    description = "LINK {{output}}"
+  }
+  tool("stamp") {
+    # TODO(scottmg): Hardcoded depth.
+    command = "$python_path ../build/toolchain/clang_win/helper.py stamp {{output}}"
+    description = "STAMP {{output}}"
+  }
+  tool("copy") {
+    # TODO(scottmg): Hardcoded depth.
+    command = "$python_path ../build/toolchain/clang_win/helper.py recursive-mirror {{source}} {{output}}"
+    description = "COPY {{source}} {{output}}"
+  }
+}
