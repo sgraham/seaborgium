@@ -57,10 +57,10 @@ static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
 int main()
 {
 	GLFWwindow* window;
-	struct DemoData data;
-	struct NVGcontext* vg = NULL;
-	struct GPUtimer gpuTimer;
-	struct PerfGraph fps, cpuGraph, gpuGraph;
+	DemoData data;
+	NVGcontext* vg = NULL;
+	GPUtimer gpuTimer;
+	PerfGraph fps, cpuGraph, gpuGraph;
 	double prevt = 0, cpuTime = 0;
 
 	if (!glfwInit()) {
@@ -105,9 +105,9 @@ int main()
 #endif
 
 #ifdef DEMO_MSAA
-	vg = nvgCreateGL3(512, 512, NVG_STENCIL_STROKES);
+	vg = nvgCreateGL3(NVG_STENCIL_STROKES | NVG_DEBUG);
 #else
-	vg = nvgCreateGL3(512, 512, NVG_ANTIALIAS | NVG_STENCIL_STROKES);
+	vg = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
 #endif
 	if (vg == NULL) {
 		printf("Could not init nanovg.\n");

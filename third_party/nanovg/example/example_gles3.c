@@ -53,9 +53,9 @@ static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
 int main()
 {
 	GLFWwindow* window;
-	struct DemoData data;
-	struct NVGcontext* vg = NULL;
-	struct PerfGraph fps;
+	DemoData data;
+	NVGcontext* vg = NULL;
+	PerfGraph fps;
 	double prevt = 0;
 
 	if (!glfwInit()) {
@@ -82,7 +82,7 @@ int main()
 
 	glfwMakeContextCurrent(window);
 
-	vg = nvgCreateGLES3(512, 512, NVG_ANTIALIAS | NVG_STENCIL_STROKES);
+	vg = nvgCreateGLES3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
 	if (vg == NULL) {
 		printf("Could not init nanovg.\n");
 		return -1;

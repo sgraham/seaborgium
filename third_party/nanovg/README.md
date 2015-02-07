@@ -17,14 +17,18 @@ The NanoVG API is modeled loosely on HTML5 canvas API. If you know canvas, you'r
 
 ## Creating drawing context
 
-The drawing context is created using platform specific constructor function. If you're using the a OpenGL 2.0 back-end the context is created as follows:
+The drawing context is created using platform specific constructor function. If you're using the OpenGL 2.0 back-end the context is created as follows:
 ```C
 #define NANOVG_GL2_IMPLEMENTATION	// Use GL2 implementation.
 #include "nanovg_gl.h"
 ...
-struct NVGcontext* vg = nvgCreateGL2(512, 512, NVG_ANTIALIAS);
+struct NVGcontext* vg = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
 ```
-The first two values passed to the constructor define the size of the texture atlas used for text rendering, 512x512 is a good starting point. If you're rendering retina sized text or plan to use a lot of different fonts, 1024x1024 is better choice. The third parameter defines if anti-aliasing should be used, passing 0 means no AA (useful when you're using MSAA).
+
+The first parameter defines flags for creating the renderer.
+
+- `NVG_ANTIALIAS` means that the renderer adjusts the geometry to include anti-aliasing. If you're using MSAA, you can omit this flags. 
+- `NVG_STENCIL_STROKES` means that the render uses better quality rendering for (overlapping) strokes. The quality is mostly visible on wider strokes. If you want speed, you can omit this flag.
 
 Currently there is an OpenGL back-end for NanoVG: [nanovg_gl.h](/src/nanovg_gl.h) for OpenGL 2.0, OpenGL ES 2.0, OpenGL 3.2 core profile and OpenGL ES 3. The implementation can be chosen using a define as in above example. See the header file and examples for further info.
 
@@ -43,7 +47,7 @@ Calling `nvgBeginPath()` will clear any existing paths and start drawing from bl
 
 ## Understanding Composite Paths
 
-Because of the way the rendering backend is build in NanoVG, drawing a composite path, that is path consisting from multiple paths defining holes and fills, is a bit more involved. NanoVG uses even-odd filling rule and by default the paths are wound in counter clockwise order. Keep that in mind when drawing using the low level draw API. In order to wind one of the predefined shapes as a hole, you should call nvgPathWinding(vg, `NVG_HOLE`), or `nvgPathWinding(vg, NVG_CV)` _after_ defining the path.
+Because of the way the rendering backend is build in NanoVG, drawing a composite path, that is path consisting from multiple paths defining holes and fills, is a bit more involved. NanoVG uses even-odd filling rule and by default the paths are wound in counter clockwise order. Keep that in mind when drawing using the low level draw API. In order to wind one of the predefined shapes as a hole, you should call `nvgPathWinding(vg, NVG_HOLE)`, or `nvgPathWinding(vg, NVG_CW)` _after_ defining the path.
 
 ``` C
 nvgBeginPath(vg);
@@ -60,6 +64,7 @@ nvgFill(vg);
 - make sure you have initialised OpenGL with stencil buffer
 - make sure you have cleared stencil buffer
 - make sure all rendering calls happen between `nvgBeginFrame()` and `nvgEndFrame()`
+- to eanble more checks for OpenGL errors, add `NVG_DEBUG` flag to `nvgCreatexxx()`
 - if the problem still persists, please report an issue!
 
 ## OpenGL state touched by the backend
@@ -97,6 +102,10 @@ See the header file [nanovg.h](/src/nanovg.h) for API reference.
 
 - [DX11 port](https://github.com/cmaughan/nanovg) by [Chris Maughan](https://github.com/cmaughan)
 - [bgfx port](https://github.com/bkaradzic/bgfx/tree/master/examples/20-nanovg) by [Branimir Karadžić](https://github.com/bkaradzic) 
+
+## Projects using NanoVG
+
+- [Processing API simulation by vinjn](https://github.com/vinjn/island/blob/master/examples/01-processing/sketch2d.h)
 
 ## License
 The library is licensed under [zlib license](LICENSE.txt)

@@ -24,13 +24,13 @@
 #define ICON_LOGIN 0xE740
 #define ICON_TRASH 0xE729
 
-static float minf(float a, float b) { return a < b ? a : b; }
+//static float minf(float a, float b) { return a < b ? a : b; }
 static float maxf(float a, float b) { return a > b ? a : b; }
-static float absf(float a) { return a >= 0.0f ? a : -a; }
+//static float absf(float a) { return a >= 0.0f ? a : -a; }
 static float clampf(float a, float mn, float mx) { return a < mn ? mn : (a > mx ? mx : a); }
 
 // Returns 1 if col.rgba is 0.0f,0.0f,0.0f,0.0f, 0 otherwise
-int isBlack( struct NVGcolor col )
+int isBlack(NVGcolor col)
 {
 	if( col.r == 0.0f && col.g == 0.0f && col.b == 0.0f && col.a == 0.0f )
 	{
@@ -61,11 +61,11 @@ static char* cpToUTF8(int cp, char* str)
 }
 
 
-void drawWindow(struct NVGcontext* vg, const char* title, float x, float y, float w, float h)
+void drawWindow(NVGcontext* vg, const char* title, float x, float y, float w, float h)
 {
 	float cornerRadius = 3.0f;
-	struct NVGpaint shadowPaint;
-	struct NVGpaint headerPaint;
+	NVGpaint shadowPaint;
+	NVGpaint headerPaint;
 
 	nvgSave(vg);
 //	nvgClearState(vg);
@@ -113,9 +113,9 @@ void drawWindow(struct NVGcontext* vg, const char* title, float x, float y, floa
 	nvgRestore(vg);
 }
 
-void drawSearchBox(struct NVGcontext* vg, const char* text, float x, float y, float w, float h)
+void drawSearchBox(NVGcontext* vg, const char* text, float x, float y, float w, float h)
 {
-	struct NVGpaint bg;
+	NVGpaint bg;
 	char icon[8];
 	float cornerRadius = h/2-1;
 
@@ -151,9 +151,9 @@ void drawSearchBox(struct NVGcontext* vg, const char* text, float x, float y, fl
 	nvgText(vg, x+w-h*0.55f, y+h*0.55f, cpToUTF8(ICON_CIRCLED_CROSS,icon), NULL);
 }
 
-void drawDropDown(struct NVGcontext* vg, const char* text, float x, float y, float w, float h)
+void drawDropDown(NVGcontext* vg, const char* text, float x, float y, float w, float h)
 {
-	struct NVGpaint bg;
+	NVGpaint bg;
 	char icon[8];
 	float cornerRadius = 4.0f;
 
@@ -181,7 +181,7 @@ void drawDropDown(struct NVGcontext* vg, const char* text, float x, float y, flo
 	nvgText(vg, x+w-h*0.5f, y+h*0.5f, cpToUTF8(ICON_CHEVRON_RIGHT,icon), NULL);
 }
 
-void drawLabel(struct NVGcontext* vg, const char* text, float x, float y, float w, float h)
+void drawLabel(NVGcontext* vg, const char* text, float x, float y, float w, float h)
 {
 	NVG_NOTUSED(w);
 
@@ -193,9 +193,9 @@ void drawLabel(struct NVGcontext* vg, const char* text, float x, float y, float 
 	nvgText(vg, x,y+h*0.5f,text, NULL);
 }
 
-void drawEditBoxBase(struct NVGcontext* vg, float x, float y, float w, float h)
+void drawEditBoxBase(NVGcontext* vg, float x, float y, float w, float h)
 {
-	struct NVGpaint bg;
+	NVGpaint bg;
 	// Edit
 	bg = nvgBoxGradient(vg, x+1,y+1+1.5f, w-2,h-2, 3,4, nvgRGBA(255,255,255,32), nvgRGBA(32,32,32,32));
 	nvgBeginPath(vg);
@@ -209,7 +209,7 @@ void drawEditBoxBase(struct NVGcontext* vg, float x, float y, float w, float h)
 	nvgStroke(vg);
 }
 
-void drawEditBox(struct NVGcontext* vg, const char* text, float x, float y, float w, float h)
+void drawEditBox(NVGcontext* vg, const char* text, float x, float y, float w, float h)
 {
 
 	drawEditBoxBase(vg, x,y, w,h);
@@ -221,7 +221,7 @@ void drawEditBox(struct NVGcontext* vg, const char* text, float x, float y, floa
 	nvgText(vg, x+h*0.3f,y+h*0.5f,text, NULL);
 }
 
-void drawEditBoxNum(struct NVGcontext* vg,
+void drawEditBoxNum(NVGcontext* vg,
 					const char* text, const char* units, float x, float y, float w, float h)
 {
 	float uw;
@@ -243,9 +243,9 @@ void drawEditBoxNum(struct NVGcontext* vg,
 	nvgText(vg, x+w-uw-h*0.5f,y+h*0.5f,text, NULL);
 }
 
-void drawCheckBox(struct NVGcontext* vg, const char* text, float x, float y, float w, float h)
+void drawCheckBox(NVGcontext* vg, const char* text, float x, float y, float w, float h)
 {
-	struct NVGpaint bg;
+	NVGpaint bg;
 	char icon[8];
 	NVG_NOTUSED(w);
 
@@ -269,9 +269,9 @@ void drawCheckBox(struct NVGcontext* vg, const char* text, float x, float y, flo
 	nvgText(vg, x+9+2, y+h*0.5f, cpToUTF8(ICON_CHECK,icon), NULL);
 }
 
-void drawButton(struct NVGcontext* vg, int preicon, const char* text, float x, float y, float w, float h, struct NVGcolor col)
+void drawButton(NVGcontext* vg, int preicon, const char* text, float x, float y, float w, float h, NVGcolor col)
 {
-	struct NVGpaint bg;
+	NVGpaint bg;
 	char icon[8];
 	float cornerRadius = 4.0f;
 	float tw = 0, iw = 0;
@@ -318,9 +318,9 @@ void drawButton(struct NVGcontext* vg, int preicon, const char* text, float x, f
 	nvgText(vg, x+w*0.5f-tw*0.5f+iw*0.25f,y+h*0.5f,text, NULL);
 }
 
-void drawSlider(struct NVGcontext* vg, float pos, float x, float y, float w, float h)
+void drawSlider(NVGcontext* vg, float pos, float x, float y, float w, float h)
 {
-	struct NVGpaint bg, knob;
+	NVGpaint bg, knob;
 	float cy = y+(int)(h*0.5f);
 	float kr = (int)(h*0.25f);
 
@@ -360,9 +360,9 @@ void drawSlider(struct NVGcontext* vg, float pos, float x, float y, float w, flo
 	nvgRestore(vg);
 }
 
-void drawEyes(struct NVGcontext* vg, float x, float y, float w, float h, float mx, float my, float t)
+void drawEyes(NVGcontext* vg, float x, float y, float w, float h, float mx, float my, float t)
 {
-	struct NVGpaint gloss, bg;
+	NVGpaint gloss, bg;
 	float ex = w *0.23f;
 	float ey = h * 0.5f;
 	float lx = x + ex;
@@ -426,9 +426,9 @@ void drawEyes(struct NVGcontext* vg, float x, float y, float w, float h, float m
 	nvgFill(vg);
 }
 
-void drawGraph(struct NVGcontext* vg, float x, float y, float w, float h, float t)
+void drawGraph(NVGcontext* vg, float x, float y, float w, float h, float t)
 {
-	struct NVGpaint bg;
+	NVGpaint bg;
 	float samples[6];
 	float sx[6], sy[6];
 	float dx = w/5.0f;
@@ -497,14 +497,14 @@ void drawGraph(struct NVGcontext* vg, float x, float y, float w, float h, float 
 	nvgStrokeWidth(vg, 1.0f);
 }
 
-void drawSpinner(struct NVGcontext* vg, float cx, float cy, float r, float t)
+void drawSpinner(NVGcontext* vg, float cx, float cy, float r, float t)
 {
 	float a0 = 0.0f + t*6;
 	float a1 = NVG_PI + t*6;
 	float r0 = r;
 	float r1 = r * 0.75f;
 	float ax,ay, bx,by;
-	struct NVGpaint paint;
+	NVGpaint paint;
 
 	nvgSave(vg);
 
@@ -523,10 +523,10 @@ void drawSpinner(struct NVGcontext* vg, float cx, float cy, float r, float t)
 	nvgRestore(vg);
 }
 
-void drawThumbnails(struct NVGcontext* vg, float x, float y, float w, float h, const int* images, int nimages, float t)
+void drawThumbnails(NVGcontext* vg, float x, float y, float w, float h, const int* images, int nimages, float t)
 {
 	float cornerRadius = 3.0f;
-	struct NVGpaint shadowPaint, imgPaint, fadePaint;
+	NVGpaint shadowPaint, imgPaint, fadePaint;
 	float ix,iy,iw,ih;
 	float thumb = 60.0f;
 	float arry = 30.5f;
@@ -589,7 +589,7 @@ void drawThumbnails(struct NVGcontext* vg, float x, float y, float w, float h, c
 		if (a < 1.0f)
 			drawSpinner(vg, tx+thumb/2,ty+thumb/2, thumb*0.25f, t);
 
-		imgPaint = nvgImagePattern(vg, tx+ix, ty+iy, iw,ih, 0.0f/180.0f*NVG_PI, images[i], NVG_NOREPEAT, a);
+		imgPaint = nvgImagePattern(vg, tx+ix, ty+iy, iw,ih, 0.0f/180.0f*NVG_PI, images[i], a);
 		nvgBeginPath(vg);
 		nvgRoundedRect(vg, tx,ty, thumb,thumb, 5);
 		nvgFillPaint(vg, imgPaint);
@@ -643,12 +643,12 @@ void drawThumbnails(struct NVGcontext* vg, float x, float y, float w, float h, c
 	nvgRestore(vg);
 }
 
-void drawColorwheel(struct NVGcontext* vg, float x, float y, float w, float h, float t)
+void drawColorwheel(NVGcontext* vg, float x, float y, float w, float h, float t)
 {
 	int i;
 	float r0, r1, ax,ay, bx,by, cx,cy, aeps, r;
 	float hue = sinf(t * 0.12f);
-	struct NVGpaint paint;
+	NVGpaint paint;
 
 	nvgSave(vg);
 
@@ -748,7 +748,7 @@ void drawColorwheel(struct NVGcontext* vg, float x, float y, float w, float h, f
 	nvgRestore(vg);
 }
 
-void drawLines(struct NVGcontext* vg, float x, float y, float w, float h, float t)
+void drawLines(NVGcontext* vg, float x, float y, float w, float h, float t)
 {
 	int i, j;
 	float pad = 5.0f, s = w/9.0f - pad*2;
@@ -802,7 +802,7 @@ void drawLines(struct NVGcontext* vg, float x, float y, float w, float h, float 
 	nvgRestore(vg);
 }
 
-int loadDemoData(struct NVGcontext* vg, struct DemoData* data)
+int loadDemoData(NVGcontext* vg, DemoData* data)
 {
 	int i;
 
@@ -812,7 +812,7 @@ int loadDemoData(struct NVGcontext* vg, struct DemoData* data)
 	for (i = 0; i < 12; i++) {
 		char file[128];
 		snprintf(file, 128, "../example/images/image%d.jpg", i+1);
-		data->images[i] = nvgCreateImage(vg, file);
+		data->images[i] = nvgCreateImage(vg, file, 0);
 		if (data->images[i] == 0) {
 			printf("Could not load %s.\n", file);
 			return -1;
@@ -838,7 +838,7 @@ int loadDemoData(struct NVGcontext* vg, struct DemoData* data)
 	return 0;
 }
 
-void freeDemoData(struct NVGcontext* vg, struct DemoData* data)
+void freeDemoData(NVGcontext* vg, DemoData* data)
 {
 	int i;
 
@@ -849,10 +849,10 @@ void freeDemoData(struct NVGcontext* vg, struct DemoData* data)
 		nvgDeleteImage(vg, data->images[i]);
 }
 
-void drawParagraph(struct NVGcontext* vg, float x, float y, float width, float height, float mx, float my)
+void drawParagraph(NVGcontext* vg, float x, float y, float width, float height, float mx, float my)
 {
-	struct NVGtextRow rows[3];
-	struct NVGglyphPosition glyphs[100];
+	NVGtextRow rows[3];
+	NVGglyphPosition glyphs[100];
 	const char* text = "This is longer chunk of text.\n  \n  Would have used lorem ipsum but she    was busy jumping over the lazy dog with the fox and all the men who came to the aid of the party.";
 	const char* start;
 	const char* end;
@@ -879,7 +879,7 @@ void drawParagraph(struct NVGcontext* vg, float x, float y, float width, float h
 	end = text + strlen(text);
 	while ((nrows = nvgTextBreakLines(vg, start, end, width, rows, 3))) {
 		for (i = 0; i < nrows; i++) {
-			struct NVGtextRow* row = &rows[i];
+			NVGtextRow* row = &rows[i];
 			int hit = mx > x && mx < (x+width) && my >= y && my < (y+lineh);
 
 			nvgBeginPath(vg);
@@ -965,7 +965,7 @@ void drawParagraph(struct NVGcontext* vg, float x, float y, float width, float h
 	nvgRestore(vg);
 }
 
-void drawWidths(struct NVGcontext* vg, float x, float y, float width)
+void drawWidths(NVGcontext* vg, float x, float y, float width)
 {
 	int i;
 
@@ -986,7 +986,7 @@ void drawWidths(struct NVGcontext* vg, float x, float y, float width)
 	nvgRestore(vg);
 }
 
-void drawCaps(struct NVGcontext* vg, float x, float y, float width)
+void drawCaps(NVGcontext* vg, float x, float y, float width)
 {
 	int i;
 	int caps[3] = {NVG_BUTT, NVG_ROUND, NVG_SQUARE};
@@ -1017,8 +1017,44 @@ void drawCaps(struct NVGcontext* vg, float x, float y, float width)
 	nvgRestore(vg);
 }
 
-void renderDemo(struct NVGcontext* vg, float mx, float my, float width, float height,
-				float t, int blowup, struct DemoData* data)
+void drawScissor(NVGcontext* vg, float x, float y, float t)
+{
+	nvgSave(vg);
+
+	// Draw first rect and set scissor to it's area.
+	nvgTranslate(vg, x, y);
+	nvgRotate(vg, nvgDegToRad(5));
+	nvgBeginPath(vg);
+	nvgRect(vg, -20,-20,60,40);
+	nvgFillColor(vg, nvgRGBA(255,0,0,255));
+	nvgFill(vg);
+	nvgScissor(vg, -20,-20,60,40);
+
+	// Draw second rectangle with offset and rotation.
+	nvgTranslate(vg, 40,0);
+	nvgRotate(vg, t);
+
+	// Draw the intended second rectangle without any scissoring.
+	nvgSave(vg);
+	nvgResetScissor(vg);
+	nvgBeginPath(vg);
+	nvgRect(vg, -20,-10,60,30);
+	nvgFillColor(vg, nvgRGBA(255,128,0,64));
+	nvgFill(vg);
+	nvgRestore(vg);
+
+	// Draw second rectangle with combined scissoring.
+	nvgIntersectScissor(vg, -20,-10,60,30);
+	nvgBeginPath(vg);
+	nvgRect(vg, -20,-10,60,30);
+	nvgFillColor(vg, nvgRGBA(255,128,0,255));
+	nvgFill(vg);
+
+	nvgRestore(vg);
+}
+
+void renderDemo(NVGcontext* vg, float mx, float my, float width, float height,
+				float t, int blowup, DemoData* data)
 {
 	float x,y,popy;
 
@@ -1028,13 +1064,15 @@ void renderDemo(struct NVGcontext* vg, float mx, float my, float width, float he
 	drawColorwheel(vg, width - 300, height - 300, 250.0f, 250.0f, t);
 
 	// Line joints
-	drawLines(vg, 50, height-50, 600, 50, t);
+	drawLines(vg, 120, height-50, 600, 50, t);
 
 	// Line caps
 	drawWidths(vg, 10, 50, 30);
 
 	// Line caps
 	drawCaps(vg, 10, 300, 30);
+
+	drawScissor(vg, 50, height-80, t);
 
 	nvgSave(vg);
 	if (blowup) {
