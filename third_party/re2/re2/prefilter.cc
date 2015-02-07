@@ -265,6 +265,7 @@ Prefilter* Prefilter::Info::TakeMatch() {
 
 // Format a Info in string form.
 string Prefilter::Info::ToString() {
+#if 0
   if (this == NULL) {
     // Sometimes when iterating on children of a node,
     // some children might have NULL Info. Adding
@@ -272,6 +273,7 @@ string Prefilter::Info::ToString() {
     // the caller is not checking.
     return "";
   }
+#endif
 
   if (is_exact_) {
     int n = 0;
@@ -665,8 +667,10 @@ Prefilter* Prefilter::FromRegexp(Regexp* re) {
 }
 
 string Prefilter::DebugString() const {
+#if 0
   if (this == NULL)
     return "<nil>";
+#endif
 
   switch (op_) {
     default:

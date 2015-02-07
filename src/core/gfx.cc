@@ -53,12 +53,14 @@ const char* GlEnumName(GLenum en) {
 #define GL_CHECK(_call) _call
 #endif  // CORE_CONFIG_DEBUG
 
+#if 0
 inline void glColorABGR(uint32_t abgr) {
   GL_CHECK(glColor4f(((abgr & 0xff) >> 0) / 255.f,
                      ((abgr & 0xff00) >> 8) / 255.f,
                      ((abgr & 0xff0000) >> 16) / 255.f,
                      ((abgr & 0xff000000) >> 24) / 255.f));
 }
+#endif
 
 static float s_dpi_scale = 1.f;
 
@@ -178,7 +180,7 @@ float GfxTextf(float x, float y, const char* format, ...) {
   char* out = temp;
   int32_t len = core::vsnprintf(out, sizeof(temp), format, arg_list);
   if ((int32_t)sizeof(temp) < len) {
-    out = reinterpret_cast<char*>(alloca(len + 1));
+    out = reinterpret_cast<char*>(_alloca(len + 1));
     len = core::vsnprintf(out, len, format, arg_list);
   }
   out[len] = '\0';

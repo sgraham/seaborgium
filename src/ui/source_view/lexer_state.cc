@@ -16,7 +16,7 @@ void TokenDefinitions::AddWithTransition(const std::string& regex,
 }
 
 LexerState::LexerState(const std::string& name)
-  : name_(name), token_defs_(NULL), token_defs_count_(0) {
+  : token_defs_(NULL), token_defs_count_(0), name_(name) {
 }
 
 LexerState::~LexerState() {

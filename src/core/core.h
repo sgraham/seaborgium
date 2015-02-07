@@ -449,7 +449,7 @@ inline void DebugPrintfVargs(const char* format, va_list arg_list) {
   char* out = temp;
   int32_t len = core::vsnprintf(out, sizeof(temp), format, arg_list);
   if ((int32_t)sizeof(temp) < len) {
-    out = reinterpret_cast<char*>(alloca(len + 1));
+    out = reinterpret_cast<char*>(_alloca(len + 1));
     len = core::vsnprintf(out, len, format, arg_list);
   }
   out[len] = '\0';

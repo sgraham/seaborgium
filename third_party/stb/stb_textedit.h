@@ -1,4 +1,4 @@
-// stb_textedit.h - v1.2  - public domain - Sean Barrett
+// stb_textedit.h - v1.5  - public domain - Sean Barrett
 // Development of this library was sponsored by RAD Game Tools
 //
 // This C header file implements the guts of a multi-line text-editing
@@ -30,7 +30,10 @@
 //
 // VERSION HISTORY
 //
-//   1.2  (2013-05-27) fix some RAD types that had crept into the new code
+//   1.5  (2014-09-10) add support for secondary keys for OS X
+//   1.4  (2014-08-17) fix signed/unsigned warnings
+//   1.3  (2014-06-19) fix mouse clicking to round to nearest char boundary
+//   1.2  (2014-05-27) fix some RAD types that had crept into the new code
 //   1.1  (2013-12-15) move-by-word (requires STB_TEXTEDIT_IS_SPACE )
 //   1.0  (2012-07-26) improve documentation, initial public release
 //   0.3  (2012-02-24) bugfixes, single-line mode; insert mode
@@ -40,6 +43,8 @@
 // ADDITIONAL CONTRIBUTORS
 //
 //   Ulf Winklemann: move-by-word in 1.1
+//   Scott Graham: mouse selection bugfix in 1.3
+//   Fabian Giesen: secondary key inputs in 1.5
 //
 // USAGE
 //
@@ -105,8 +110,8 @@
 //    STB_TEXTEDIT_STRINGLEN(obj)       the length of the string (ideally O(1))
 //    STB_TEXTEDIT_LAYOUTROW(&r,obj,n)  returns the results of laying out a line of characters
 //                                        starting from character #n (see discussion below)
-//    STB_TEXTEDIT_GETWIDTH(obj,n,i)    returns the pixel delta from the xpos of the i-1'th
-//                                        character to the i'th char for a line of characters
+//    STB_TEXTEDIT_GETWIDTH(obj,n,i)    returns the pixel delta from the xpos of the i'th character
+//                                        to the xpos of the i+1'th char for a line of characters
 //                                        starting at character #n (i.e. accounts for kerning
 //                                        with previous char)
 //    STB_TEXTEDIT_KEYTOTEXT(k)         maps a keyboard input to an insertable character
@@ -139,6 +144,10 @@
 //                                 required for WORDLEFT/WORDRIGHT
 //    STB_TEXTEDIT_K_WORDLEFT    keyboard input to move cursor left one word // e.g. ctrl-LEFT
 //    STB_TEXTEDIT_K_WORDRIGHT   keyboard input to move cursor right one word // e.g. ctrl-RIGHT
+//    STB_TEXTEDIT_K_LINESTART2  secondary keyboard input to move cursor to start of line
+//    STB_TEXTEDIT_K_LINEEND2    secondary keyboard input to move cursor to end of line
+//    STB_TEXTEDIT_K_TEXTSTART2  secondary keyboard input to move cursor to start of text
+//    STB_TEXTEDIT_K_TEXTEND2    secondary keyboard input to move cursor to end of text
 //
 // Todo:
 //    STB_TEXTEDIT_K_PGUP        keyboard input to move cursor up a page
@@ -443,7 +452,7 @@ static void stb_textedit_drag(STB_TEXTEDIT_STRING *str, STB_TexteditState *state
 static void stb_text_undo(STB_TEXTEDIT_STRING *str, STB_TexteditState *state);
 static void stb_text_redo(STB_TEXTEDIT_STRING *str, STB_TexteditState *state);
 static void stb_text_makeundo_delete(STB_TEXTEDIT_STRING *str, STB_TexteditState *state, int where, int length);
-static void stb_text_makeundo_insert(STB_TEXTEDIT_STRING *str, STB_TexteditState *state, int where, int length);
+static void stb_text_makeundo_insert(STB_TexteditState *state, int where, int length);
 static void stb_text_makeundo_replace(STB_TEXTEDIT_STRING *str, STB_TexteditState *state, int where, int old_length, int new_length);
 
 typedef struct
@@ -647,7 +656,7 @@ static int stb_textedit_paste(STB_TEXTEDIT_STRING *str, STB_TexteditState *state
    stb_textedit_delete_selection(str,state);
    // try to insert the characters
    if (STB_TEXTEDIT_INSERTCHARS(str, state->cursor, text, len)) {
-      stb_text_makeundo_insert(str, state, state->cursor, len);
+      stb_text_makeundo_insert(state, state->cursor, len);
       state->cursor += len;
       state->has_preferred_x = 0;
       return 1;
@@ -682,7 +691,7 @@ retry:
             } else {
                stb_textedit_delete_selection(str,state); // implicity clamps
                if (STB_TEXTEDIT_INSERTCHARS(str, state->cursor, &ch, 1)) {
-                  stb_text_makeundo_insert(str, state, state->cursor, 1);
+                  stb_text_makeundo_insert(state, state->cursor, 1);
                   ++state->cursor;
                   state->has_preferred_x = 0;
                }
@@ -914,23 +923,35 @@ retry:
          state->has_preferred_x = 0;
          break;
          
+#ifdef STB_TEXTEDIT_K_TEXTSTART2
+      case STB_TEXTEDIT_K_TEXTSTART2:
+#endif
       case STB_TEXTEDIT_K_TEXTSTART:
          state->cursor = state->select_start = state->select_end = 0;
          state->has_preferred_x = 0;
          break;
 
+#ifdef STB_TEXTEDIT_K_TEXTEND2
+      case STB_TEXTEDIT_K_TEXTEND2:
+#endif
       case STB_TEXTEDIT_K_TEXTEND:
          state->cursor = STB_TEXTEDIT_STRINGLEN(str);
          state->select_start = state->select_end = 0;
          state->has_preferred_x = 0;
          break;
         
+#ifdef STB_TEXTEDIT_K_TEXTSTART2
+      case STB_TEXTEDIT_K_TEXTSTART2 | STB_TEXTEDIT_K_SHIFT:
+#endif
       case STB_TEXTEDIT_K_TEXTSTART | STB_TEXTEDIT_K_SHIFT:
          stb_textedit_prep_selection_at_cursor(state);
          state->cursor = state->select_end = 0;
          state->has_preferred_x = 0;
          break;
 
+#ifdef STB_TEXTEDIT_K_TEXTEND2
+      case STB_TEXTEDIT_K_TEXTEND2 | STB_TEXTEDIT_K_SHIFT:
+#endif
       case STB_TEXTEDIT_K_TEXTEND | STB_TEXTEDIT_K_SHIFT:
          stb_textedit_prep_selection_at_cursor(state);
          state->cursor = state->select_end = STB_TEXTEDIT_STRINGLEN(str);
@@ -938,6 +959,9 @@ retry:
          break;
 
 
+#ifdef STB_TEXTEDIT_K_LINESTART2
+      case STB_TEXTEDIT_K_LINESTART2:
+#endif
       case STB_TEXTEDIT_K_LINESTART: {
          StbFindState find;
          stb_textedit_clamp(str, state);
@@ -948,6 +972,9 @@ retry:
          break;
       }
 
+#ifdef STB_TEXTEDIT_K_LINEEND2
+      case STB_TEXTEDIT_K_LINEEND2:
+#endif
       case STB_TEXTEDIT_K_LINEEND: {
          StbFindState find;
          stb_textedit_clamp(str, state);
@@ -958,6 +985,9 @@ retry:
          break;
       }
 
+#ifdef STB_TEXTEDIT_K_LINESTART2
+      case STB_TEXTEDIT_K_LINESTART2 | STB_TEXTEDIT_K_SHIFT:
+#endif
       case STB_TEXTEDIT_K_LINESTART | STB_TEXTEDIT_K_SHIFT: {
          StbFindState find;
          stb_textedit_clamp(str, state);
@@ -968,6 +998,9 @@ retry:
          break;
       }
 
+#ifdef STB_TEXTEDIT_K_LINEEND2
+      case STB_TEXTEDIT_K_LINEEND2 | STB_TEXTEDIT_K_SHIFT:
+#endif
       case STB_TEXTEDIT_K_LINEEND | STB_TEXTEDIT_K_SHIFT: {
          StbFindState find;
          stb_textedit_clamp(str, state);
@@ -1005,13 +1038,13 @@ static void stb_textedit_discard_undo(StbUndoState *state)
          int n = state->undo_rec[0].insert_length, i;
          // delete n characters from all other records
          state->undo_char_point = state->undo_char_point - (short) n;  // vsnet05
-         memmove(state->undo_char, state->undo_char + n, state->undo_char_point*sizeof(STB_TEXTEDIT_CHARTYPE));
+         memmove(state->undo_char, state->undo_char + n, (size_t) (state->undo_char_point*sizeof(STB_TEXTEDIT_CHARTYPE)));
          for (i=0; i < state->undo_point; ++i)
             if (state->undo_rec[i].char_storage >= 0)
                state->undo_rec[i].char_storage = state->undo_rec[i].char_storage - (short) n; // vsnet05 // @OPTIMIZE: get rid of char_storage and infer it
       }
       --state->undo_point;
-      memmove(state->undo_rec, state->undo_rec+1, state->undo_point*sizeof(state->undo_rec[0]));
+      memmove(state->undo_rec, state->undo_rec+1, (size_t) (state->undo_point*sizeof(state->undo_rec[0])));
    }
 }
 
@@ -1029,13 +1062,13 @@ static void stb_textedit_discard_redo(StbUndoState *state)
          int n = state->undo_rec[k].insert_length, i;
          // delete n characters from all other records
          state->redo_char_point = state->redo_char_point + (short) n; // vsnet05
-         memmove(state->undo_char + state->redo_char_point, state->undo_char + state->redo_char_point-n, (STB_TEXTEDIT_UNDOSTATECOUNT - state->redo_char_point)*sizeof(STB_TEXTEDIT_CHARTYPE));
+         memmove(state->undo_char + state->redo_char_point, state->undo_char + state->redo_char_point-n, (size_t) ((STB_TEXTEDIT_UNDOSTATECOUNT - state->redo_char_point)*sizeof(STB_TEXTEDIT_CHARTYPE)));
          for (i=state->redo_point; i < k; ++i)
             if (state->undo_rec[i].char_storage >= 0)
                state->undo_rec[i].char_storage = state->undo_rec[i].char_storage + (short) n; // vsnet05
       }
       ++state->redo_point;
-      memmove(state->undo_rec + state->redo_point-1, state->undo_rec + state->redo_point, (STB_TEXTEDIT_UNDOSTATECOUNT - state->redo_point)*sizeof(state->undo_rec[0]));
+      memmove(state->undo_rec + state->redo_point-1, state->undo_rec + state->redo_point, (size_t) ((STB_TEXTEDIT_UNDOSTATECOUNT - state->redo_point)*sizeof(state->undo_rec[0])));
    }
 }
 
@@ -1201,7 +1234,7 @@ static void stb_text_redo(STB_TEXTEDIT_STRING *str, STB_TexteditState *state)
    s->redo_point++;
 }
 
-static void stb_text_makeundo_insert(STB_TEXTEDIT_STRING *str, STB_TexteditState *state, int where, int length)
+static void stb_text_makeundo_insert(STB_TexteditState *state, int where, int length)
 {
    stb_text_createundo(&state->undostate, where, 0, length);
 }

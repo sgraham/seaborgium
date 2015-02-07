@@ -6,10 +6,16 @@ config("debug") {
   defines = [
     "_DEBUG",
   ]
+  cflags = [
+    "/MTd",
+  ]
 }
 
 config("release") {
   defines = [
     "NDEBUG",
+  ]
+  cflags = [
+    "/MT",
   ]
 }

@@ -873,8 +873,10 @@ CharClass* CharClass::New(int maxranges) {
 }
 
 void CharClass::Delete() {
+#if 0
   if (this == NULL)
     return;
+#endif
   uint8 *data = reinterpret_cast<uint8*>(this);
   delete[] data;
 }

@@ -12,7 +12,9 @@
 
 namespace {
 
+#if 0
 const int kTitleOffset = 3;
+#endif
 
 }  // namespace
 

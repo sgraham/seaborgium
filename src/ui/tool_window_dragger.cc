@@ -18,8 +18,10 @@
 namespace {
 
 float kDetachedScale = 0.8f;
+#if 0
 float kHoveringAlpha = 0.75f;
 float kDropTargetAlpha = 0.6f;
+#endif
 
 struct ScopedIcon {
   ScopedIcon() {

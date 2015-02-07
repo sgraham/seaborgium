@@ -68,7 +68,6 @@ class ColorScheme {
   NVGcolor title_bar_inactive_inner_;
   NVGcolor title_bar_inactive_outer_;
   NVGcolor title_bar_text_active_;
-  NVGcolor title_bar_inactive_;
   NVGcolor title_bar_text_inactive_;
   NVGcolor title_bar_text_drop_shadow_;
   NVGcolor drop_shadow_inner_;

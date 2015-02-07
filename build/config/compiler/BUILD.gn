@@ -4,7 +4,8 @@
 
 config("default_include_dirs") {
   include_dirs = [
-    "//",
+    "C:/Program Files (x86)/Microsoft Visual Studio 12.0/VC/INCLUDE",
+    "//src",
     root_gen_dir,
   ]
 }
@@ -16,63 +17,54 @@ config("compiler") {
   ldflags = []
   defines = []
 
-  cflags += [
-    "-march=armv6",
-    "-mtune=arm1176jzf-s",
-    "-fno-strict-aliasing",
-    "-fsigned-char",
-  ]
-
   cflags_cc += [
-    "-fno-exceptions",
-    "-fno-rtti",
-    "-fno-threadsafe-statics",
-    "-fvisibility-inlines-hidden",
+    "/wd4530",
+    "-GR-"
   ]
 
-  cflags_c += [ "-std=gnu99" ]
-  cflags_cc += [ "-std=gnu++11" ]
+  cflags += [
+    "/wd4996",
+    "-Wno-deprecated-declarations",
+  ]
 }
 
 config("default_warnings") {
   cflags = [
-    "-Wall",
-    "-Werror",
-    "-Wextra",
-    "-Wendif-labels",  # Weird old-style text after an #endif.
-
-    "-Wno-missing-field-initializers",  # "struct foo f = {0};"
-    "-Wno-unused-parameter",  # Unused function parameters.
+    "/W4",
+    "/WX",
+  ]
+  defines = [
+    "_CRT_SECURE_NO_WARNINGS",
+    "_HAS_EXCEPTIONS=0",
+    "NOMINMAX",
+    "WIN32",
+    "_WIN32",
   ]
 }
 
 config("optimize") {
   cflags = [
-    "-fdata-sections",
-    "-ffunction-sections",
+    "/Ox",
+    "/GL",
   ]
 
   ldflags = [
-    "-Wl,-O1",
-    "-Wl,--as-needed",
-    "-Wl,--gc-sections",
+    "/LTCG",
   ]
-
-  cflags += [ "-O2" ]
 }
 
 config("no_optimize") {
-  cflags = [ "-O0" ]
+  cflags = [ "/O0" ]
+  ldflags = [ "/DEBUG" ]
 }
 
 config("symbols") {
-  cflags = [ "-g2" ]
+  cflags = [ "/Zi" ]
+  ldflags = [ "/DEBUG" ]
 }
 
 config("minimal_symbols") {
-  cflags = [ "-g1" ]
 }
 
 config("no_symbols") {
-  cflags = [ "-g0" ]
 }

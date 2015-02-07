@@ -101,7 +101,7 @@ float GetWidth(STB_TEXTEDIT_STRING* str, int n, int i) {
 
 // Define all the #defines needed for stb_textedit's implementation.
 
-#define KEYDOWN_BIT 0x80000000
+#define KEYDOWN_BIT 0x40000000
 #define STB_TEXTEDIT_STRINGLEN(tc) ((tc)->string_len)
 #define STB_TEXTEDIT_LAYOUTROW LayoutFunc
 #define STB_TEXTEDIT_GETWIDTH(tc, n, i) GetWidth(tc, n, i)
@@ -112,8 +112,8 @@ float GetWidth(STB_TEXTEDIT_STRING* str, int n, int i) {
 #define STB_TEXTEDIT_DELETECHARS DeleteChars
 #define STB_TEXTEDIT_INSERTCHARS InsertChars
 
-#define STB_TEXTEDIT_K_SHIFT 0x40000000
-#define STB_TEXTEDIT_K_CONTROL 0x20000000
+#define STB_TEXTEDIT_K_SHIFT 0x20000000
+#define STB_TEXTEDIT_K_CONTROL 0x10000000
 #define STB_TEXTEDIT_K_LEFT (KEYDOWN_BIT | core::Key::Left)
 #define STB_TEXTEDIT_K_RIGHT (KEYDOWN_BIT | core::Key::Right)
 #define STB_TEXTEDIT_K_UP (KEYDOWN_BIT | core::Key::Up)
