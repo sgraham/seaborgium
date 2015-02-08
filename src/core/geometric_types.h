@@ -22,7 +22,7 @@ class Rect {
     return Rect(x - other.x, y - other.y, w, h);
   }
   bool IsValid() const { return w != -1; }
-  float x, y, w, h;
+  int x, y, w, h;
 };
 
 class Point {
