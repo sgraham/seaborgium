@@ -17,6 +17,7 @@
 
 namespace {
 
+#if CORE_CONFIG_DEBUG
 const char* GlEnumName(GLenum en) {
 #define GLENUM(_ty) \
   case _ty:         \
@@ -33,6 +34,7 @@ const char* GlEnumName(GLenum en) {
 #undef GLENUM
   return "<GLenum?>";
 }
+#endif  // CORE_CONFIG_DEBUG
 
 #define _GL_CHECK(check, call)                                          \
   do {                                                                  \
@@ -206,8 +208,11 @@ void GfxDrawFps() {
   nvgFontSize(VG, 13.f);
   nvgFontFace(VG, "mono");
   nvgFillColor(VG, nvgRGBA(0x00, 0xa0, 0x00, 0x60));
+  GfxTextf(10, s_height - (16 * pos++), " GL_VERSION: %s", glGetString(GL_VERSION));
+  GfxTextf(10, s_height - (16 * pos++), "GL_RENDERER: %s", glGetString(GL_RENDERER));
+  GfxTextf(10, s_height - (16 * pos++), "  GL_VENDOR: %s", glGetString(GL_VENDOR));
   GfxTextf(10,
-           16 * pos++,
+           s_height - (16 * pos++),
            // utf-8 sequences are UPWARDS ARROW and DOWNWARDS ARROW.
            "      Frame: %7.3f, % 7.3f \xe2\x86\x91, % 7.3f \xe2\x86\x93 [ms] "
            "/ % 6.2f FPS ",
@@ -215,9 +220,6 @@ void GfxDrawFps() {
            static_cast<double>(min) * to_ms,
            static_cast<double>(max) * to_ms,
            freq / frame_time);
-  GfxTextf(10, 16 * pos++, "  GL_VENDOR: %s", glGetString(GL_VENDOR));
-  GfxTextf(10, 16 * pos++, "GL_RENDERER: %s", glGetString(GL_RENDERER));
-  GfxTextf(10, 16 * pos++, " GL_VERSION: %s", glGetString(GL_VERSION));
 }
 
 float GetDpiScale() {

@@ -45,11 +45,6 @@ config("default_warnings") {
 config("optimize") {
   cflags = [
     "/Ox",
-    "/GL",
-  ]
-
-  ldflags = [
-    "/LTCG",
   ]
 }
 

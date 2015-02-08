@@ -37,9 +37,13 @@ http://opensource.org/licenses/Zlib
 
 https://github.com/nothings/stb/
 stb_image.c
-stb_freetype.h
 stb_textedit.h
-Public domain by Sean Barrett (image and freetype are via nanovg)
+Public domain by Sean Barrett (image is via nanovg)
+
+
+http://www.freetype.org/freetype2/
+David Turner, Robert Wilhelm, and Werner Lemberg
+http://git.savannah.gnu.org/cgit/freetype/freetype2.git/tree/docs/FTL.TXT
 
 
 http://glew.sourceforge.net/
