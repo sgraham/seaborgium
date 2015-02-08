@@ -144,6 +144,7 @@ void fonsDrawDebug(FONScontext* s, float x, float y);
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_ADVANCES_H
+#include FT_LCD_FILTER_H
 #include <math.h>
 
 struct FONSttFontImpl {
@@ -158,6 +159,8 @@ int fons__tt_init(FONScontext *context)
 	FT_Error ftError;
         FONS_NOTUSED(context);
 	ftError = FT_Init_FreeType(&ftLibrary);
+  //if (ftError) return 0;
+  //ftError = FT_Library_SetLcdFilter(ftLibrary, FT_LCD_FILTER_LIGHT);
 	return ftError == 0;
 }
 
@@ -197,7 +200,7 @@ int fons__tt_buildGlyphBitmap(FONSttFontImpl *font, int glyph, float size, float
 
 	ftError = FT_Set_Pixel_Sizes(font->font, 0, (FT_UInt)(size * (float)font->font->units_per_EM / (float)(font->font->ascender - font->font->descender)));
 	if (ftError) return 0;
-	ftError = FT_Load_Glyph(font->font, glyph, FT_LOAD_RENDER);
+	ftError = FT_Load_Glyph(font->font, glyph, FT_LOAD_RENDER /*| FT_LOAD_TARGET_LCD*/);
 	if (ftError) return 0;
 	ftError = FT_Get_Advance(font->font, glyph, FT_LOAD_NO_SCALE, (FT_Fixed*)advance);
 	if (ftError) return 0;
@@ -421,6 +424,7 @@ struct FONScontext
 	void* errorUptr;
 };
 
+#ifndef FONS_USE_FREETYPE
 static void* fons__tmpalloc(size_t size, void* up)
 {
 	unsigned char* ptr;
@@ -445,6 +449,7 @@ static void fons__tmpfree(void* ptr, void* up)
 	(void)up;
 	// empty
 }
+#endif
 
 // Copyright (c) 2008-2010 Bjoern Hoehrmann <bjoern@hoehrmann.de>
 // See http://bjoern.hoehrmann.de/utf-8/decoder/dfa/ for details.

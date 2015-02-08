@@ -216,7 +216,7 @@ int Main(int argc, char** argv) {
 
     main_area.Render();
 
-    nvgFontSize(core::VG, 13.0f);
+    nvgFontSize(core::VG, 14.0f);
     nvgFontFace(core::VG, "mono");
     nvgFillColor(core::VG, Skin::current().GetColorScheme().text());
     nvgText(core::VG,

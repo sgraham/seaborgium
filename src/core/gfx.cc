@@ -157,7 +157,7 @@ void GfxInit() {
   CORE_CHECK(glewInit() == GLEW_OK, "couldn't glewInit");
   GL_CHECK(glDisable(GL_DEPTH_TEST));
   GL_CHECK(glDisable(GL_STENCIL_TEST));
-  VG = nvgCreateGL2(NVG_ANTIALIAS);
+  VG = nvgCreateGL2(0);
 }
 
 void GfxResize(uint32_t width, uint32_t height) {
