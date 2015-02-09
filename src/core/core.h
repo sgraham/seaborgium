@@ -399,17 +399,19 @@ inline void DebugBreak() {
 #endif
 }
 
-inline void DebugOutput(const char* _out) {
+inline void DebugOutput(const char* out) {
 #if CORE_PLATFORM_WINDOWS
-  OutputDebugStringA(_out);
+  OutputDebugStringA(out);
+  fputs(out, stdout);
+  fflush(stdout);
 #elif CORE_PLATFORM_OSX
 #if defined(__OBJC__)
-  NSLog(@"%s", _out);
+  NSLog(@"%s", out);
 #else
-  NSLog(__CFStringMakeConstantString("%s"), _out);
+  NSLog(__CFStringMakeConstantString("%s"), out);
 #endif  // defined(__OBJC__)
 #else
-  fputs(_out, stdout);
+  fputs(out, stdout);
   fflush(stdout);
 #endif  // CORE_PLATFORM_
 }

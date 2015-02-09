@@ -12,6 +12,7 @@
 #include "ui/focus.h"
 #include "ui/skin.h"
 #include "ui/solid_color.h"
+#include "ui/source_view/source_view.h"
 #include "ui/text_edit.h"
 #include "ui/tree_grid.h"
 
@@ -158,7 +159,7 @@ int Main(int argc, char** argv) {
   DockingWorkspace main_area;
   const Skin& skin = Skin::current();
   const ColorScheme& cs = skin.GetColorScheme();
-  SolidColor* source_view = new SolidColor(cs.background());
+  SourceView* source_view = new SourceView();
 
   DockingToolWindow* stack =
       new DockingToolWindow(new SolidColor(cs.background()), "Stack");
@@ -215,15 +216,6 @@ int Main(int argc, char** argv) {
                   core::GetDpiScale());
 
     main_area.Render();
-
-    nvgFontSize(core::VG, 14.0f);
-    nvgFontFace(core::VG, "mono");
-    nvgFillColor(core::VG, Skin::current().GetColorScheme().text());
-    nvgText(core::VG,
-            100,
-            200,
-            "int main(int argc, char** argv) {",
-            NULL);
 
     core::GfxDrawFps();
 
