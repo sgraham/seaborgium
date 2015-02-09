@@ -23,8 +23,11 @@ config("compiler") {
   ]
 
   cflags += [
+    "/FS",
+    "/FC",
     "/wd4996",
-    "-Wno-deprecated-declarations",
+    #"-Wno-deprecated-declarations",
+    "/wd4201",
   ]
 }
 
@@ -49,7 +52,7 @@ config("optimize") {
 }
 
 config("no_optimize") {
-  cflags = [ "/O0" ]
+  cflags = [ "/Od" ]
   ldflags = [ "/DEBUG" ]
 }
 

@@ -2,9 +2,12 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-ar = "C:/Program Files (x86)/LLVM/bin/clang-cl.exe"
-cc = "C:/Program Files (x86)/LLVM/bin/clang-cl.exe"
-cxx = "C:/Program Files (x86)/LLVM/bin/clang-cl.exe"
+#ar = "C:/Program Files (x86)/LLVM/bin/clang-cl.exe"
+#cc = "C:/Program Files (x86)/LLVM/bin/clang-cl.exe"
+#cxx = "C:/Program Files (x86)/LLVM/bin/clang-cl.exe"
+ar = "C:/Program Files (x86)/Microsoft Visual Studio 12.0/VC/bin/amd64/cl.exe"
+cc = "C:/Program Files (x86)/Microsoft Visual Studio 12.0/VC/bin/amd64/cl.exe"
+cxx = "C:/Program Files (x86)/Microsoft Visual Studio 12.0/VC/bin/amd64/cl.exe"
 ld = "C:/Program Files (x86)/Microsoft Visual Studio 12.0/VC/bin/amd64/link.exe"
 
 toolchain("win") {
