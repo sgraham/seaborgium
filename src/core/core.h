@@ -139,10 +139,6 @@
 //
 // --------------------------------------------------------------------------
 
-#define CORE_MAKEFOURCC(_a, _b, _c, _d)                               \
-  (((uint32_t)(_a) | ((uint32_t)(_b) << 8) | ((uint32_t)(_c) << 16) | \
-    ((uint32_t)(_d) << 24)))
-
 #define CORE_STRINGIZE(_x) CORE_STRINGIZE_(_x)
 #define CORE_STRINGIZE_(_x) #_x
 
@@ -381,10 +377,7 @@ inline int64_t GetHPFrequency() {
 //
 // --------------------------------------------------------------------------
 
-#if CORE_PLATFORM_WINDOWS
-extern "C" __declspec(dllimport) void __stdcall OutputDebugStringA(
-    const char* str);
-#elif CORE_PLATFORM_OSX
+#if CORE_PLATFORM_OSX
 #if defined(__OBJC__)
 #import <Foundation/NSObjCRuntime.h>
 #else
