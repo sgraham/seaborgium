@@ -270,7 +270,7 @@ void TextEdit::SetText(const std::string& value) {
   LOCAL_control();
   control->string = static_cast<char*>(realloc(control->string, value.size()));
   memcpy(control->string, value.data(), value.size());
-  control->string_len = value.size();
+  control->string_len = static_cast<int>(value.size());
   state->cursor = 0;
   state->select_start = 0;
   state->select_end = 0;

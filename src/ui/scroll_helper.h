@@ -22,7 +22,7 @@ class ScrollHelperDataProvider {
 class ScrollHelper {
  public:
   ScrollHelper(ScrollHelperDataProvider* data_provider,
-               int num_pixels_in_line);
+               float num_pixels_in_line);
   virtual ~ScrollHelper();
 
   // Returns whether invalidation is required.
@@ -46,7 +46,7 @@ class ScrollHelper {
       bool* invalidate,
       bool* handled);
   void CommonMouseWheel(
-      int delta,
+      float delta,
       uint8_t modifiers,
       bool* invalidate,
       bool* handled);

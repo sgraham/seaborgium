@@ -17,12 +17,12 @@ const int kFadeOutOverTicks = 30;
 }  // namespace
 
 ScrollHelper::ScrollHelper(ScrollHelperDataProvider* data_provider,
-                           int num_pixels_in_line)
+                           float num_pixels_in_line)
     : y_pixel_scroll_(0),
       y_pixel_scroll_target_(0),
       // Start hidden.
       ticks_since_stopped_moving_(kFadeOutAfterTicks + kFadeOutOverTicks),
-      num_pixels_in_line_(num_pixels_in_line),
+      num_pixels_in_line_(static_cast<int>(num_pixels_in_line)),
       data_provider_(data_provider) {
 }
 
@@ -32,7 +32,7 @@ ScrollHelper::~ScrollHelper() {
 bool ScrollHelper::Update() {
   float delta = (y_pixel_scroll_target_ - y_pixel_scroll_) * 0.2f;
   int before = y_pixel_scroll_;
-  y_pixel_scroll_ += delta;
+  y_pixel_scroll_ += static_cast<int>(delta);
   if (before == y_pixel_scroll_) {
     y_pixel_scroll_ = y_pixel_scroll_target_;
     ticks_since_stopped_moving_++;
@@ -44,6 +44,7 @@ bool ScrollHelper::Update() {
 }
 
 void ScrollHelper::RenderScrollIndicators(const Skin& skin) {
+  CORE_UNUSED(skin);
 #if 0
   int scrollable_height = data_provider_->GetContentSize() +
                           data_provider_->GetScreenRect().h -
@@ -114,8 +115,9 @@ bool ScrollHelper::ScrollLines(int delta) {
 }
 
 bool ScrollHelper::ScrollPages(int delta) {
-  int screen_height = data_provider_->GetScreenRect().h;
-  y_pixel_scroll_target_ += delta * screen_height - num_pixels_in_line_;
+  float screen_height = data_provider_->GetScreenRect().h;
+  y_pixel_scroll_target_ +=
+      static_cast<int>(delta * screen_height - num_pixels_in_line_);
   return ClampScrollTarget();
 }
 
@@ -137,38 +139,41 @@ void ScrollHelper::CommonNotifyKey(core::Key::Enum key,
                                    bool* handled) {
   *invalidate = false;
   *handled = false;
-  if (key == core::Key::Down) {
-    *invalidate = ScrollLines(1);
-    *handled = true;
-  } else if (key == core::Key::Up) {
-    *invalidate = ScrollLines(-1);
-    *handled = true;
-  } else if (key == core::Key::PageUp ||
-             (key == core::Key::Space &&
-              (modifiers & (core::Modifier::LeftShift |
-                            core::Modifier::RightShift)) != 0)) {
-    *invalidate = ScrollPages(-1);
-    *handled = true;
-  } else if (key == core::Key::PageDown ||
-             (key == core::Key::Space &&
-              (modifiers & (core::Modifier::LeftShift |
-                            core::Modifier::RightShift)) == 0)) {
-    *invalidate = ScrollPages(1);
-    *handled = true;
-  } else if (key == core::Key::Home) {
-    *invalidate = ScrollToBeginning();
-    *handled = true;
-  } else if (key == core::Key::End) {
-    *invalidate = ScrollToEnd();
-    *handled = true;
+  if (down) {
+    if (key == core::Key::Down) {
+      *invalidate = ScrollLines(1);
+      *handled = true;
+    } else if (key == core::Key::Up) {
+      *invalidate = ScrollLines(-1);
+      *handled = true;
+    } else if (key == core::Key::PageUp ||
+               (key == core::Key::Space &&
+                (modifiers & (core::Modifier::LeftShift |
+                              core::Modifier::RightShift)) != 0)) {
+      *invalidate = ScrollPages(-1);
+      *handled = true;
+    } else if (key == core::Key::PageDown ||
+               (key == core::Key::Space &&
+                (modifiers & (core::Modifier::LeftShift |
+                              core::Modifier::RightShift)) == 0)) {
+      *invalidate = ScrollPages(1);
+      *handled = true;
+    } else if (key == core::Key::Home) {
+      *invalidate = ScrollToBeginning();
+      *handled = true;
+    } else if (key == core::Key::End) {
+      *invalidate = ScrollToEnd();
+      *handled = true;
+    }
   }
 }
 
-void ScrollHelper::CommonMouseWheel(int delta,
+void ScrollHelper::CommonMouseWheel(float delta,
                                     uint8_t modifiers,
                                     bool* invalidate,
                                     bool* handled) {
-  ScrollPixels(-delta * .5f);
+  CORE_UNUSED(modifiers);
+  ScrollPixels(static_cast<int>(-delta * .5f));
   *invalidate = true;
   *handled = true;
 }

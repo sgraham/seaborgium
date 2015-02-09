@@ -236,7 +236,8 @@ void TreeGrid::CalculateLayoutNodes(const std::vector<TreeGridNode*>& nodes,
                *y_position + layout_data->header.h,
                adjusted_width,
                kLineHeight);
-      layout_data->cells.push_back(LayoutData::RectNodeAndIndex(box, node, j));
+      layout_data->cells.push_back(
+          LayoutData::RectNodeAndIndex(box, node, static_cast<int>(j)));
       if (j == 0 && node == focused_node_)
         layout_data->focus = box;
     }
@@ -363,8 +364,8 @@ bool TreeGrid::CouldStartDrag(DragSetup* drag_setup) {
       // TODO(scottmg): Should this only be in the header?
       drag_setup->drag_direction = kDragDirectionLeftRight;
       if (drag_setup->draggable) {
-        drag_setup->draggable->reset(
-            new ColumnDragHelper(this, i, column_x, layout_data.body));
+        drag_setup->draggable->reset(new ColumnDragHelper(
+            this, static_cast<int>(i), column_x, layout_data.body));
       }
       return true;
     }

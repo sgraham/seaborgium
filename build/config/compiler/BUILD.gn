@@ -28,6 +28,8 @@ config("compiler") {
     "/wd4996",
     #"-Wno-deprecated-declarations",
     "/wd4201",
+    "/wd4702",
+    "/wd4267",
   ]
 }
 

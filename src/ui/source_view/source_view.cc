@@ -14,15 +14,18 @@ SourceView::~SourceView() {
 }
 
 void SourceView::SetFilePath(const std::string& path) {
+  CORE_UNUSED(path);
 }
 
 bool SourceView::NotifyMouseWheel(int x,
                                   int y,
                                   float delta,
                                   uint8_t modifiers) {
+  CORE_UNUSED(x);
+  CORE_UNUSED(y);
   bool invalidate = false;
   bool handled = false;
-  scroll_.CommonMouseWheel(delta / 65536.0, modifiers, &invalidate, &handled);
+  scroll_.CommonMouseWheel(delta, modifiers, &invalidate, &handled);
   return handled;
 }
 
@@ -39,7 +42,7 @@ void SourceView::Render() {
   const ColorScheme& cs = skin.GetColorScheme();
   DrawSolidRect(GetClientRect(), cs.background());
 
-  ScopedRenderOffset scroll_offset(0, scroll_.GetOffset());
+  ScopedRenderOffset scroll_offset(0, static_cast<float>(scroll_.GetOffset()));
   nvgFontSize(core::VG, 14.0f);
   nvgFontFace(core::VG, "mono");
   nvgFillColor(core::VG, Skin::current().GetColorScheme().text());
