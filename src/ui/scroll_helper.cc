@@ -68,7 +68,7 @@ void ScrollHelper::RenderScrollIndicators() {
   }
 
   DrawOutlineRoundedRect(
-      Rect(screen_rect.w - 10.f, scrollbar_offset, 8.f, scrollbar_height),
+      Rect(screen_rect.w - 13.f, scrollbar_offset, 8.f, scrollbar_height),
       nvgRGBA(80, 80, 80, static_cast<unsigned char>(alpha * 255)),
       4.f,
       1.f);
