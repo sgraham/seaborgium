@@ -28,7 +28,7 @@ class ScrollHelper {
   // Returns whether invalidation is required.
   bool Update();
 
-  void RenderScrollIndicators(const Skin& skin);
+  void RenderScrollIndicators();
   int GetOffset() const { return y_pixel_scroll_; }
 
   // Returns "did move", i.e. whether invalidation is required.

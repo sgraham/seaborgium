@@ -7,6 +7,7 @@
 #include <algorithm>
 
 #include "core/gfx.h"
+#include "ui/drawing_common.h"
 #include "ui/skin.h"
 
 namespace {
@@ -35,29 +36,30 @@ bool ScrollHelper::Update() {
   y_pixel_scroll_ += static_cast<int>(delta);
   if (before == y_pixel_scroll_) {
     y_pixel_scroll_ = y_pixel_scroll_target_;
-    ticks_since_stopped_moving_++;
-    return ticks_since_stopped_moving_ <
-           (kFadeOutAfterTicks + kFadeOutOverTicks);
+    bool invalidate =
+        ticks_since_stopped_moving_ < (kFadeOutAfterTicks + kFadeOutOverTicks);
+    if (invalidate)
+      ticks_since_stopped_moving_++;
+    return invalidate;
   }
   ticks_since_stopped_moving_ = 0;
   return true;
 }
 
-void ScrollHelper::RenderScrollIndicators(const Skin& skin) {
-  CORE_UNUSED(skin);
-#if 0
+void ScrollHelper::RenderScrollIndicators() {
   int scrollable_height = data_provider_->GetContentSize() +
-                          data_provider_->GetScreenRect().h -
+                          static_cast<int>(data_provider_->GetScreenRect().h) -
                           num_pixels_in_line_;
   Rect screen_rect = data_provider_->GetScreenRect();
-  int visible_height = screen_rect.h;
+  int visible_height = static_cast<int>(screen_rect.h);
   double fraction_visible = static_cast<double>(visible_height) /
                             static_cast<double>(scrollable_height);
-  int scrollbar_height = static_cast<int>(visible_height * fraction_visible);
+  float scrollbar_height =
+      static_cast<float>(visible_height * fraction_visible);
 
   double offset_fraction = static_cast<double>(y_pixel_scroll_) /
                            static_cast<double>(scrollable_height);
-  int scrollbar_offset = static_cast<int>(visible_height * offset_fraction);
+  float scrollbar_offset = static_cast<float>(visible_height * offset_fraction);
 
   double alpha = 1.0;
   if (ticks_since_stopped_moving_ >= kFadeOutAfterTicks) {
@@ -65,31 +67,11 @@ void ScrollHelper::RenderScrollIndicators(const Skin& skin) {
         ticks_since_stopped_moving_ - kFadeOutAfterTicks) / kFadeOutOverTicks;
   }
 
-  const Texture* top_texture = skin.vscrollbar_top_texture();
-  const Texture* middle_texture = skin.vscrollbar_middle_texture();
-  const Texture* bottom_texture = skin.vscrollbar_bottom_texture();
-  int scrollbar_middle_height =
-      scrollbar_height - top_texture->height - bottom_texture->height;
-  int x = screen_rect.w - middle_texture->width;
-  int y = scrollbar_offset;
-  renderer->DrawTexturedRectAlpha(
-      top_texture,
-      Rect(x, y, top_texture->width, top_texture->height),
-      alpha,
-      0, 0, 1, 1);
-  y += top_texture->height;
-  renderer->DrawTexturedRectAlpha(
-      middle_texture,
-      Rect(x, y, middle_texture->width, scrollbar_middle_height),
-      alpha,
-      0, 0, 1, 1);
-  y += scrollbar_middle_height;
-  renderer->DrawTexturedRectAlpha(
-      bottom_texture,
-      Rect(x, y, bottom_texture->width, bottom_texture->height),
-      alpha,
-      0, 0, 1, 1);
-#endif
+  DrawOutlineRoundedRect(
+      Rect(screen_rect.w - 10.f, scrollbar_offset, 8.f, scrollbar_height),
+      nvgRGBA(80, 80, 80, static_cast<unsigned char>(alpha * 255)),
+      4.f,
+      1.f);
 }
 
 bool ScrollHelper::ClampScrollTarget() {
@@ -106,7 +88,6 @@ bool ScrollHelper::ClampScrollTarget() {
 
 bool ScrollHelper::ScrollPixels(int delta) {
   y_pixel_scroll_target_ += delta;
-  core::DebugPrintf("y_pixel_scroll_target_: %f\n", y_pixel_scroll_target_);
   return ClampScrollTarget();
 }
 
@@ -174,7 +155,7 @@ void ScrollHelper::CommonMouseWheel(float delta,
                                     bool* invalidate,
                                     bool* handled) {
   CORE_UNUSED(modifiers);
-  ScrollPixels(static_cast<int>(-delta * 2));
+  ScrollPixels(static_cast<int>(delta * 3));
   *invalidate = true;
   *handled = true;
 }

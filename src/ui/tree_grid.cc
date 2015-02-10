@@ -298,14 +298,14 @@ void TreeGrid::Render() {
   // TODO(scottmg): lost focus should cancel or commit edit
   if (ld.focus.IsValid()) {
     if (GetFocusedContents() == inline_edit_.get()) {
-      DrawOutlineRoundedRect(ld.focus, cs.text_selection(), 3.f);
+      DrawOutlineRoundedRect(ld.focus, cs.text_selection(), 3.f, 1.f);
       inline_edit_->SetScreenRect(ClientToScreen(ld.focus));
       ScopedRenderOffset text_edit_offset(this, inline_edit_.get(), false);
       inline_edit_->Render();
     } else if (GetFocusedContents() == this) {
       DrawSolidRoundedRect(ld.focus, cs.text_selection(), 3.f);
     } else {
-      DrawOutlineRoundedRect(ld.focus, cs.text_selection(), 3.f);
+      DrawOutlineRoundedRect(ld.focus, cs.text_selection(), 3.f, 1.f);
     }
   }
 }

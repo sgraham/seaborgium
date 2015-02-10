@@ -2027,7 +2027,8 @@ void nvgRoundedRect(NVGcontext* ctx, float x, float y, float w, float h, float r
 		return;
 	}
 	else {
-		float rx = nvg__minf(r, nvg__absf(w)*0.5f) * nvg__signf(w), ry = nvg__minf(r, nvg__absf(h)*0.5f) * nvg__signf(h);
+		float rx = nvg__minf(r, nvg__absf(w)*0.5f) * nvg__signf(w),
+			  ry = nvg__minf(r, nvg__absf(h)*0.5f) * nvg__signf(h);
 		float vals[] = {
 			NVG_MOVETO, x, y+ry,
 			NVG_LINETO, x, y+h-ry,

@@ -113,11 +113,13 @@ void DrawSolidRoundedRect(const Rect& rect,
 
 void DrawOutlineRoundedRect(const Rect& rect,
                             const NVGcolor& color,
-                            float radius) {
+                            float radius,
+                            float width) {
   nvgSave(core::VG);
   nvgBeginPath(core::VG);
   nvgRoundedRect(core::VG, rect.x, rect.y, rect.w, rect.h, radius);
   nvgStrokeColor(core::VG, color);
+  nvgStrokeWidth(core::VG, width);
   nvgStroke(core::VG);
   nvgRestore(core::VG);
 }

@@ -42,15 +42,20 @@ void SourceView::Render() {
   const ColorScheme& cs = skin.GetColorScheme();
   DrawSolidRect(GetClientRect(), cs.background());
 
-  ScopedRenderOffset scroll_offset(0, static_cast<float>(scroll_.GetOffset()));
-  nvgFontSize(core::VG, 14.0f);
-  nvgFontFace(core::VG, "mono");
-  nvgFillColor(core::VG, Skin::current().GetColorScheme().text());
-  nvgText(core::VG, 100, 200, "int main(int argc, char** argv) {", NULL);
+  {
+    ScopedRenderOffset scroll_offset(0,
+                                     static_cast<float>(scroll_.GetOffset()));
+    nvgFontSize(core::VG, 14.0f);
+    nvgFontFace(core::VG, "mono");
+    nvgFillColor(core::VG, Skin::current().GetColorScheme().text());
+    nvgText(core::VG, 100, 200, "int main(int argc, char** argv) {", NULL);
+  }
+
+  scroll_.RenderScrollIndicators();
 }
 
 int SourceView::GetContentSize() {
-  return 10000;
+  return 2000;
 }
 
 const Rect& SourceView::GetScreenRect() const {
