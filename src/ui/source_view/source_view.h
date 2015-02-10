@@ -20,6 +20,7 @@ class SourceView : public Widget, public ScrollHelperDataProvider {
 
   // Implementation of core::InputHandler:
   bool WantMouseEvents() override { return true; }
+  bool WantKeyEvents() override { return true; }
   bool NotifyMouseWheel(int x, int y, float delta, uint8_t modifiers) override;
   bool NotifyKey(core::Key::Enum key, bool down, uint8_t modifiers) override;
 

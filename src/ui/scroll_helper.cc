@@ -106,6 +106,7 @@ bool ScrollHelper::ClampScrollTarget() {
 
 bool ScrollHelper::ScrollPixels(int delta) {
   y_pixel_scroll_target_ += delta;
+  core::DebugPrintf("y_pixel_scroll_target_: %f\n", y_pixel_scroll_target_);
   return ClampScrollTarget();
 }
 
@@ -173,7 +174,7 @@ void ScrollHelper::CommonMouseWheel(float delta,
                                     bool* invalidate,
                                     bool* handled) {
   CORE_UNUSED(modifiers);
-  ScrollPixels(static_cast<int>(-delta * .5f));
+  ScrollPixels(static_cast<int>(-delta * 2));
   *invalidate = true;
   *handled = true;
 }

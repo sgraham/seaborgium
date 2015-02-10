@@ -407,11 +407,12 @@ struct Context {
           int32_t mx, my;
           MouseFromLparam(lparam, &mx, &my);
           uint8_t modifiers = TranslateKeyModifiers();
-          event_queue_.PostMouseWheelEvent(mx,
-                                           my,
-                                           static_cast<float>(HIWORD(wparam)) /
-                                               static_cast<float>(WHEEL_DELTA),
-                                           modifiers);
+          short delta = HIWORD(wparam);
+          event_queue_.PostMouseWheelEvent(
+              mx,
+              my,
+              static_cast<float>(delta) / static_cast<float>(WHEEL_DELTA),
+              modifiers);
         } break;
 
         case WM_LBUTTONDOWN:
