@@ -160,6 +160,7 @@ int Main(int argc, char** argv) {
   const Skin& skin = Skin::current();
   const ColorScheme& cs = skin.GetColorScheme();
   SourceView* source_view = new SourceView();
+  source_view->SetFilePath("src\\main.cc");
 
   DockingToolWindow* stack =
       new DockingToolWindow(new SolidColor(cs.background()), "Stack");

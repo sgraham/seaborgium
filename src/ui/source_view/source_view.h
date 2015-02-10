@@ -5,11 +5,19 @@
 #ifndef UI_SOURCE_VIEW_SOURCE_VIEW_H_
 #define UI_SOURCE_VIEW_SOURCE_VIEW_H_
 
+#include <string>
+
 #include "core/core.h"
+#include "nanovg.h"
 #include "ui/scroll_helper.h"
+#include "ui/source_view/lexer.h"
 #include "ui/widget.h"
 
-#include <string>
+struct ColoredText {
+  Lexer::TokenType type;
+  std::string text;
+};
+typedef std::vector<ColoredText> Line;
 
 class SourceView : public Widget, public ScrollHelperDataProvider {
  public:
@@ -32,7 +40,12 @@ class SourceView : public Widget, public ScrollHelperDataProvider {
   const Rect& GetScreenRect() const override;
 
  private:
+  int GetFirstLineInView();
+  bool LineInView(int line_number);
+  const NVGcolor& ColorForTokenType(const Skin& skin, Lexer::TokenType type);
+
   ScrollHelper scroll_;
+  std::vector<Line> lines_;
 
   CORE_DISALLOW_COPY_AND_ASSIGN(SourceView);
 };
