@@ -204,7 +204,7 @@ struct Context {
     s_translateKey[VK_LEFT] = Key::Left;
     s_translateKey[VK_RIGHT] = Key::Right;
     s_translateKey[VK_PRIOR] = Key::PageUp;
-    s_translateKey[VK_NEXT] = Key::PageUp;
+    s_translateKey[VK_NEXT] = Key::PageDown;
     s_translateKey[VK_HOME] = Key::Home;
     s_translateKey[VK_END] = Key::End;
     s_translateKey[VK_INSERT] = Key::Insert;

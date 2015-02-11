@@ -41,7 +41,7 @@ void SyntaxHighlight(const std::string& input, std::vector<Line>* lines) {
 
 void SourceView::SetFilePath(const std::string& path) {
   // TODO(scottmg): On background thread.
-  FILE* f = fopen(path.c_str(), "r");
+  FILE* f = fopen(path.c_str(), "rb");
   if (!f) return;
   fseek(f, 0, SEEK_END);
   long len = ftell(f);
@@ -108,7 +108,7 @@ void SourceView::Render() {
       Height()));
 #endif
 
-  int y_pixel_scroll = scroll_.GetOffset();
+  int y_pixel_scroll = scroll_.GetOffset() - line_height;
 
   for (size_t i = start_line; i < lines_.size(); ++i) {
     // Extra |line_height| added to height so that a full line is drawn at
@@ -131,7 +131,7 @@ void SourceView::Render() {
     // Source.
     for (size_t j = 0; j < lines_[i].size(); ++j) {
       nvgFillColor(core::VG, ColorForTokenType(skin, lines_[i][j].type));
-      x += static_cast<size_t>(
+      x = static_cast<size_t>(
           nvgText(core::VG,
                   static_cast<float>(x),
                   static_cast<float>(i * line_height - y_pixel_scroll),
@@ -156,7 +156,7 @@ void SourceView::Render() {
 }
 
 int SourceView::GetContentSize() {
-  return 2000;
+  return static_cast<int>(Skin::current().text_line_height() * lines_.size());
 }
 
 const Rect& SourceView::GetScreenRect() const {
