@@ -6,88 +6,88 @@
 #define UI_SKIN_H_
 
 #include "core/core.h"
-#include "nanovg.h"
+#include "core/gfx.h"
 
 class ColorScheme {
  public:
   // TODO(config): Configuration from .json or something.
   ColorScheme();
-  const NVGcolor& border() const { return border_; }
-  const NVGcolor& background() const { return background_; }
-  const NVGcolor& text() const { return text_; }
-  const NVGcolor& text_selection() const { return text_selection_; }
-  const NVGcolor& cursor() const { return cursor_; }
-  const NVGcolor& title_bar_active_inner() const {
+  const core::Color& border() const { return border_; }
+  const core::Color& background() const { return background_; }
+  const core::Color& text() const { return text_; }
+  const core::Color& text_selection() const { return text_selection_; }
+  const core::Color& cursor() const { return cursor_; }
+  const core::Color& title_bar_active_inner() const {
     return title_bar_active_inner_;
   }
-  const NVGcolor& title_bar_active_outer() const {
+  const core::Color& title_bar_active_outer() const {
     return title_bar_active_outer_;
   }
-  const NVGcolor& title_bar_inactive_inner() const {
+  const core::Color& title_bar_inactive_inner() const {
     return title_bar_inactive_inner_;
   }
-  const NVGcolor& title_bar_inactive_outer() const {
+  const core::Color& title_bar_inactive_outer() const {
     return title_bar_inactive_outer_;
   }
-  const NVGcolor& title_bar_text_active() const {
+  const core::Color& title_bar_text_active() const {
     return title_bar_text_active_;
   }
-  const NVGcolor& title_bar_text_inactive() const {
+  const core::Color& title_bar_text_inactive() const {
     return title_bar_text_inactive_;
   }
-  const NVGcolor& title_bar_text_drop_shadow() const {
+  const core::Color& title_bar_text_drop_shadow() const {
     return title_bar_text_drop_shadow_;
   }
-  const NVGcolor& drop_shadow_inner() const { return drop_shadow_inner_; }
-  const NVGcolor& drop_shadow_outer() const { return drop_shadow_outer_; }
-  const NVGcolor& drop_indicator() const { return drop_indicator_; }
+  const core::Color& drop_shadow_inner() const { return drop_shadow_inner_; }
+  const core::Color& drop_shadow_outer() const { return drop_shadow_outer_; }
+  const core::Color& drop_indicator() const { return drop_indicator_; }
 
-  const NVGcolor& comment() const { return comment_; }
-  const NVGcolor& comment_preprocessor() const { return comment_preprocessor_; }
-  const NVGcolor& error() const { return error_; }
-  const NVGcolor& keyword() const { return keyword_; }
-  const NVGcolor& keyword_type() const { return keyword_type_; }
-  const NVGcolor& literal_number() const { return literal_number_; }
-  const NVGcolor& literal_string() const { return literal_string_; }
-  const NVGcolor& klass() const { return klass_; }
-  const NVGcolor& op() const { return op_; }
+  const core::Color& comment() const { return comment_; }
+  const core::Color& comment_preprocessor() const { return comment_preprocessor_; }
+  const core::Color& error() const { return error_; }
+  const core::Color& keyword() const { return keyword_; }
+  const core::Color& keyword_type() const { return keyword_type_; }
+  const core::Color& literal_number() const { return literal_number_; }
+  const core::Color& literal_string() const { return literal_string_; }
+  const core::Color& klass() const { return klass_; }
+  const core::Color& op() const { return op_; }
 
-  const NVGcolor& margin() const { return margin_; }
-  const NVGcolor& margin_text() const { return margin_text_; }
+  const core::Color& margin() const { return margin_; }
+  const core::Color& margin_text() const { return margin_text_; }
 
-  const NVGcolor& pc_indicator() const { return pc_indicator_; }
+  const core::Color& pc_indicator() const { return pc_indicator_; }
 
  private:
-  NVGcolor border_;
-  NVGcolor background_;
-  NVGcolor text_;
-  NVGcolor text_selection_;
-  NVGcolor cursor_;
-  NVGcolor title_bar_active_inner_;
-  NVGcolor title_bar_active_outer_;
-  NVGcolor title_bar_inactive_inner_;
-  NVGcolor title_bar_inactive_outer_;
-  NVGcolor title_bar_text_active_;
-  NVGcolor title_bar_text_inactive_;
-  NVGcolor title_bar_text_drop_shadow_;
-  NVGcolor drop_shadow_inner_;
-  NVGcolor drop_shadow_outer_;
-  NVGcolor drop_indicator_;
+  core::Color border_;
+  core::Color background_;
+  core::Color text_;
+  core::Color text_selection_;
+  core::Color cursor_;
+  core::Color title_bar_active_inner_;
+  core::Color title_bar_active_outer_;
+  core::Color title_bar_inactive_inner_;
+  core::Color title_bar_inactive_outer_;
+  core::Color title_bar_text_active_;
+  core::Color title_bar_text_inactive_;
+  core::Color title_bar_text_drop_shadow_;
+  core::Color drop_shadow_inner_;
+  core::Color drop_shadow_outer_;
+  core::Color drop_indicator_;
 
-  NVGcolor comment_;
-  NVGcolor comment_preprocessor_;
-  NVGcolor error_;
-  NVGcolor keyword_;
-  NVGcolor keyword_type_;
-  NVGcolor literal_number_;
-  NVGcolor literal_string_;
-  NVGcolor klass_;
-  NVGcolor op_;
+  core::Color comment_;
+  core::Color comment_preprocessor_;
+  core::Color error_;
+  core::Color keyword_;
+  core::Color keyword_type_;
+  core::Color literal_number_;
+  core::Color literal_string_;
+  core::Color klass_;
+  core::Color op_;
 
-  NVGcolor margin_;
-  NVGcolor margin_text_;
+  core::Color margin_;
+  core::Color margin_text_;
 
-  NVGcolor pc_indicator_;
+  core::Color pc_indicator_;
 };
 
 class Skin {

@@ -7,7 +7,6 @@
 #include <algorithm>
 
 #include "core/gfx.h"
-#include "nanovg.h"
 #include "ui/draggable.h"
 #include "ui/drawing_common.h"
 #include "ui/focus.h"
@@ -27,7 +26,7 @@ TreeGridNodeValueString::TreeGridNodeValueString(const std::string& value)
 
 void TreeGridNodeValueString::Render(const Rect& rect) const {
   const ColorScheme& cs = Skin::current().GetColorScheme();
-  DrawTextInRect(rect, value_, cs.text(), kTextPadding);
+  core::DrawTextInRect(rect, value_.c_str(), cs.text(), kTextPadding);
 }
 
 // --------------------------------------------------------------------
@@ -161,7 +160,9 @@ std::vector<TreeGridColumn*>* TreeGrid::Columns() {
 TreeGrid::LayoutData TreeGrid::CalculateLayout(const Rect& client_rect) {
   TreeGrid::LayoutData ret;
 
-  ScopedSansSetup text_setup;
+  (void)client_rect;
+#if 0
+  core::ScopedSansSetup text_setup;
 
   float ascender, descender, line_height;
   nvgTextMetrics(core::VG, &ascender, &descender, &line_height);
@@ -197,6 +198,7 @@ TreeGrid::LayoutData TreeGrid::CalculateLayout(const Rect& client_rect) {
   float y_position = 0.f;
   CalculateLayoutNodes(
       *Nodes(), ret.column_widths, kMarginWidth, 0.f, &y_position, &ret);
+#endif
 
   return ret;
 }
@@ -254,6 +256,7 @@ void TreeGrid::CalculateLayoutNodes(const std::vector<TreeGridNode*>& nodes,
 }
 
 void TreeGrid::Render() {
+#if 0
   ScopedSansSetup text_setup;
   const Rect& client_rect = GetClientRect();
   const LayoutData& ld = CalculateLayout(client_rect);
@@ -308,6 +311,7 @@ void TreeGrid::Render() {
       DrawOutlineRoundedRect(ld.focus, cs.text_selection(), 3.f, 1.f);
     }
   }
+#endif
 }
 
 class ColumnDragHelper : public Draggable {

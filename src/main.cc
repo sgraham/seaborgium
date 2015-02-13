@@ -211,16 +211,18 @@ int Main(int argc, char** argv) {
       prev_height = height;
     }
 
+    /*
     nvgBeginFrame(core::VG,
                   static_cast<int>(width / core::GetDpiScale()),
                   static_cast<int>(height / core::GetDpiScale()),
                   core::GetDpiScale());
+                  */
 
     main_area.Render();
 
     core::GfxDrawFps();
 
-    nvgEndFrame(core::VG);
+    //nvgEndFrame(core::VG);
     core::GfxFrame();
   }
 

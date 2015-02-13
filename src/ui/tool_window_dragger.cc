@@ -25,26 +25,40 @@ float kDropTargetAlpha = 0.6f;
 
 struct ScopedIcon {
   ScopedIcon() {
+#if 0
     nvgSave(core::VG);
     nvgFontFace(core::VG, "icons");
     nvgFontSize(core::VG, 72);
     nvgFillColor(core::VG, Skin::current().GetColorScheme().drop_indicator());
+#endif
   }
   ~ScopedIcon() {
+#if 0
     nvgRestore(core::VG);
+#endif
   }
 };
 
 float IconWidth(const char* icon) {
+  (void)icon;
+  // XXX !
+  return 10.f;
+#if 0
   float bounds[4];
   nvgTextBounds(core::VG, 0, 0, icon, NULL, bounds);
   return bounds[2] - bounds[0];
+#endif
 }
 
 float IconHeight(const char* icon) {
+  (void)icon;
+  // XXX !
+  return 10.f;
+#if 0
   float bounds[4];
   nvgTextBounds(core::VG, 0, 0, icon, NULL, bounds);
   return bounds[3] - bounds[1];
+#endif
 }
 
 DropTargetIndicator IndicatorAt(Widget* dockable,
@@ -239,6 +253,8 @@ void ToolWindowDragger::Render() {
   dragging_->Render(render_to_texture_renderer.get());
 #endif
 
+  // XXX !
+#if 0
   for (size_t i = 0; i < targets_.size(); ++i) {
     const DropTargetIndicator& dti = targets_[i];
     nvgTextAlign(core::VG, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
@@ -272,6 +288,7 @@ void ToolWindowDragger::Render() {
   renderer->DrawFilledRect(draw_rect);
 #else
   DrawSolidRect(draw_rect, nvgRGBA(255, 255, 255, 64));
+#endif
 #endif
 
   // TODO(scottmg): Workspace::Invalidate();

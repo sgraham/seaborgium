@@ -61,15 +61,15 @@ void ScrollHelper::RenderScrollIndicators() {
                            static_cast<double>(scrollable_height);
   float scrollbar_offset = static_cast<float>(visible_height * offset_fraction);
 
-  double alpha = 1.0;
+  float alpha = 1.0;
   if (ticks_since_stopped_moving_ >= kFadeOutAfterTicks) {
-    alpha = 1.0 - static_cast<double>(
+    alpha = 1.f - static_cast<float>(
         ticks_since_stopped_moving_ - kFadeOutAfterTicks) / kFadeOutOverTicks;
   }
 
-  DrawOutlineRoundedRect(
+  core::DrawOutlineRoundedRect(
       Rect(screen_rect.w - 13.f, scrollbar_offset, 8.f, scrollbar_height),
-      nvgRGBA(80, 80, 80, static_cast<unsigned char>(alpha * 255)),
+      core::Color(0x808080, alpha),
       4.f,
       1.f);
 }

@@ -5,9 +5,8 @@
 #include "ui/drawing_common.h"
 
 #include "core/gfx.h"
-#include "nanovg.h"
 #include "ui/skin.h"
-
+#if 0
 void DrawWindow(const char* title,
                 bool active,
                 float x,
@@ -181,3 +180,5 @@ void DrawTextInRect(const Rect& rect,
             &text.data()[text.size()]);
   }
 }
+#endif
+

@@ -5,13 +5,11 @@
 group("seaborgium") {
   source_set("sglib") {
     deps = [
-      ":glew",
-      ":nanovg",
       ":re2",
     ]
 
     sources = [
-      "src/core/gfx.cc",
+      "src/core/gfx_win.cc",
       "src/ui/docking_resizer.cc",
       "src/ui/docking_split_container.cc",
       "src/ui/docking_tool_window.cc",
@@ -31,85 +29,7 @@ group("seaborgium") {
     ]
 
     include_dirs = [
-      "//third_party/glew-1.10.0/include",
-      "//third_party/nanovg/src",
       "//third_party/re2",
-    ]
-
-    defines = [
-      "GLEW_STATIC",
-    ]
-  }
-
-  source_set("glew") {
-    sources = [
-      "third_party/glew-1.10.0/src/glew.c",
-    ]
-
-    include_dirs = [
-      "//third_party/glew-1.10.0/include",
-    ]
-
-    defines = [
-      "GLEW_STATIC",
-    ]
-  }
-
-  source_set("nanovg") {
-    deps = [
-      ":freetype2",
-    ]
-
-    sources = [
-      "third_party/nanovg/src/nanovg.c",
-    ]
-
-    include_dirs = [
-      "//third_party/nanovg/src",
-      "//third_party/freetype-2.5.5/include",
-    ]
-
-    defines = [
-      "FONS_USE_FREETYPE",
-    ]
-  }
-
-  source_set("freetype2") {
-    sources = [
-      "third_party/freetype-2.5.5/src/autofit/autofit.c",
-      "third_party/freetype-2.5.5/src/bdf/bdf.c",
-      "third_party/freetype-2.5.5/src/cff/cff.c",
-      "third_party/freetype-2.5.5/src/base/ftbase.c",
-      "third_party/freetype-2.5.5/src/base/ftlcdfil.c",
-      "third_party/freetype-2.5.5/src/cache/ftcache.c",
-      "third_party/freetype-2.5.5/src/base/ftbitmap.c",
-      "third_party/freetype-2.5.5/src/base/ftglyph.c",
-      "third_party/freetype-2.5.5/src/gzip/ftgzip.c",
-      "third_party/freetype-2.5.5/src/base/ftinit.c",
-      "third_party/freetype-2.5.5/src/lzw/ftlzw.c",
-      "third_party/freetype-2.5.5/src/base/ftsystem.c",
-      "third_party/freetype-2.5.5/src/smooth/smooth.c",
-      "third_party/freetype-2.5.5/src/base/ftmm.c",
-      "third_party/freetype-2.5.5/src/pcf/pcf.c",
-      "third_party/freetype-2.5.5/src/pfr/pfr.c",
-      "third_party/freetype-2.5.5/src/psaux/psaux.c",
-      "third_party/freetype-2.5.5/src/pshinter/pshinter.c",
-      "third_party/freetype-2.5.5/src/psnames/psmodule.c",
-      "third_party/freetype-2.5.5/src/raster/raster.c",
-      "third_party/freetype-2.5.5/src/sfnt/sfnt.c",
-      "third_party/freetype-2.5.5/src/truetype/truetype.c",
-      "third_party/freetype-2.5.5/src/type1/type1.c",
-      "third_party/freetype-2.5.5/src/cid/type1cid.c",
-      "third_party/freetype-2.5.5/src/type42/type42.c",
-      "third_party/freetype-2.5.5/src/winfonts/winfnt.c",
-    ]
-
-    include_dirs = [
-      "third_party/freetype-2.5.5/include",
-    ]
-
-    defines = [
-      "FT2_BUILD_LIBRARY",
     ]
   }
 

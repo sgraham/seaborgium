@@ -77,6 +77,7 @@ void SourceView::Render() {
   const ColorScheme& cs = skin.GetColorScheme();
   DrawSolidRect(GetClientRect(), cs.background());
 
+#if 0
   nvgFontSize(core::VG, 14.0f);
   nvgFontFace(core::VG, "mono");
 #if 0
@@ -151,6 +152,7 @@ void SourceView::Render() {
         0, 0, 1, 1);
   }
 #endif
+#endif
 
   scroll_.RenderScrollIndicators();
 }
@@ -178,8 +180,8 @@ bool SourceView::LineInView(int line_number) {
   return true;
 }
 
-const NVGcolor& SourceView::ColorForTokenType(const Skin& skin,
-                                              Lexer::TokenType type) {
+const core::Color& SourceView::ColorForTokenType(const Skin& skin,
+                                                 Lexer::TokenType type) {
   // TODO(config): More customizability with fallbacks.
   const ColorScheme& cs = skin.GetColorScheme();
   switch (type) {

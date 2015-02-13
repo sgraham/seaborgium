@@ -12,7 +12,6 @@
 
 #include "core/entry.h"
 #include "core/gfx.h"
-#include "nanovg.h"
 #include "ui/drawing_common.h"
 #include "ui/focus.h"
 #include "ui/skin.h"
@@ -28,6 +27,7 @@ struct TextControl {
   STB_TexteditState state;
 };
 
+#if 0
 float CursorXFromIndex(NVGglyphPosition* positions, int count, int index) {
   CORE_CHECK(index <= count, "index out of range");
   if (index == 0)
@@ -37,10 +37,16 @@ float CursorXFromIndex(NVGglyphPosition* positions, int count, int index) {
   else
     return positions[index].minx;
 }
+#endif
 
 void LayoutFunc(StbTexteditRow* row, STB_TEXTEDIT_STRING* str, int start_i) {
-  ScopedMonoSetup text_setup;
+  core::ScopedMonoSetup text_setup;
 
+  (void)row;
+  (void)str;
+  (void)start_i;
+
+#if 0
   int remaining_chars = str->string_len - start_i;
   // Always single line.
   row->num_chars = remaining_chars;
@@ -60,6 +66,7 @@ void LayoutFunc(StbTexteditRow* row, STB_TEXTEDIT_STRING* str, int start_i) {
   row->baseline_y_delta = line_height;
   row->ymin = 0;
   row->ymax = line_height - descender;
+#endif
 }
 
 int DeleteChars(STB_TEXTEDIT_STRING* str, int pos, int num) {
@@ -82,8 +89,14 @@ int InsertChars(STB_TEXTEDIT_STRING* str,
 }
 
 float GetWidth(STB_TEXTEDIT_STRING* str, int n, int i) {
-  ScopedMonoSetup text_setup;
+  core::ScopedMonoSetup text_setup;
   CORE_UNUSED(n);  // Single line only.
+  (void)str;
+  (void)n;
+  (void)i;
+  // XXX !
+  return 10.f;
+#if 0
   std::unique_ptr<NVGglyphPosition[]> positions(
       new NVGglyphPosition[str->string_len]);
   nvgTextGlyphPositions(core::VG,
@@ -96,6 +109,7 @@ float GetWidth(STB_TEXTEDIT_STRING* str, int n, int i) {
   CORE_CHECK(i < str->string_len, "out of bounds request");
   return CursorXFromIndex(positions.get(), str->string_len, i + 1) -
          CursorXFromIndex(positions.get(), str->string_len, i);
+#endif
 }
 
 
@@ -277,6 +291,7 @@ void TextEdit::SetText(const std::string& value) {
 }
 
 void TextEdit::Render() {
+#if 0
   ScopedMonoSetup text_setup;
 
   const ColorScheme& cs = Skin::current().GetColorScheme();
@@ -333,4 +348,5 @@ void TextEdit::Render() {
         cs.text_selection(),
         3.f);
   }
+#endif
 }

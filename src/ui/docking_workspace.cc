@@ -23,7 +23,7 @@ DockingWorkspace::~DockingWorkspace() {
 void DockingWorkspace::Render() {
   if (root_->left()) {
     const Rect& rect = GetScreenRect();
-    ScopedRenderOffset offset(rect.x, rect.y);
+    core::ScopedRenderOffset offset(rect.x, rect.y);
     root_->left()->Render();
   }
   if (draggable_.get())

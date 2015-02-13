@@ -14,8 +14,9 @@ DockingResizer::DockingResizer(DockingSplitContainer* resizing)
   // Only one of these is relevant, so we handle both vertical and horizontal
   // by making the point on the splitter be the same fraction.
   float parent_size = ParentSize();
-  initial_location_ = Point(parent_size * resizing_->fraction(),
-                            parent_size * resizing_->fraction());
+  initial_location_ =
+      Point(parent_size * resizing_->fraction(),
+            parent_size * resizing_->fraction());
 }
 
 DockingResizer::~DockingResizer() {

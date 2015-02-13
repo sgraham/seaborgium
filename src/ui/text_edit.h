@@ -5,7 +5,7 @@
 #ifndef UI_TEXT_EDIT_H_
 #define UI_TEXT_EDIT_H_
 
-#include "nanovg.h"
+#include "core/gfx.h"
 #include "ui/widget.h"
 
 #include <string>
@@ -44,8 +44,8 @@ class TextEdit : public Widget {
   void* impl_;
   float mouse_x_;
   float mouse_y_;
-  NVGcolor cursor_color_;
-  NVGcolor cursor_color_target_;
+  core::Color cursor_color_;
+  core::Color cursor_color_target_;
   bool left_mouse_is_down_;
 
   CORE_DISALLOW_COPY_AND_ASSIGN(TextEdit);

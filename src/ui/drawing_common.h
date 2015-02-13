@@ -6,9 +6,9 @@
 #define UI_DRAWING_COMMON_H_
 
 #include "core/gfx.h"
-#include "nanovg.h"
 #include "ui/widget.h"
 
+#if 0
 #include <string>
 
 void DrawWindow(const char* title,
@@ -82,5 +82,6 @@ struct ScopedSansSetup : public ScopedTextSetup {
 struct ScopedIconsSetup : public ScopedTextSetup {
   ScopedIconsSetup() : ScopedTextSetup("icons", 28.f) {}
 };
+#endif
 
 #endif  // UI_DRAWING_COMMON_H_

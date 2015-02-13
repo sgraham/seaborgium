@@ -189,7 +189,8 @@ static Key::Enum TranslateKey(WPARAM wparam) {
 static HCURSOR s_current_cursor;
 
 extern void WinGfxSetHwnd(HWND hwnd);
-extern void WinGfxSetDpiScale(float dpi_scale);
+extern void WinGfxCreateDeviceIndependentResources();
+extern float GetDpiScale();
 
 struct Context {
   Context() : init_(false), exit_(false) {
@@ -288,13 +289,7 @@ struct Context {
     wnd.hIconSm = ::LoadIcon(NULL, IDI_APPLICATION);
     ::RegisterClassExA(&wnd);
 
-    HDC screen_dc = ::GetDC(NULL);
-    float dpi_scale_x = GetDeviceCaps(screen_dc, LOGPIXELSX) / 96.f;
-    float dpi_scale_y = GetDeviceCaps(screen_dc, LOGPIXELSY) / 96.f;
-    CORE_CHECK(dpi_scale_x == dpi_scale_y,
-               "Don't handle non-uniform DPI scale");
-    WinGfxSetDpiScale(dpi_scale_x);
-    ::ReleaseDC(NULL, screen_dc);
+    WinGfxCreateDeviceIndependentResources();
 
     hwnd_ =
         ::CreateWindowA("seaborgium",

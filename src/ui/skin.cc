@@ -7,47 +7,46 @@
 #include "core/core.h"
 #include "core/entry.h"
 #include "core/gfx.h"
-#include "nanovg.h"
 
 // Temp manual config; Solarized Dark
 namespace {
 
-NVGcolor kBase03 = nvgRGB(0, 43, 54);
-NVGcolor kBase02 = nvgRGB(7, 54, 66);
-NVGcolor kBase01 = nvgRGB(88, 110, 117);
-NVGcolor kBase00 = nvgRGB(101, 123, 131);
-NVGcolor kBase0 = nvgRGB(131, 148, 150);
-NVGcolor kBase1 = nvgRGB(147, 161, 161);
-NVGcolor kBase2 = nvgRGB(238, 232, 213);
-NVGcolor kBase3 = nvgRGB(253, 246, 227);
-NVGcolor kYellow = nvgRGB(181, 137, 0);
-NVGcolor kOrange = nvgRGB(203, 75, 22);
-NVGcolor kRed = nvgRGB(220, 50, 47);
-NVGcolor kMagenta = nvgRGB(211, 54, 130);
-NVGcolor kViolet = nvgRGB(108, 113, 196);
-NVGcolor kBlue = nvgRGB(38, 139, 210);
-NVGcolor kCyan = nvgRGB(42, 161, 152);
-NVGcolor kGreen = nvgRGB(133, 153, 0);
+core::Color kBase03(0, 43, 54);
+core::Color kBase02(7, 54, 66);
+core::Color kBase01(88, 110, 117);
+core::Color kBase00(101, 123, 131);
+core::Color kBase0(131, 148, 150);
+core::Color kBase1(147, 161, 161);
+core::Color kBase2(238, 232, 213);
+core::Color kBase3(253, 246, 227);
+core::Color kYellow(181, 137, 0);
+core::Color kOrange(203, 75, 22);
+core::Color kRed(220, 50, 47);
+core::Color kMagenta(211, 54, 130);
+core::Color kViolet(108, 113, 196);
+core::Color kBlue(38, 139, 210);
+core::Color kCyan(42, 161, 152);
+core::Color kGreen(133, 153, 0);
 
 Skin g_skin;
 
 }  // namespace
 
 ColorScheme::ColorScheme()
-  : border_(nvgRGBA(0, 0, 0, 255)),
+  : border_(0, 0, 0, 255),
     background_(kBase03),
     text_(kBase0),
     text_selection_(kYellow),
     cursor_(kBase1),
-    title_bar_active_inner_(nvgRGBA(128, 255, 255, 192)),
-    title_bar_active_outer_(nvgRGBA(128, 255, 255, 32)),
-    title_bar_inactive_inner_(nvgRGBA(128, 128, 128, 8)),
-    title_bar_inactive_outer_(nvgRGBA(0, 0, 0, 16)),
+    title_bar_active_inner_(128, 255, 255, 192),
+    title_bar_active_outer_(128, 255, 255, 32),
+    title_bar_inactive_inner_(128, 128, 128, 8),
+    title_bar_inactive_outer_(0, 0, 0, 16),
     title_bar_text_active_(kBase2),
     title_bar_text_inactive_(kBase00),
-    title_bar_text_drop_shadow_(nvgRGBA(0, 0, 0, 128)),
-    drop_shadow_inner_(nvgRGBA(0, 0, 0, 128)),
-    drop_shadow_outer_(nvgRGBA(0, 0, 0, 0)),
+    title_bar_text_drop_shadow_(0, 0, 0, 128),
+    drop_shadow_inner_(0, 0, 0, 128),
+    drop_shadow_outer_(0, 0, 0, 0),
     drop_indicator_(kBase1),
     comment_(kBase01),
     comment_preprocessor_(kOrange),
@@ -72,6 +71,8 @@ Skin::Skin()
       text_line_height_(17.f) {}
 
 void Skin::Init() {
+  // TODO !
+#if 0
   CORE_CHECK(nvgCreateFont(core::VG, "sans", "art/Roboto-Regular.ttf") != -1,
              "font load failed");
   CORE_CHECK(
@@ -81,6 +82,7 @@ void Skin::Init() {
              "font load failed");
   CORE_CHECK(nvgCreateFont(core::VG, "icons", "art/entypo.ttf") != -1,
              "font load failed");
+#endif
 
   dock_bottom_icon_ = "\xee\x9d\x98";  // circled-down
   dock_left_icon_ = "\xee\x9d\x99";  // circled-left

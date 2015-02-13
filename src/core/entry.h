@@ -143,8 +143,6 @@ bool ProcessEvents(uint32_t* width,
                    uint32_t* height,
                    InputHandler* input_handler);
 
-float GetDpiScale();
-
 void SetWindowSize(uint32_t width, uint32_t height);
 
 struct MouseCursor {

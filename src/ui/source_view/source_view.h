@@ -8,7 +8,7 @@
 #include <string>
 
 #include "core/core.h"
-#include "nanovg.h"
+#include "core/gfx.h"
 #include "ui/scroll_helper.h"
 #include "ui/source_view/lexer.h"
 #include "ui/widget.h"
@@ -42,7 +42,7 @@ class SourceView : public Widget, public ScrollHelperDataProvider {
  private:
   int GetFirstLineInView();
   bool LineInView(int line_number);
-  const NVGcolor& ColorForTokenType(const Skin& skin, Lexer::TokenType type);
+  const core::Color& ColorForTokenType(const Skin& skin, Lexer::TokenType type);
 
   ScrollHelper scroll_;
   std::vector<Line> lines_;
