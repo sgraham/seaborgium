@@ -18,12 +18,12 @@ void GfxResize(uint32_t width, uint32_t height);
 void GfxFrame();
 void GfxShutdown();
 
-float GfxText(float x, float y, const char* string);
-float GfxTextf(float x, float y, const char* format, ...);
-
-void GfxDrawFps();
-
-float GetDpiScale();
+// Perhaps a bit anemic.
+enum class Font {
+  kMono,
+  kUI,
+  kTitle,
+};
 
 struct Color {
   float r;
@@ -32,14 +32,26 @@ struct Color {
   float a;
 
   Color() {}
-  Color(float r, float g, float b) : r(r), g(g), b(b), a(1.f) {}
-  Color(float r, float g, float b, float a) : r(r), g(g), b(b), a(a) {}
-  Color(uint32_t rgb, float a)
-      : r(((rgb & 0xff0000) >> 16) / 255.f),
-        g(((rgb & 0xff00) >> 8) / 255.f),
-        b((rgb & 0xff) / 255.f),
-        a(a) {}
+  Color(float r, float g, float b) : Color(r, g, b, 1.f) {}
+  Color::Color(uint32_t rgb, float a)
+      : Color(((rgb & 0xff0000) >> 16) / 255.f,
+              ((rgb & 0xff00) >> 8) / 255.f,
+              (rgb & 0xff) / 255.f,
+              a) {}
+  Color::Color(float r, float g, float b, float a) : r(r), g(g), b(b), a(a) {}
+  bool operator==(const Color& rhs) const {
+    return r == rhs.r && g == rhs.g && b == rhs.b && a == rhs.a;
+  }
 };
+
+float GfxText(Font font, const Color& color, float x, float y, const char* string);
+float GfxTextf(Font font, const Color& color, float x, float y, const char* format, ...);
+
+void GfxDrawFps();
+
+float GetDpiScale();
+
+class ColorInternalData;
 
 // Drawing helpers.
 void DrawSolidRect(const Rect& rect, const Color& color);
@@ -50,7 +62,8 @@ void DrawOutlineRoundedRect(const Rect& rect,
                             float width);
 void DrawVerticalLine(const Color& color, float x, float y0, float y1);
 void DrawHorizontalLine(const Color& color, float x0, float x1, float y);
-void DrawTextInRect(const Rect& rect,
+void DrawTextInRect(Font font,
+                    const Rect& rect,
                     const char* text,
                     const core::Color& color,
                     float x_padding = 0.f);

@@ -447,7 +447,7 @@ struct Context {
           uint8_t modifiers = TranslateKeyModifiers();
           Key::Enum key = TranslateKey(wparam);
 
-          if (Key::Print == key && 0x3 == ((uint32_t)(lparam) >> 30)) {
+          if (key == Key::Print && 0x3 == ((uint32_t)(lparam) >> 30)) {
             // VK_SNAPSHOT doesn't generate keydown event. Fire on down event
             // when previous key state bit is set to 1 and transition state bit
             // is set to 1.
@@ -466,8 +466,6 @@ struct Context {
         } break;
 
 
-        // These don't appear sufficient to avoid flicker during drag resizing
-        // with GL rendering. I don't know why.
         case WM_ERASEBKGND:
           return TRUE;
 

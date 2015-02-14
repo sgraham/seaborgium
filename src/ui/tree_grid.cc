@@ -26,7 +26,8 @@ TreeGridNodeValueString::TreeGridNodeValueString(const std::string& value)
 
 void TreeGridNodeValueString::Render(const Rect& rect) const {
   const ColorScheme& cs = Skin::current().GetColorScheme();
-  core::DrawTextInRect(rect, value_.c_str(), cs.text(), kTextPadding);
+  core::DrawTextInRect(
+      core::Font::kUI, rect, value_.c_str(), cs.text(), kTextPadding);
 }
 
 // --------------------------------------------------------------------

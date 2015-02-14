@@ -218,8 +218,6 @@ int Main(int argc, char** argv) {
                   core::GetDpiScale());
                   */
 
-    main_area.Render();
-
     core::GfxDrawFps();
 
     //nvgEndFrame(core::VG);

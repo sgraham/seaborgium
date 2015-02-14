@@ -9,9 +9,12 @@
 #include <d2d1helper.h>
 #include <dwrite.h>
 
+#include <unordered_map>
+
 #include "core/entry.h"
 
 #pragma comment(lib, "d2d1.lib")
+#pragma comment(lib, "dwrite.lib")
 
 namespace core {
 
@@ -22,8 +25,30 @@ static float g_dpi_scale = 1.0;
 
 static ID2D1Factory* g_direct2d_factory;
 static ID2D1HwndRenderTarget* g_render_target;
-static ID2D1SolidColorBrush* g_light_slate_gray_brush;
-static ID2D1SolidColorBrush* g_cornflower_blue_brush;
+static IDWriteFactory* g_dwrite_factory;
+static IDWriteTextFormat* g_text_format_mono;
+struct ColorHash {
+  size_t operator()(const Color& c) const {
+    return (static_cast<size_t>(c.a * 255.f) << 24) +
+           (static_cast<size_t>(c.r * 255.f) << 16) +
+           (static_cast<size_t>(c.g * 255.f) << 8) +
+           static_cast<size_t>(c.b * 255.f);
+  }
+};
+static std::unordered_map<Color, ID2D1SolidColorBrush*, ColorHash>
+    g_brush_for_color;
+
+ID2D1SolidColorBrush* SolidBrushForColor(const Color& color) {
+  auto it = g_brush_for_color.find(color);
+  if (it != g_brush_for_color.end())
+    return it->second;
+  ID2D1SolidColorBrush* brush;
+  CORE_CHECK(SUCCEEDED(g_render_target->CreateSolidColorBrush(
+                 D2D1::ColorF(color.r, color.g, color.b, color.a), &brush)),
+             "CreateSolidColorBrush");
+  g_brush_for_color[color] = brush;
+  return brush;
+}
 
 void WinGfxSetHwnd(HWND hwnd) {
   g_hwnd = hwnd;
@@ -46,6 +71,23 @@ void WinGfxCreateDeviceIndependentResources() {
   g_direct2d_factory->GetDesktopDpi(&dpi_x, &dpi_y);
   CORE_CHECK(dpi_x == dpi_y, "non-uniform dpi");
   g_dpi_scale = dpi_x;
+
+  CORE_CHECK(SUCCEEDED(DWriteCreateFactory(
+                 DWRITE_FACTORY_TYPE_SHARED,
+                 __uuidof(IDWriteFactory),
+                 reinterpret_cast<IUnknown**>(&g_dwrite_factory))),
+             "DWriteCreateFactory");
+
+  CORE_CHECK(SUCCEEDED(g_dwrite_factory->CreateTextFormat(
+                 L"Consolas",  // Font family name.
+                 nullptr,
+                 DWRITE_FONT_WEIGHT_REGULAR,
+                 DWRITE_FONT_STYLE_NORMAL,
+                 DWRITE_FONT_STRETCH_NORMAL,
+                 13.0f,
+                 L"en-us",
+                 &g_text_format_mono)),
+             "CreateTextFormat");
 }
 
 void CreateDeviceResources() {
@@ -56,25 +98,18 @@ void CreateDeviceResources() {
 
   CORE_CHECK(SUCCEEDED(g_direct2d_factory->CreateHwndRenderTarget(
                  D2D1::RenderTargetProperties(),
-                 D2D1::HwndRenderTargetProperties(g_hwnd, size),
+                 D2D1::HwndRenderTargetProperties(
+                     g_hwnd, size, D2D1_PRESENT_OPTIONS_NONE),
                  &g_render_target)),
              "CreateHwndRenderTarget");
-
-  CORE_CHECK(SUCCEEDED(g_render_target->CreateSolidColorBrush(
-                 D2D1::ColorF(D2D1::ColorF::LightSlateGray),
-                 &g_light_slate_gray_brush)),
-             "CreateSolidColorBrush");
-
-  CORE_CHECK(SUCCEEDED(g_render_target->CreateSolidColorBrush(
-                 D2D1::ColorF(D2D1::ColorF::CornflowerBlue),
-                 &g_cornflower_blue_brush)),
-             "CreateSolidColorBrush");
 }
 
 void DiscardDeviceResources() {
   SafeRelease(&g_render_target);
-  SafeRelease(&g_light_slate_gray_brush);
-  SafeRelease(&g_cornflower_blue_brush);
+
+  for (auto& brush : g_brush_for_color)
+    SafeRelease(&brush.second);
+  g_brush_for_color.clear();
 }
 
 void GfxInit() {
@@ -83,14 +118,18 @@ void GfxInit() {
   // We use GfxFrame as "swap", so clear and get ready here.
   g_render_target->BeginDraw();
   g_render_target->SetTransform(D2D1::Matrix3x2F::Identity());
-  g_render_target->Clear(D2D1::ColorF(D2D1::ColorF::Blue));
+  g_render_target->Clear(D2D1::ColorF(D2D1::ColorF::White));
 }
 
 void GfxResize(uint32_t width, uint32_t height) {
   g_width = width;
   g_height = height;
-  if (g_render_target)
+  printf("%d, %d\n", width, height);
+  if (g_render_target) {
     g_render_target->Resize(D2D1::SizeU(width, height));
+    DiscardDeviceResources();
+    CreateDeviceResources();
+  }
 }
 
 void GfxFrame() {
@@ -99,54 +138,27 @@ void GfxFrame() {
     DiscardDeviceResources();
   }
 
-
+  if (!g_render_target)
+    CreateDeviceResources();
 
   g_render_target->BeginDraw();
   g_render_target->SetTransform(D2D1::Matrix3x2F::Identity());
   g_render_target->Clear(D2D1::ColorF(D2D1::ColorF::White));
-  D2D1_SIZE_F size = g_render_target->GetSize();
-
-  // XXX Debug stuff, grid background.
-  int width = static_cast<int>(size.width);
-  int height = static_cast<int>(size.height);
-
-  for (int x = 0; x < width; x += 10) {
-    g_render_target->DrawLine(D2D1::Point2F(static_cast<FLOAT>(x), 0.0f),
-                              D2D1::Point2F(static_cast<FLOAT>(x), size.height),
-                              g_light_slate_gray_brush,
-                              0.5f);
-  }
-
-  for (int y = 0; y < height; y += 10) {
-    g_render_target->DrawLine(D2D1::Point2F(0.0f, static_cast<FLOAT>(y)),
-                              D2D1::Point2F(size.width, static_cast<FLOAT>(y)),
-                              g_light_slate_gray_brush,
-                              0.5f);
-  }
-
-  // Draw two rectangles.
-  D2D1_RECT_F rectangle1 = D2D1::RectF(size.width / 2 - 50.0f,
-                                       size.height / 2 - 50.0f,
-                                       size.width / 2 + 50.0f,
-                                       size.height / 2 + 50.0f);
-
-  D2D1_RECT_F rectangle2 = D2D1::RectF(size.width / 2 - 100.0f,
-                                       size.height / 2 - 100.0f,
-                                       size.width / 2 + 100.0f,
-                                       size.height / 2 + 100.0f);
-
-  g_render_target->FillRectangle(&rectangle1, g_light_slate_gray_brush);
-  g_render_target->DrawRectangle(&rectangle2, g_cornflower_blue_brush);
-
-  CORE_CHECK(SUCCEEDED(g_render_target->EndDraw()), "EndDraw");
 }
 
 void GfxShutdown() {
   DiscardDeviceResources();
   SafeRelease(&g_direct2d_factory);
+  SafeRelease(&g_dwrite_factory);
+  SafeRelease(&g_text_format_mono);
 }
 
-float GfxTextf(float x, float y, const char* format, ...) {
+float GfxTextf(Font font,
+               const Color& color,
+               float x,
+               float y,
+               const char* format,
+               ...) {
   va_list arg_list;
   va_start(arg_list, format);
 
@@ -160,11 +172,21 @@ float GfxTextf(float x, float y, const char* format, ...) {
   out[len] = '\0';
   va_end(arg_list);
 
-  // TODO !
-  (void)x;
-  (void)y;
-  // return nvgText(core::VG, x, y, out, out + len);
-  return 1.f; 
+  int wide_len = MultiByteToWideChar(CP_UTF8, 0, out, -1, NULL, 0);
+  wchar_t* wide =
+      reinterpret_cast<wchar_t*>(_alloca(sizeof(wchar_t) * wide_len));
+  if (MultiByteToWideChar(CP_UTF8, 0, out, -1, wide, wide_len) != wide_len)
+    return 0.f;
+
+  D2D1_RECT_F layout_rect = D2D1::RectF(
+      x, y, static_cast<float>(g_width), static_cast<float>(g_height));
+  (void)font;
+  g_render_target->DrawTextA(wide,
+                             wide_len,
+                             g_text_format_mono,
+                             layout_rect,
+                             SolidBrushForColor(color));
+  return 0.f;
 }
 
 void GfxDrawFps() {
@@ -181,27 +203,26 @@ void GfxDrawFps() {
   double to_ms = 1000.0 / freq;
   float pos = 1;
 
-  (void)pos;
-  (void)to_ms;
-
-  // TODO !
-  /*
-  nvgFontSize(VG, 13.f);
-  nvgFontFace(VG, "mono");
-  nvgFillColor(VG, nvgRGBA(0x00, 0xa0, 0x00, 0x60));
-  //GfxTextf(10, s_height - (16 * pos++), " GL_VERSION: %s", glGetString(GL_VERSION));
-  //GfxTextf(10, s_height - (16 * pos++), "GL_RENDERER: %s", glGetString(GL_RENDERER));
-  //GfxTextf(10, s_height - (16 * pos++), "  GL_VENDOR: %s", glGetString(GL_VENDOR));
-  GfxTextf(10,
-           s_height - (16 * pos++),
+    // TODO !
+    /*
+    nvgFontSize(VG, 13.f);
+    nvgFontFace(VG, "mono");
+    nvgFillColor(VG, nvgRGBA(0x00, 0xa0, 0x00, 0x60));
+    //GfxTextf(10, s_height - (16 * pos++), " GL_VERSION: %s", glGetString(GL_VERSION));
+    //GfxTextf(10, s_height - (16 * pos++), "GL_RENDERER: %s", glGetString(GL_RENDERER));
+    //GfxTextf(10, s_height - (16 * pos++), "  GL_VENDOR: %s", glGetString(GL_VENDOR));
+    */
+  GfxTextf(Font::kMono,
+           Color(0, 0, 0),
+           10,
+           16 * pos++,
            // utf-8 sequences are UPWARDS ARROW and DOWNWARDS ARROW.
-           "      Frame: %7.3f, % 7.3f \xe2\x86\x91, % 7.3f \xe2\x86\x93 [ms] "
-           "/ % 6.2f FPS ",
+           "Frame: %7.3f, % 7.3f \xe2\x86\x91, % 7.3f \xe2\x86\x93 [ms] / % "
+           "6.2f FPS ",
            static_cast<double>(frame_time) * to_ms,
            static_cast<double>(min) * to_ms,
            static_cast<double>(max) * to_ms,
            freq / frame_time);
-           */
 }
 
 float GetDpiScale() {
@@ -209,8 +230,8 @@ float GetDpiScale() {
 }
 
 void DrawSolidRect(const Rect& rect, const Color& color) {
-  (void)rect;
-  (void)color;
+  D2D1_RECT_F d2d1rect = { rect.x, rect.y, rect.x + rect.w, rect.y + rect.h };
+  g_render_target->FillRectangle(d2d1rect, SolidBrushForColor(color));
 }
 
 void DrawSolidRoundedRect(const Rect& rect, const Color& color, float radius) {
@@ -243,10 +264,12 @@ void DrawHorizontalLine(const Color& color, float x0, float x1, float y) {
   (void)y;
 }
 
-void DrawTextInRect(const Rect& rect,
+void DrawTextInRect(Font font,
+                    const Rect& rect,
                     const char* text,
                     const core::Color& color,
                     float x_padding) {
+  (void)font;
   (void)rect;
   (void)text;
   (void)color;
