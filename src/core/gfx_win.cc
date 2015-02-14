@@ -28,6 +28,10 @@ static ID2D1Factory* g_direct2d_factory;
 static ID2D1HwndRenderTarget* g_render_target;
 static IDWriteFactory* g_dwrite_factory;
 static IDWriteTextFormat* g_text_format_mono;
+static IDWriteTextFormat* g_text_format_ui;
+static IDWriteTextFormat* g_text_format_title;
+static ID2D1LinearGradientBrush* g_title_bar_active_gradient_brush;
+static ID2D1LinearGradientBrush* g_title_bar_inactive_gradient_brush;
 struct ColorHash {
   size_t operator()(const Color& c) const {
     return (static_cast<size_t>(c.a * 255.f) << 24) +
@@ -49,6 +53,10 @@ ID2D1SolidColorBrush* SolidBrushForColor(const Color& color) {
              "CreateSolidColorBrush");
   g_brush_for_color[color] = brush;
   return brush;
+}
+
+D2D1_COLOR_F ColorToD2DColorF(const Color& color) {
+  return D2D1::ColorF(color.r, color.g, color.b, color.a);
 }
 
 void WinGfxSetHwnd(HWND hwnd) {
@@ -89,6 +97,30 @@ void WinGfxCreateDeviceIndependentResources() {
                  L"en-us",
                  &g_text_format_mono)),
              "CreateTextFormat");
+
+  CORE_CHECK(SUCCEEDED(g_dwrite_factory->CreateTextFormat(
+                 L"Segoe UI",  // Font family name.
+                 nullptr,
+                 DWRITE_FONT_WEIGHT_REGULAR,
+                 DWRITE_FONT_STYLE_NORMAL,
+                 DWRITE_FONT_STRETCH_NORMAL,
+                 12.0f,
+                 L"en-us",
+                 &g_text_format_ui)),
+             "CreateTextFormat");
+
+  CORE_CHECK(SUCCEEDED(g_dwrite_factory->CreateTextFormat(
+                 L"Segoe UI",  // Font family name.
+                 nullptr,
+                 DWRITE_FONT_WEIGHT_BOLD,
+                 DWRITE_FONT_STYLE_NORMAL,
+                 DWRITE_FONT_STRETCH_NORMAL,
+                 15.0f,
+                 L"en-us",
+                 &g_text_format_title)),
+             "CreateTextFormat");
+  g_text_format_title->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+  g_text_format_title->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 }
 
 void CreateDeviceResources() {
@@ -103,10 +135,55 @@ void CreateDeviceResources() {
                      g_hwnd, size, D2D1_PRESENT_OPTIONS_NONE),
                  &g_render_target)),
              "CreateHwndRenderTarget");
+
+  const Skin& sk = Skin::current();
+  const ColorScheme& cs = sk.GetColorScheme();
+
+  ID2D1GradientStopCollection* gradient_stop_collection;
+  D2D1_GRADIENT_STOP gradient_stops[2];
+  gradient_stops[0].color = ColorToD2DColorF(cs.title_bar_active_inner());
+  gradient_stops[0].position = 0.0f;
+  gradient_stops[1].color = ColorToD2DColorF(cs.title_bar_active_outer());
+  gradient_stops[1].position = 1.f;
+  CORE_CHECK(SUCCEEDED(g_render_target->CreateGradientStopCollection(
+                 gradient_stops,
+                 2,
+                 D2D1_GAMMA_2_2,
+                 D2D1_EXTEND_MODE_CLAMP,
+                 &gradient_stop_collection)),
+             "CreateGradientStopCollection active");
+  CORE_CHECK(
+      SUCCEEDED(g_render_target->CreateLinearGradientBrush(
+          D2D1::LinearGradientBrushProperties(
+              D2D1::Point2F(0.0, 0.0), D2D1::Point2F(0.0, sk.title_bar_size())),
+          gradient_stop_collection,
+          &g_title_bar_active_gradient_brush)),
+      "CreateLinearGradientBrush active");
+  SafeRelease(&gradient_stop_collection);
+
+  gradient_stops[0].color = ColorToD2DColorF(cs.title_bar_inactive_inner());
+  gradient_stops[1].color = ColorToD2DColorF(cs.title_bar_inactive_outer());
+  CORE_CHECK(SUCCEEDED(g_render_target->CreateGradientStopCollection(
+                 gradient_stops,
+                 2,
+                 D2D1_GAMMA_2_2,
+                 D2D1_EXTEND_MODE_CLAMP,
+                 &gradient_stop_collection)),
+             "CreateGradientStopCollection inactive");
+  CORE_CHECK(
+      SUCCEEDED(g_render_target->CreateLinearGradientBrush(
+          D2D1::LinearGradientBrushProperties(
+              D2D1::Point2F(0.0, 0.0), D2D1::Point2F(0.0, sk.title_bar_size())),
+          gradient_stop_collection,
+          &g_title_bar_inactive_gradient_brush)),
+      "CreateLinearGradientBrush inactive");
+  SafeRelease(&gradient_stop_collection);
 }
 
 void DiscardDeviceResources() {
   SafeRelease(&g_render_target);
+  SafeRelease(&g_title_bar_active_gradient_brush);
+  SafeRelease(&g_title_bar_inactive_gradient_brush);
 
   for (auto& brush : g_brush_for_color)
     SafeRelease(&brush.second);
@@ -149,6 +226,21 @@ void GfxShutdown() {
   SafeRelease(&g_direct2d_factory);
   SafeRelease(&g_dwrite_factory);
   SafeRelease(&g_text_format_mono);
+  SafeRelease(&g_text_format_ui);
+  SafeRelease(&g_text_format_title);
+}
+
+IDWriteTextFormat* TextFormatForFont(Font font) {
+  switch (font) {
+    case Font::kMono:
+      return g_text_format_mono;
+    case Font::kUI:
+      return g_text_format_ui;
+    case Font::kTitle:
+      return g_text_format_title;
+    default:
+      return nullptr;
+  }
 }
 
 float GfxTextf(Font font,
@@ -178,13 +270,31 @@ float GfxTextf(Font font,
 
   D2D1_RECT_F layout_rect = D2D1::RectF(
       x, y, static_cast<float>(g_width), static_cast<float>(g_height));
-  (void)font;
   g_render_target->DrawTextA(wide,
                              wide_len,
-                             g_text_format_mono,
+                             TextFormatForFont(font),
                              layout_rect,
                              SolidBrushForColor(color));
   return 0.f;
+}
+
+void GfxText(Font font,
+             const Color& color,
+             const Rect& rect,
+             const char* string) {
+  int wide_len = MultiByteToWideChar(CP_UTF8, 0, string, -1, NULL, 0);
+  wchar_t* wide =
+      reinterpret_cast<wchar_t*>(_alloca(sizeof(wchar_t) * wide_len));
+  if (MultiByteToWideChar(CP_UTF8, 0, string, -1, wide, wide_len) != wide_len)
+    return;
+
+  D2D1_RECT_F layout_rect =
+      D2D1::RectF(rect.x, rect.y, rect.x + rect.w, rect.x + rect.h);
+  g_render_target->DrawTextA(wide,
+                             wide_len,
+                             TextFormatForFont(font),
+                             layout_rect,
+                             SolidBrushForColor(color));
 }
 
 void GfxDrawFps() {
@@ -293,13 +403,30 @@ void DrawWindow(const char* title,
   DrawSolidRect(Rect(x, y + sk.title_bar_size(), w, h - sk.title_bar_size()),
                 cs.background());
   
-  // Drop shadow
-  // TODO
-  
+  // Drop shadow maybe.
+
   // Header.
-  // TODO
-  (void)active;
-  (void)title;
+  g_render_target->FillRoundedRectangle(
+      D2D1::RoundedRect(D2D1::RectF(x, y, x + w, y + sk.title_bar_size()),
+                        kCornerRadius - 1,
+                        kCornerRadius - 1),
+      active ? g_title_bar_active_gradient_brush
+             : g_title_bar_inactive_gradient_brush);
+  g_render_target->DrawLine(
+      D2D1::Point2F(x + 0.5f, y + sk.title_bar_size() - 1),
+      D2D1::Point2F(x + 0.5f + w - 1, y + sk.title_bar_size() - 1),
+      SolidBrushForColor(cs.border()));
+
+  // Title.
+  const float kTextFudge = -4;
+  GfxText(Font::kTitle,
+           cs.title_bar_text_drop_shadow(),
+           Rect(x + 1, y + 1 + kTextFudge, w, sk.title_bar_size()),
+           title);
+  GfxText(Font::kTitle,
+           active ? cs.title_bar_text_active() : cs.title_bar_text_inactive(),
+           Rect(x, y + kTextFudge, w, sk.title_bar_size()),
+           title);
 }
 
 class ScopedRenderOffset::Data {

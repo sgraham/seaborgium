@@ -46,8 +46,21 @@ struct Color {
   }
 };
 
-float GfxText(Font font, const Color& color, float x, float y, const char* string);
-float GfxTextf(Font font, const Color& color, float x, float y, const char* format, ...);
+float GfxText(Font font,
+              const Color& color,
+              float x,
+              float y,
+              const char* string);
+float GfxTextf(Font font,
+               const Color& color,
+               float x,
+               float y,
+               const char* format,
+               ...);
+void GfxText(Font font,
+             const Color& color,
+             const Rect& rect,
+             const char* string);
 
 void GfxDrawFps();
 
