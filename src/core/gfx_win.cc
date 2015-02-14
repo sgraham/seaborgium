@@ -70,7 +70,7 @@ void WinGfxCreateDeviceIndependentResources() {
   FLOAT dpi_x, dpi_y;
   g_direct2d_factory->GetDesktopDpi(&dpi_x, &dpi_y);
   CORE_CHECK(dpi_x == dpi_y, "non-uniform dpi");
-  g_dpi_scale = dpi_x;
+  g_dpi_scale = dpi_x / 96.f;
 
   CORE_CHECK(SUCCEEDED(DWriteCreateFactory(
                  DWRITE_FACTORY_TYPE_SHARED,
@@ -112,21 +112,21 @@ void DiscardDeviceResources() {
   g_brush_for_color.clear();
 }
 
-void GfxInit() {
-  CreateDeviceResources();
-
-  // We use GfxFrame as "swap", so clear and get ready here.
+void BeginFrame() {
   g_render_target->BeginDraw();
   g_render_target->SetTransform(D2D1::Matrix3x2F::Identity());
   g_render_target->Clear(D2D1::ColorF(D2D1::ColorF::White));
 }
 
+void GfxInit() {
+  CreateDeviceResources();
+  BeginFrame();
+}
+
 void GfxResize(uint32_t width, uint32_t height) {
   g_width = width;
   g_height = height;
-  printf("%d, %d\n", width, height);
   if (g_render_target) {
-    g_render_target->Resize(D2D1::SizeU(width, height));
     DiscardDeviceResources();
     CreateDeviceResources();
   }
@@ -134,16 +134,13 @@ void GfxResize(uint32_t width, uint32_t height) {
 
 void GfxFrame() {
   HRESULT hr = g_render_target->EndDraw();
-  if (hr == D2DERR_RECREATE_TARGET) {
+  if (hr == D2DERR_RECREATE_TARGET)
     DiscardDeviceResources();
-  }
 
   if (!g_render_target)
     CreateDeviceResources();
 
-  g_render_target->BeginDraw();
-  g_render_target->SetTransform(D2D1::Matrix3x2F::Identity());
-  g_render_target->Clear(D2D1::ColorF(D2D1::ColorF::White));
+  BeginFrame();
 }
 
 void GfxShutdown() {
@@ -213,7 +210,7 @@ void GfxDrawFps() {
     //GfxTextf(10, s_height - (16 * pos++), "  GL_VENDOR: %s", glGetString(GL_VENDOR));
     */
   GfxTextf(Font::kMono,
-           Color(0, 0, 0),
+           Color(0.f, 0.65f, 0.f, 0.375f),
            10,
            16 * pos++,
            // utf-8 sequences are UPWARDS ARROW and DOWNWARDS ARROW.
