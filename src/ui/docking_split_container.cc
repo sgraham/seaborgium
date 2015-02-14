@@ -141,12 +141,14 @@ Rect DockingSplitContainer::GetRectForSplitter() {
 
 void DockingSplitContainer::Render() {
   {
-    core::ScopedRenderOffset left_offset(this, left_.get(), true);
+    core::ScopedRenderOffset left_offset(
+        left_->GetScreenRect().RelativeTo(GetScreenRect()), true);
     left_->Render();
   }
 
   if (right_.get()) {
-    core::ScopedRenderOffset right_offset(this, right_.get(), true);
+    core::ScopedRenderOffset right_offset(
+        right_->GetScreenRect().RelativeTo(GetScreenRect()), true);
     right_->Render();
   } else {
     CORE_DCHECK(direction_ == kSplitNoneRoot, "split direction error");

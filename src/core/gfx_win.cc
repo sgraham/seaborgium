@@ -12,6 +12,7 @@
 #include <unordered_map>
 
 #include "core/entry.h"
+#include "ui/skin.h"
 
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "dwrite.lib")
@@ -227,14 +228,18 @@ float GetDpiScale() {
 }
 
 void DrawSolidRect(const Rect& rect, const Color& color) {
-  D2D1_RECT_F d2d1rect = { rect.x, rect.y, rect.x + rect.w, rect.y + rect.h };
-  g_render_target->FillRectangle(d2d1rect, SolidBrushForColor(color));
+  g_render_target->FillRectangle(
+      D2D1::RectF(rect.x, rect.y, rect.x + rect.w, rect.y + rect.h),
+      SolidBrushForColor(color));
 }
 
 void DrawSolidRoundedRect(const Rect& rect, const Color& color, float radius) {
-  (void)rect;
-  (void)color;
-  (void)radius;
+  g_render_target->FillRoundedRectangle(
+      D2D1::RoundedRect(
+          D2D1::RectF(rect.x, rect.y, rect.x + rect.w, rect.y + rect.h),
+          radius,
+          radius),
+      SolidBrushForColor(color));
 }
 
 void DrawOutlineRoundedRect(const Rect& rect,
@@ -275,16 +280,53 @@ void DrawTextInRect(Font font,
 
 void DrawWindow(const char* title,
                 bool active,
-                double x,
-                double y,
-                double w,
-                double h) {
-  (void)title;
+                float x,
+                float y,
+                float w,
+                float h) {
+  const Skin& sk = Skin::current();
+  const ColorScheme& cs = sk.GetColorScheme();
+  const float kCornerRadius = 3.f;
+  
+  // Window: round top, but square content area.
+  DrawSolidRoundedRect(Rect(x, y, w, h), cs.background(), kCornerRadius);
+  DrawSolidRect(Rect(x, y + sk.title_bar_size(), w, h - sk.title_bar_size()),
+                cs.background());
+  
+  // Drop shadow
+  // TODO
+  
+  // Header.
+  // TODO
   (void)active;
-  (void)x;
-  (void)y;
-  (void)w;
-  (void)h;
+  (void)title;
+}
+
+class ScopedRenderOffset::Data {
+ public:
+  Data() {
+    g_render_target->GetTransform(&transform_);
+  }
+  ~Data() {
+    g_render_target->SetTransform(transform_);
+  }
+
+  D2D1_MATRIX_3X2_F transform_;
+};
+
+ScopedRenderOffset::ScopedRenderOffset(const Rect& rect, bool scissor)
+    : data_(new Data) {
+  g_render_target->SetTransform(data_->transform_ *
+                                D2D1::Matrix3x2F::Translation(rect.x, rect.y));
+  (void)scissor;
+}
+
+ScopedRenderOffset::ScopedRenderOffset(float dx, float dy) : data_(new Data) {
+  g_render_target->SetTransform(data_->transform_ *
+                                D2D1::Matrix3x2F::Translation(dx, dy));
+}
+
+ScopedRenderOffset::~ScopedRenderOffset() {
 }
 
 }  // namespace core

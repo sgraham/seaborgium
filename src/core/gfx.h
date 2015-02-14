@@ -7,6 +7,8 @@
 
 #include <inttypes.h>
 
+#include <memory>
+
 #include "core/geometric_types.h"
 
 class Widget;
@@ -69,46 +71,13 @@ void DrawTextInRect(Font font,
                     float x_padding = 0.f);
 
 struct ScopedRenderOffset {
-  ScopedRenderOffset(Widget* parent, Widget* child, bool scissor) {
-    (void)parent;
-    (void)child;
-    (void)scissor;
-  }
-  ScopedRenderOffset(const Rect& rect, bool scissor) {
-    (void)rect;
-    (void)scissor;
-  }
-  ScopedRenderOffset(float dx, float dy) {
-    (void)dx;
-    (void)dy;
-  }
-  /*
-    nvgSave(core::VG);
-    Rect relative = child->GetScreenRect().RelativeTo(parent->GetScreenRect());
-    nvgTranslate(core::VG, relative.x, relative.y);
-    if (scissor)
-      nvgScissor(core::VG, 0, 0, relative.w, relative.h);
-  }
+  ScopedRenderOffset(const Rect& rect, bool scissor);
+  ScopedRenderOffset(float dx, float dy);
 
-  ScopedRenderOffset(const Rect& rect, bool scissor) {
-    nvgSave(core::VG);
-    nvgTranslate(core::VG, rect.x, rect.y);
-    if (scissor)
-      nvgScissor(core::VG, 0, 0, rect.w, rect.h);
-#if 0
-    NVGcolor random_color =
-        nvgRGBA(rand() % 255, rand() % 255, rand() % 255, 64);
-    GfxSolidRect(Rect(0, 0, rect.w, rect.h), random_color);
-#endif
-  }
+  ~ScopedRenderOffset();
 
-  ScopedRenderOffset(float dx, float dy) {
-    nvgSave(core::VG);
-    nvgTranslate(core::VG, dx, dy);
-  }
-
-  virtual ~ScopedRenderOffset() { nvgRestore(core::VG); }
-  */
+  class Data;
+  std::unique_ptr<Data> data_;
 };
 
 struct ScopedTextSetup {
@@ -144,10 +113,10 @@ struct ScopedIconsSetup : public ScopedTextSetup {
 // TODO: Not very core.
 void DrawWindow(const char* title,
                 bool active,
-                double x,
-                double y,
-                double w,
-                double h);
+                float x,
+                float y,
+                float w,
+                float h);
 
 }  // namespace core
 

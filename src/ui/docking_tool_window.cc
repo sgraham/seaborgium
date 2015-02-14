@@ -34,7 +34,8 @@ void DockingToolWindow::Render() {
   bool focused = GetFocusedContents() == contents_;
   core::DrawWindow(title_.c_str(), focused, 0, 0, Width(), Height());
 
-  core::ScopedRenderOffset offset(this, contents_, true);
+  core::ScopedRenderOffset offset(
+      contents_->GetScreenRect().RelativeTo(GetScreenRect()), true);
   contents_->Render();
 }
 
