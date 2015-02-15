@@ -9,9 +9,11 @@
 #include <d2d1helper.h>
 #include <dwrite.h>
 
+#include <limits>
 #include <unordered_map>
 
 #include "core/entry.h"
+#include "core/string_piece.h"
 #include "ui/skin.h"
 
 #pragma comment(lib, "d2d1.lib")
@@ -243,6 +245,18 @@ IDWriteTextFormat* TextFormatForFont(Font font) {
   }
 }
 
+std::wstring UTF8ToUTF16(StringPiece utf8) {
+  int wide_len =
+      MultiByteToWideChar(CP_UTF8, 0, utf8.data(), utf8.size(), NULL, 0);
+  wchar_t* wide =
+      reinterpret_cast<wchar_t*>(_alloca(sizeof(wchar_t) * wide_len));
+  if (MultiByteToWideChar(
+          CP_UTF8, 0, utf8.data(), utf8.size(), wide, wide_len) != wide_len) {
+    return std::wstring();
+  }
+  return std::wstring(wide, wide_len);
+}
+
 float GfxTextf(Font font,
                const Color& color,
                float x,
@@ -295,6 +309,31 @@ void GfxText(Font font,
                              TextFormatForFont(font),
                              layout_rect,
                              SolidBrushForColor(color));
+}
+
+TextMeasurements GfxMeasureText(Font font, const char* str, int string_len) {
+  IDWriteTextLayout* layout;
+  std::wstring wide = UTF8ToUTF16(StringPiece(str, string_len));
+  CORE_CHECK(SUCCEEDED(g_dwrite_factory->CreateTextLayout(
+                 &wide[0],
+                 wide.size(),
+                 TextFormatForFont(font),
+                 std::numeric_limits<float>::max(),
+                 std::numeric_limits<float>::max(),
+                 &layout)),
+             "CreateTextLayout");
+  DWRITE_TEXT_METRICS metrics;
+  CORE_CHECK(SUCCEEDED(layout->GetMetrics(&metrics)), "GetMetrics");
+
+  DWRITE_LINE_SPACING_METHOD method;
+  float line_spacing, baseline;
+  CORE_CHECK(
+      SUCCEEDED(layout->GetLineSpacing(&method, &line_spacing, &baseline)),
+      "GetLineSpacing");
+
+  layout->Release();
+
+  return TextMeasurements(metrics.width, metrics.height, line_spacing);
 }
 
 void GfxDrawFps() {
@@ -363,17 +402,15 @@ void DrawOutlineRoundedRect(const Rect& rect,
 }
 
 void DrawVerticalLine(const Color& color, float x, float y0, float y1) {
-  (void)color;
-  (void)x;
-  (void)y0;
-  (void)y1;
+  g_render_target->DrawLine(D2D1::Point2F(x, y0),
+                            D2D1::Point2F(x, y1),
+                            SolidBrushForColor(color));
 }
 
 void DrawHorizontalLine(const Color& color, float x0, float x1, float y) {
-  (void)color;
-  (void)x0;
-  (void)x1;
-  (void)y;
+  g_render_target->DrawLine(D2D1::Point2F(x0, y),
+                            D2D1::Point2F(x1, y),
+                            SolidBrushForColor(color));
 }
 
 void DrawTextInRect(Font font,
@@ -397,12 +434,12 @@ void DrawWindow(const char* title,
   const Skin& sk = Skin::current();
   const ColorScheme& cs = sk.GetColorScheme();
   const float kCornerRadius = 3.f;
-  
+
   // Window: round top, but square content area.
   DrawSolidRoundedRect(Rect(x, y, w, h), cs.background(), kCornerRadius);
   DrawSolidRect(Rect(x, y + sk.title_bar_size(), w, h - sk.title_bar_size()),
                 cs.background());
-  
+
   // Drop shadow maybe.
 
   // Header.

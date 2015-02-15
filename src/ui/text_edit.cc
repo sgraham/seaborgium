@@ -12,7 +12,7 @@
 
 #include "core/entry.h"
 #include "core/gfx.h"
-#include "ui/drawing_common.h"
+#include "core/string_piece.h"
 #include "ui/focus.h"
 #include "ui/skin.h"
 
@@ -46,27 +46,16 @@ void LayoutFunc(StbTexteditRow* row, STB_TEXTEDIT_STRING* str, int start_i) {
   (void)str;
   (void)start_i;
 
-#if 0
   int remaining_chars = str->string_len - start_i;
   // Always single line.
   row->num_chars = remaining_chars;
-  std::unique_ptr<NVGglyphPosition[]> positions(
-      new NVGglyphPosition[str->string_len]);
-  nvgTextGlyphPositions(core::VG,
-                        0,
-                        0,
-                        str->string,
-                        str->string + str->string_len,
-                        positions.get(),
-                        str->string_len);
-  float ascender, descender, line_height;
-  nvgTextMetrics(core::VG, &ascender, &descender, &line_height);
+  core::TextMeasurements tm =
+      core::GfxMeasureText(core::Font::kMono, str->string, str->string_len);
   row->x0 = 0.f;  // TODO(scottmg): This seems suspect.
-  row->x1 = positions[str->string_len - 1].maxx;
-  row->baseline_y_delta = line_height;
+  row->x1 = tm.width;
+  row->baseline_y_delta = tm.line_height;
   row->ymin = 0;
-  row->ymax = line_height - descender;
-#endif
+  row->ymax = tm.height;
 }
 
 int DeleteChars(STB_TEXTEDIT_STRING* str, int pos, int num) {

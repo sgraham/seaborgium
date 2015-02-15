@@ -46,6 +46,15 @@ struct Color {
   }
 };
 
+struct TextMeasurements {
+  float width;
+  float height;
+  float line_height;
+
+  TextMeasurements(float width, float height, float line_height)
+      : width(width), height(height), line_height(line_height) {}
+};
+
 float GfxText(Font font,
               const Color& color,
               float x,
@@ -61,6 +70,8 @@ void GfxText(Font font,
              const Color& color,
              const Rect& rect,
              const char* string);
+
+TextMeasurements GfxMeasureText(Font font, const char* str, int string_len);
 
 void GfxDrawFps();
 
