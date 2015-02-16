@@ -16,8 +16,6 @@
 #include "ui/text_edit.h"
 #include "ui/tree_grid.h"
 
-#include "nanovg.h"
-
 #if 0
 #include "clang-c/Index.h"
 #endif
