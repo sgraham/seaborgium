@@ -26,6 +26,7 @@ enum class Font {
   kMono,
   kUI,
   kTitle,
+  kIcon,
 };
 
 struct Color {
@@ -100,7 +101,7 @@ void DrawVerticalLine(const Color& color, float x, float y0, float y1);
 void DrawHorizontalLine(const Color& color, float x0, float x1, float y);
 void DrawTextInRect(Font font,
                     const Rect& rect,
-                    const char* text,
+                    StringPiece str,
                     const core::Color& color,
                     float x_padding = 0.f);
 
@@ -112,6 +113,7 @@ struct ScopedRenderOffset {
 
   class Data;
   std::unique_ptr<Data> data_;
+  bool scissor_;
 };
 
 struct ScopedTextSetup {

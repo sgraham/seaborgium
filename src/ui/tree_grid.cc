@@ -161,15 +161,9 @@ std::vector<TreeGridColumn*>* TreeGrid::Columns() {
 TreeGrid::LayoutData TreeGrid::CalculateLayout(const Rect& client_rect) {
   TreeGrid::LayoutData ret;
 
-  (void)client_rect;
-#if 0
-  core::ScopedSansSetup text_setup;
-
-  float ascender, descender, line_height;
-  nvgTextMetrics(core::VG, &ascender, &descender, &line_height);
-
-  const float kMarginWidth = line_height - descender;
-  const float kHeaderHeight = kMarginWidth + 5;
+  const float kMarginWidth =
+      22;  // TODO(scottmg): Should be something font-related.
+  const float kHeaderHeight = kMarginWidth;
 
   ret.margin =
       Rect(0, kHeaderHeight, kMarginWidth, client_rect.h - kHeaderHeight);
@@ -199,7 +193,6 @@ TreeGrid::LayoutData TreeGrid::CalculateLayout(const Rect& client_rect) {
   float y_position = 0.f;
   CalculateLayoutNodes(
       *Nodes(), ret.column_widths, kMarginWidth, 0.f, &y_position, &ret);
-#endif
 
   return ret;
 }
@@ -257,8 +250,6 @@ void TreeGrid::CalculateLayoutNodes(const std::vector<TreeGridNode*>& nodes,
 }
 
 void TreeGrid::Render() {
-#if 0
-  ScopedSansSetup text_setup;
   const Rect& client_rect = GetClientRect();
   const LayoutData& ld = CalculateLayout(client_rect);
 
@@ -269,8 +260,10 @@ void TreeGrid::Render() {
   DrawSolidRect(ld.header, cs.margin());
 
   DrawVerticalLine(cs.border(), ld.header.x, ld.header.y, client_rect.h);
+
   for (size_t i = 0; i < columns_.size(); ++i) {
-    DrawTextInRect(ld.header_columns[i],
+    DrawTextInRect(core::Font::kUI,
+                   ld.header_columns[i],
                    columns_[i]->GetCaption(),
                    cs.margin_text(),
                    kTextPadding);
@@ -284,18 +277,16 @@ void TreeGrid::Render() {
 
   for (const auto& cell : ld.cells)
     cell.node->GetValue(cell.index)->Render(cell.rect);
-
+/*
   {
-    ScopedIconsSetup icons;
-    nvgFillColor(core::VG, cs.text());
     const char* kSquaredPlus = "\xE2\x8A\x9E";
     const char* kSquaredMinus = "\xE2\x8A\x9F";
     for (const auto& button : ld.expansion_boxes) {
-      nvgText(core::VG,
+      GfxText(core::Font::kIcon,
+              cs.text(),
               button.rect.x,
               button.rect.y + button.rect.h,
-              button.node->Expanded() ? kSquaredMinus : kSquaredPlus,
-              NULL);
+              button.node->Expanded() ? kSquaredMinus : kSquaredPlus);
     }
   }
 
@@ -312,7 +303,7 @@ void TreeGrid::Render() {
       DrawOutlineRoundedRect(ld.focus, cs.text_selection(), 3.f, 1.f);
     }
   }
-#endif
+  */
 }
 
 class ColumnDragHelper : public Draggable {

@@ -115,7 +115,7 @@ void WinGfxCreateDeviceIndependentResources() {
                  DWRITE_FONT_WEIGHT_REGULAR,
                  DWRITE_FONT_STYLE_NORMAL,
                  DWRITE_FONT_STRETCH_NORMAL,
-                 12.0f,
+                 13.0f,
                  L"en-us",
                  &g_text_format_ui)),
              "CreateTextFormat");
@@ -449,14 +449,11 @@ void DrawHorizontalLine(const Color& color, float x0, float x1, float y) {
 
 void DrawTextInRect(Font font,
                     const Rect& rect,
-                    const char* text,
+                    StringPiece str,
                     const core::Color& color,
                     float x_padding) {
-  (void)font;
-  (void)rect;
-  (void)text;
-  (void)color;
-  (void)x_padding;
+  ScopedRenderOffset offset(rect, true);
+  GfxText(font, color, x_padding, 0.f, str);
 }
 
 void DrawWindow(const char* title,
@@ -513,18 +510,24 @@ class ScopedRenderOffset::Data {
 };
 
 ScopedRenderOffset::ScopedRenderOffset(const Rect& rect, bool scissor)
-    : data_(new Data) {
+    : data_(new Data), scissor_(scissor) {
   g_render_target->SetTransform(data_->transform_ *
                                 D2D1::Matrix3x2F::Translation(rect.x, rect.y));
-  (void)scissor;
+  if (scissor) {
+    g_render_target->PushAxisAlignedClip(D2D1::RectF(0, 0, rect.w, rect.h),
+                                         D2D1_ANTIALIAS_MODE_ALIASED);
+  }
 }
 
-ScopedRenderOffset::ScopedRenderOffset(float dx, float dy) : data_(new Data) {
+ScopedRenderOffset::ScopedRenderOffset(float dx, float dy)
+    : data_(new Data), scissor_(false) {
   g_render_target->SetTransform(data_->transform_ *
                                 D2D1::Matrix3x2F::Translation(dx, dy));
 }
 
 ScopedRenderOffset::~ScopedRenderOffset() {
+  if (scissor_)
+    g_render_target->PopAxisAlignedClip();
 }
 
 }  // namespace core
