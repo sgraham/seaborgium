@@ -140,12 +140,12 @@ void CreateDeviceResources() {
 
   D2D1_SIZE_U size = D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top);
 
-  CORE_CHECK(SUCCEEDED(g_direct2d_factory->CreateHwndRenderTarget(
-                 D2D1::RenderTargetProperties(),
-                 D2D1::HwndRenderTargetProperties(
-                     g_hwnd, size, D2D1_PRESENT_OPTIONS_NONE),
-                 &g_render_target)),
-             "CreateHwndRenderTarget");
+  if (FAILED(g_direct2d_factory->CreateHwndRenderTarget(
+          D2D1::RenderTargetProperties(),
+          D2D1::HwndRenderTargetProperties(
+              g_hwnd, size, D2D1_PRESENT_OPTIONS_NONE),
+          &g_render_target)))
+    return;
 
   const Skin& sk = Skin::current();
   const ColorScheme& cs = sk.GetColorScheme();
@@ -228,6 +228,11 @@ void GfxFrame() {
 
   if (!g_render_target)
     CreateDeviceResources();
+
+  if (!g_render_target) {
+    // If still failed, can't continue.
+    return;
+  }
 
   BeginFrame();
 }

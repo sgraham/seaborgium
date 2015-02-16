@@ -306,19 +306,17 @@ void TextEdit::Render() {
     DrawSolidRect(Rect(cursor_x, rect.y, 1.5f, line_height_),
                   cursor_color_);
   }
-/*
+
   // Selection.
   if (state->select_start != state->select_end) {
     int start = std::min(state->select_start, state->select_end);
     int end = std::max(state->select_start, state->select_end);
-    float select_x =
-        CursorXFromIndex(positions.get(), control->string_len, start);
-    float select_w =
-        CursorXFromIndex(positions.get(), control->string_len, end) - select_x;
+    float select_x = CursorXFromIndex(tm, control->string_len, start);
+    float select_w = CursorXFromIndex(tm, control->string_len, end) - select_x;
     DrawSolidRoundedRect(
-        Rect(select_x, rect.y, select_w, rect.y + line_height - descender),
+        Rect(select_x, rect.y, select_w, rect.y + line_height_),
         cs.text_selection(),
         3.f);
   }
-  */
+
 }
