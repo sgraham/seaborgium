@@ -274,6 +274,7 @@ struct Context {
   }
 
   int32_t Run(int argc, char** argv) {
+    HeapSetInformation(nullptr, HeapEnableTerminationOnCorruption, nullptr, 0);
     ::SetDllDirectory(".");
 
     HINSTANCE instance = reinterpret_cast<HINSTANCE>(::GetModuleHandle(NULL));

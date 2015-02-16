@@ -255,6 +255,7 @@ IDWriteTextFormat* TextFormatForFont(Font font) {
     case Font::kTitle:
       return g_text_format_title;
     default:
+      CORE_CHECK(false, "unexpected font");
       return nullptr;
   }
 }
