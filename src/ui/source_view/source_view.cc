@@ -14,6 +14,23 @@ SourceView::SourceView() : scroll_(this, Skin::current().text_line_height()) {
 SourceView::~SourceView() {
 }
 
+static void SplitString(const std::string& str, char delimiter,
+                        std::vector<std::string>* into) {
+  std::vector<std::string> parsed;
+  std::string::size_type pos = 0;
+  for (;;) {
+    const std::string::size_type at = str.find(delimiter, pos);
+    if (at == std::string::npos) {
+      parsed.push_back(str.substr(pos));
+      break;
+    } else {
+      parsed.push_back(str.substr(pos, at - pos));
+      pos = at + 1;
+    }
+  }
+  into->swap(parsed);
+}
+
 // TODO(scottmg): Losing last line if doesn't end in \n.
 void SyntaxHighlight(const std::string& input, std::vector<Line>* lines) {
   std::unique_ptr<Lexer> lexer(MakeCppLexer());
@@ -28,12 +45,16 @@ void SyntaxHighlight(const std::string& input, std::vector<Line>* lines) {
     } else {
       ColoredText fragment;
       fragment.type = token.token;
-      fragment.text = token.value;
+      std::vector<std::string> tok_lines;
+      SplitString(token.value, '\n', &tok_lines);
+      fragment.text = tok_lines[0];
       current_line.push_back(fragment);
-      if (token.token == Lexer::CommentSingle) {
-        // Includes \n in its value so we don't otherwise see it.
+      // If we have multiple lines in a token, push as separate pieces.
+      for (size_t i = 1; i < tok_lines.size(); ++i) {
         lines->push_back(current_line);
         current_line.clear();
+        fragment.text = tok_lines[i];
+        current_line.push_back(fragment);
       }
     }
   }
@@ -77,9 +98,6 @@ void SourceView::Render() {
   const ColorScheme& cs = skin.GetColorScheme();
   DrawSolidRect(GetClientRect(), cs.background());
 
-#if 0
-  nvgFontSize(core::VG, 14.0f);
-  nvgFontFace(core::VG, "mono");
 #if 0
   {
     ScopedRenderOffset scroll_offset(0,
@@ -130,15 +148,28 @@ void SourceView::Render() {
     size_t x = 5;
 
     // Source.
+    // TODO(scottmg): This could be a lot faster:
+    // - Only set ranges for non-text.
+    // - Do more than one line at a time.
+    // - Different abstraction to allow dwrite to cache Layout across frames --
+    // it's completely static in our case anyway.
+    // - etc.
+    std::vector<core::RangeAndColor> ranges;
+    std::string current_line;
     for (size_t j = 0; j < lines_[i].size(); ++j) {
-      nvgFillColor(core::VG, ColorForTokenType(skin, lines_[i][j].type));
-      x = static_cast<size_t>(
-          nvgText(core::VG,
-                  static_cast<float>(x),
-                  static_cast<float>(i * line_height - y_pixel_scroll),
-                  lines_[i][j].text.c_str(),
-                  nullptr));
+      core::RangeAndColor rac(
+          static_cast<int>(current_line.size()),
+          static_cast<int>(current_line.size() + lines_[i][j].text.size()),
+          ColorForTokenType(skin, lines_[i][j].type));
+      ranges.push_back(rac);
+      current_line += lines_[i][j].text;
     }
+    GfxColoredText(core::Font::kMono,
+                   cs.text(),
+                   static_cast<float>(x),
+                   static_cast<float>(i * line_height - y_pixel_scroll),
+                   &current_line[0],
+                   ranges);
   }
 
 #if 0
@@ -151,7 +182,6 @@ void SourceView::Render() {
                    indicator_width, indicator_height),
         0, 0, 1, 1);
   }
-#endif
 #endif
 
   scroll_.RenderScrollIndicators();

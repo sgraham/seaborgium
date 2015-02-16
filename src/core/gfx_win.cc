@@ -323,6 +323,33 @@ void GfxTextf(Font font,
   GfxText(font, color, x, y, StringPiece(out, len));
 }
 
+void GfxColoredText(Font font,
+                    const Color& default_color,
+                    float x,
+                    float y,
+                    StringPiece str,
+                    const std::vector<RangeAndColor> colors) {
+  IDWriteTextLayout* layout;
+  std::wstring wide = UTF8ToUTF16(str);
+  CORE_CHECK(SUCCEEDED(g_dwrite_factory->CreateTextLayout(
+                 &wide[0],
+                 wide.size(),
+                 TextFormatForFont(font),
+                 std::numeric_limits<float>::max(),
+                 std::numeric_limits<float>::max(),
+                 &layout)),
+             "CreateTextLayout");
+  for (const auto& rac : colors) {
+    DWRITE_TEXT_RANGE range = { rac.start, rac.end - rac.start };
+    layout->SetDrawingEffect(SolidBrushForColor(rac.color), range);
+  }
+
+  g_render_target->DrawTextLayout(
+      D2D1::Point2F(x, y), layout, SolidBrushForColor(default_color));
+
+  layout->Release();
+}
+
 TextMeasurements GfxMeasureText(Font font, StringPiece str) {
   IDWriteTextLayout* layout;
   std::wstring wide = UTF8ToUTF16(str);

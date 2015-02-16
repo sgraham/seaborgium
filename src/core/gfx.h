@@ -8,6 +8,7 @@
 #include <inttypes.h>
 
 #include <memory>
+#include <vector>
 
 #include "core/geometric_types.h"
 #include "core/string_piece.h"
@@ -68,6 +69,16 @@ struct TextMeasurements {
   void GetCaretPosition(int index, bool trailing, float* x, float* y) const;
 };
 
+struct RangeAndColor {
+  RangeAndColor() {}
+  RangeAndColor(int start, int end, const Color& color)
+      : start(start), end(end), color(color) {}
+
+  int start;
+  int end;
+  Color color;
+};
+
 void GfxText(Font font,
              const Color& color,
              float x,
@@ -83,6 +94,13 @@ void GfxTextf(Font font,
               float y,
               const char* format,
               ...);
+void GfxColoredText(Font font,
+                    const Color& default_color,
+                    float x,
+                    float y,
+                    StringPiece str,
+                    const std::vector<RangeAndColor> colors);
+
 
 TextMeasurements GfxMeasureText(Font font, StringPiece str);
 
