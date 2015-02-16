@@ -10,6 +10,7 @@
 #include <memory>
 
 #include "core/geometric_types.h"
+#include "core/string_piece.h"
 
 class Widget;
 
@@ -46,38 +47,47 @@ struct Color {
   }
 };
 
+Color Lerp(const Color& x, const Color& y, float frac);
+
 struct TextMeasurements {
   float width;
   float height;
   float line_height;
+  void* data_;
 
   TextMeasurements(float width, float height, float line_height)
-      : width(width), height(height), line_height(line_height) {}
+      : width(width),
+        height(height),
+        line_height(line_height),
+        data_(nullptr) {}
+  TextMeasurements(const TextMeasurements& rhs);
+  void operator=(const TextMeasurements& rhs) = delete;
+  ~TextMeasurements();
+
+  void GetCaretPosition(int index, bool trailing, float* x, float* y) const;
 };
 
-float GfxText(Font font,
-              const Color& color,
-              float x,
-              float y,
-              const char* string);
-float GfxTextf(Font font,
-               const Color& color,
-               float x,
-               float y,
-               const char* format,
-               ...);
+void GfxText(Font font,
+             const Color& color,
+             float x,
+             float y,
+             StringPiece string);
 void GfxText(Font font,
              const Color& color,
              const Rect& rect,
              const char* string);
+void GfxTextf(Font font,
+              const Color& color,
+              float x,
+              float y,
+              const char* format,
+              ...);
 
-TextMeasurements GfxMeasureText(Font font, const char* str, int string_len);
+TextMeasurements GfxMeasureText(Font font, StringPiece str);
 
 void GfxDrawFps();
 
 float GetDpiScale();
-
-class ColorInternalData;
 
 // Drawing helpers.
 void DrawSolidRect(const Rect& rect, const Color& color);

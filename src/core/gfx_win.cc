@@ -9,11 +9,11 @@
 #include <d2d1helper.h>
 #include <dwrite.h>
 
+#include <algorithm>
 #include <limits>
 #include <unordered_map>
 
 #include "core/entry.h"
-#include "core/string_piece.h"
 #include "ui/skin.h"
 
 #pragma comment(lib, "d2d1.lib")
@@ -59,6 +59,15 @@ ID2D1SolidColorBrush* SolidBrushForColor(const Color& color) {
 
 D2D1_COLOR_F ColorToD2DColorF(const Color& color) {
   return D2D1::ColorF(color.r, color.g, color.b, color.a);
+}
+
+Color Lerp(const Color& x, const Color& y, float frac) {
+  frac = std::max(0.f, std::min(frac, 1.f));
+  float one_minus_frac = 1.f - frac;
+  return Color(x.r * one_minus_frac + y.r * frac,
+               x.g * one_minus_frac + y.g * frac,
+               x.b * one_minus_frac + y.b * frac,
+               x.a * one_minus_frac + y.a * frac);
 }
 
 void WinGfxSetHwnd(HWND hwnd) {
@@ -257,12 +266,41 @@ std::wstring UTF8ToUTF16(StringPiece utf8) {
   return std::wstring(wide, wide_len);
 }
 
-float GfxTextf(Font font,
-               const Color& color,
-               float x,
-               float y,
-               const char* format,
-               ...) {
+void GfxText(Font font,
+             const Color& color,
+             float x,
+             float y,
+             StringPiece string) {
+  std::wstring wide = UTF8ToUTF16(string);
+  D2D1_RECT_F layout_rect = D2D1::RectF(
+      x, y, static_cast<float>(g_width), static_cast<float>(g_height));
+  g_render_target->DrawTextA(&wide[0],
+                             wide.size(),
+                             TextFormatForFont(font),
+                             layout_rect,
+                             SolidBrushForColor(color));
+}
+
+void GfxText(Font font,
+             const Color& color,
+             const Rect& rect,
+             const char* string) {
+  std::wstring wide = UTF8ToUTF16(string);
+  D2D1_RECT_F layout_rect =
+      D2D1::RectF(rect.x, rect.y, rect.x + rect.w, rect.x + rect.h);
+  g_render_target->DrawTextA(&wide[0],
+                             wide.size(),
+                             TextFormatForFont(font),
+                             layout_rect,
+                             SolidBrushForColor(color));
+}
+
+void GfxTextf(Font font,
+              const Color& color,
+              float x,
+              float y,
+              const char* format,
+              ...) {
   va_list arg_list;
   va_start(arg_list, format);
 
@@ -276,44 +314,12 @@ float GfxTextf(Font font,
   out[len] = '\0';
   va_end(arg_list);
 
-  int wide_len = MultiByteToWideChar(CP_UTF8, 0, out, -1, NULL, 0);
-  wchar_t* wide =
-      reinterpret_cast<wchar_t*>(_alloca(sizeof(wchar_t) * wide_len));
-  if (MultiByteToWideChar(CP_UTF8, 0, out, -1, wide, wide_len) != wide_len)
-    return 0.f;
-
-  D2D1_RECT_F layout_rect = D2D1::RectF(
-      x, y, static_cast<float>(g_width), static_cast<float>(g_height));
-  g_render_target->DrawTextA(wide,
-                             wide_len,
-                             TextFormatForFont(font),
-                             layout_rect,
-                             SolidBrushForColor(color));
-  return 0.f;
+  GfxText(font, color, x, y, StringPiece(out, len));
 }
 
-void GfxText(Font font,
-             const Color& color,
-             const Rect& rect,
-             const char* string) {
-  int wide_len = MultiByteToWideChar(CP_UTF8, 0, string, -1, NULL, 0);
-  wchar_t* wide =
-      reinterpret_cast<wchar_t*>(_alloca(sizeof(wchar_t) * wide_len));
-  if (MultiByteToWideChar(CP_UTF8, 0, string, -1, wide, wide_len) != wide_len)
-    return;
-
-  D2D1_RECT_F layout_rect =
-      D2D1::RectF(rect.x, rect.y, rect.x + rect.w, rect.x + rect.h);
-  g_render_target->DrawTextA(wide,
-                             wide_len,
-                             TextFormatForFont(font),
-                             layout_rect,
-                             SolidBrushForColor(color));
-}
-
-TextMeasurements GfxMeasureText(Font font, const char* str, int string_len) {
+TextMeasurements GfxMeasureText(Font font, StringPiece str) {
   IDWriteTextLayout* layout;
-  std::wstring wide = UTF8ToUTF16(StringPiece(str, string_len));
+  std::wstring wide = UTF8ToUTF16(str);
   CORE_CHECK(SUCCEEDED(g_dwrite_factory->CreateTextLayout(
                  &wide[0],
                  wide.size(),
@@ -331,9 +337,32 @@ TextMeasurements GfxMeasureText(Font font, const char* str, int string_len) {
       SUCCEEDED(layout->GetLineSpacing(&method, &line_spacing, &baseline)),
       "GetLineSpacing");
 
-  layout->Release();
+  auto tm = TextMeasurements(metrics.width, metrics.height, metrics.height /* TODO */);
+  tm.data_ = reinterpret_cast<void*>(layout);
+  return tm;
+}
 
-  return TextMeasurements(metrics.width, metrics.height, line_spacing);
+TextMeasurements::TextMeasurements(const TextMeasurements& rhs) {
+  width = rhs.width;
+  height = rhs.height;
+  line_height = rhs.line_height;
+  data_ = rhs.data_;
+  reinterpret_cast<IDWriteTextLayout*>(data_)->AddRef();
+}
+
+TextMeasurements::~TextMeasurements() {
+  reinterpret_cast<IDWriteTextLayout*>(data_)->Release();
+}
+
+void TextMeasurements::GetCaretPosition(int index,
+                                        bool trailing,
+                                        float* x,
+                                        float* y) const {
+  auto layout = reinterpret_cast<IDWriteTextLayout*>(data_);
+  DWRITE_HIT_TEST_METRICS metrics;
+  CORE_CHECK(
+      SUCCEEDED(layout->HitTestTextPosition(index, trailing, x, y, &metrics)),
+      "HitTestTextPosition");
 }
 
 void GfxDrawFps() {

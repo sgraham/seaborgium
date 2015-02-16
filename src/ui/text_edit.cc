@@ -27,17 +27,15 @@ struct TextControl {
   STB_TexteditState state;
 };
 
-#if 0
-float CursorXFromIndex(NVGglyphPosition* positions, int count, int index) {
+float CursorXFromIndex(const core::TextMeasurements& tm, int count, int index) {
   CORE_CHECK(index <= count, "index out of range");
   if (index == 0)
     return 0.f;
-  else if (index == count)
-    return positions[index - 1].maxx;
-  else
-    return positions[index].minx;
+  bool trailing = index == count;
+  float x, y;
+  tm.GetCaretPosition(index, trailing, &x, &y);
+  return x;
 }
-#endif
 
 void LayoutFunc(StbTexteditRow* row, STB_TEXTEDIT_STRING* str, int start_i) {
   core::ScopedMonoSetup text_setup;
@@ -49,8 +47,8 @@ void LayoutFunc(StbTexteditRow* row, STB_TEXTEDIT_STRING* str, int start_i) {
   int remaining_chars = str->string_len - start_i;
   // Always single line.
   row->num_chars = remaining_chars;
-  core::TextMeasurements tm =
-      core::GfxMeasureText(core::Font::kMono, str->string, str->string_len);
+  core::TextMeasurements tm = core::GfxMeasureText(
+      core::Font::kMono, StringPiece(str->string, str->string_len));
   row->x0 = 0.f;  // TODO(scottmg): This seems suspect.
   row->x1 = tm.width;
   row->baseline_y_delta = tm.line_height;
@@ -78,7 +76,6 @@ int InsertChars(STB_TEXTEDIT_STRING* str,
 }
 
 float GetWidth(STB_TEXTEDIT_STRING* str, int n, int i) {
-  core::ScopedMonoSetup text_setup;
   CORE_UNUSED(n);  // Single line only.
   (void)str;
   (void)n;
@@ -187,6 +184,8 @@ TextEdit::TextEdit()
   LOCAL_control();
   control->string = static_cast<char*>(malloc(0));
   stb_textedit_initialize_state(state, 1 /*is_single_line*/);
+
+  line_height_ = GfxMeasureText(core::Font::kMono, "X").line_height;
 }
 
 TextEdit::~TextEdit() {
@@ -280,9 +279,6 @@ void TextEdit::SetText(const std::string& value) {
 }
 
 void TextEdit::Render() {
-#if 0
-  ScopedMonoSetup text_setup;
-
   const ColorScheme& cs = Skin::current().GetColorScheme();
   const Rect& rect = GetClientRect();
   DrawSolidRect(rect, cs.background());
@@ -290,41 +286,28 @@ void TextEdit::Render() {
   LOCAL_state();
   LOCAL_control();
 
-  float ascender, descender, line_height;
-  nvgTextMetrics(core::VG, &ascender, &descender, &line_height);
-  nvgFillColor(core::VG, cs.text());
-  nvgText(core::VG,
-          rect.x,
-          rect.y + line_height,
-          control->string,
-          control->string + control->string_len);
+  StringPiece str(control->string, control->string_len);
+  core::GfxText(core::Font::kMono, cs.text(), rect.x, rect.y, str);
 
-  std::unique_ptr<NVGglyphPosition[]> positions(
-      new NVGglyphPosition[control->string_len]);
-  nvgTextGlyphPositions(core::VG,
-                        rect.x,
-                        rect.y,
-                        control->string,
-                        control->string + control->string_len,
-                        positions.get(),
-                        control->string_len);
+  core::TextMeasurements tm = GfxMeasureText(core::Font::kMono, str);
 
+  // Caret.
   if (GetFocusedContents() == this) {
     // TODO(scottmg): Frame rate.
-    cursor_color_ = nvgLerpRGBA(cursor_color_, cursor_color_target_, 0.3f);
+    cursor_color_ = Lerp(cursor_color_, cursor_color_target_, 0.3f);
     if (fabsf(cursor_color_.a - cursor_color_target_.a) < 0.0001f) {
       if (cursor_color_target_.a == 0.f)
         cursor_color_target_.a = 1.f;
       else
         cursor_color_target_.a = 0.f;
     }
-    float cursor_x =
-        CursorXFromIndex(positions.get(), control->string_len, state->cursor);
+    float cursor_x = CursorXFromIndex(tm, control->string_len, state->cursor);
 
-    DrawSolidRect(Rect(cursor_x, rect.y, 1.5f, line_height - descender),
+    DrawSolidRect(Rect(cursor_x, rect.y, 1.5f, line_height_),
                   cursor_color_);
   }
-
+/*
+  // Selection.
   if (state->select_start != state->select_end) {
     int start = std::min(state->select_start, state->select_end);
     int end = std::max(state->select_start, state->select_end);
@@ -337,5 +320,5 @@ void TextEdit::Render() {
         cs.text_selection(),
         3.f);
   }
-#endif
+  */
 }

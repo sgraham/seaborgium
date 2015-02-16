@@ -47,6 +47,7 @@ class TextEdit : public Widget {
   core::Color cursor_color_;
   core::Color cursor_color_target_;
   bool left_mouse_is_down_;
+  float line_height_;
 
   CORE_DISALLOW_COPY_AND_ASSIGN(TextEdit);
 };
