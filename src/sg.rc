@@ -1,5 +1,5 @@
 #include <windows.h>
-#include "core/resource.h"
+#include "resource.h"
 
 RES_MAIN_ICON ICON "art/sg.ico"
 
