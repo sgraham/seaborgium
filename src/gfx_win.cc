@@ -59,8 +59,7 @@ ID2D1SolidColorBrush* SolidBrushForColor(const Color& color) {
     return it->second;
   ID2D1SolidColorBrush* brush;
   CHECK(SUCCEEDED(g_render_target->CreateSolidColorBrush(
-            D2D1::ColorF(color.r, color.g, color.b, color.a), &brush)),
-        "CreateSolidColorBrush");
+            D2D1::ColorF(color.r, color.g, color.b, color.a), &brush)));
   g_brush_for_color[color] = brush;
   return brush;
 }
@@ -103,34 +102,29 @@ ID2D1Bitmap* LoadBitmapFromResource(int res) {
   CHECK(image_file_size, "SizeofResource");
 
   IWICStream* stream;
-  CHECK(SUCCEEDED(g_wic_factory->CreateStream(&stream)), "CreateStream");
+  CHECK(SUCCEEDED(g_wic_factory->CreateStream(&stream)));
   CHECK(SUCCEEDED(stream->InitializeFromMemory(
-                 reinterpret_cast<BYTE*>(image_file), image_file_size)),
-             "InitializeFromMemory");
+                 reinterpret_cast<BYTE*>(image_file), image_file_size)));
 
   IWICBitmapDecoder* decoder;
   CHECK(SUCCEEDED(g_wic_factory->CreateDecoderFromStream(
-                 stream, nullptr, WICDecodeMetadataCacheOnLoad, &decoder)),
-             "CreateDecoderFromStream");
+      stream, nullptr, WICDecodeMetadataCacheOnLoad, &decoder)));
 
   IWICBitmapFrameDecode* source;
-  CHECK(SUCCEEDED(decoder->GetFrame(0, &source)), "GetFrame");
+  CHECK(SUCCEEDED(decoder->GetFrame(0, &source)));
 
   IWICFormatConverter* converter;
-  CHECK(SUCCEEDED(g_wic_factory->CreateFormatConverter(&converter)),
-             "CreateFormatConverter");
+  CHECK(SUCCEEDED(g_wic_factory->CreateFormatConverter(&converter)));
   CHECK(SUCCEEDED(converter->Initialize(source,
                                              GUID_WICPixelFormat32bppPBGRA,
                                              WICBitmapDitherTypeNone,
                                              nullptr,
                                              0.f,
-                                             WICBitmapPaletteTypeMedianCut)),
-             "converter Initialize");
+                                             WICBitmapPaletteTypeMedianCut)));
 
   ID2D1Bitmap* bitmap;
   CHECK(SUCCEEDED(g_render_target->CreateBitmapFromWicBitmap(
-                 converter, nullptr, &bitmap)),
-             "CreateBitmapFromWicBitmap");
+                 converter, nullptr, &bitmap)));
 
   SafeRelease(&decoder);
   SafeRelease(&source);
@@ -153,8 +147,7 @@ void WinGfxCreateDeviceIndependentResources() {
   CHECK(SUCCEEDED(DWriteCreateFactory(
                  DWRITE_FACTORY_TYPE_SHARED,
                  __uuidof(IDWriteFactory),
-                 reinterpret_cast<IUnknown**>(&g_dwrite_factory))),
-             "DWriteCreateFactory");
+                 reinterpret_cast<IUnknown**>(&g_dwrite_factory))));
 
   CHECK(SUCCEEDED(g_dwrite_factory->CreateTextFormat(
                  L"Consolas",  // Font family name.
@@ -164,8 +157,7 @@ void WinGfxCreateDeviceIndependentResources() {
                  DWRITE_FONT_STRETCH_NORMAL,
                  12.0f,
                  L"en-us",
-                 &g_text_format_mono)),
-             "CreateTextFormat");
+                 &g_text_format_mono)));
 
   CHECK(SUCCEEDED(g_dwrite_factory->CreateTextFormat(
                  L"Segoe UI",  // Font family name.
@@ -175,8 +167,7 @@ void WinGfxCreateDeviceIndependentResources() {
                  DWRITE_FONT_STRETCH_NORMAL,
                  13.0f,
                  L"en-us",
-                 &g_text_format_ui)),
-             "CreateTextFormat");
+                 &g_text_format_ui)));
 
   CHECK(SUCCEEDED(g_dwrite_factory->CreateTextFormat(
                  L"Segoe UI",  // Font family name.
@@ -186,8 +177,7 @@ void WinGfxCreateDeviceIndependentResources() {
                  DWRITE_FONT_STRETCH_NORMAL,
                  15.0f,
                  L"en-us",
-                 &g_text_format_title)),
-             "CreateTextFormat");
+                 &g_text_format_title)));
   g_text_format_title->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
   g_text_format_title->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 }
@@ -198,14 +188,12 @@ void CreateDeviceResources() {
 
   D2D1_SIZE_U size = D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top);
 
-  CHECK(SUCCEEDED(CoInitialize(nullptr)), "CoInitialize");
-  CHECK(
-      SUCCEEDED(CoCreateInstance(CLSID_WICImagingFactory,
-                                 nullptr,
-                                 CLSCTX_INPROC_SERVER,
-                                 IID_IWICImagingFactory,
-                                 reinterpret_cast<void**>(&g_wic_factory))),
-      "CoCreateInstance WICImagingFactory");
+  CHECK(SUCCEEDED(CoInitialize(nullptr)));
+  CHECK(SUCCEEDED(CoCreateInstance(CLSID_WICImagingFactory,
+                                   nullptr,
+                                   CLSCTX_INPROC_SERVER,
+                                   IID_IWICImagingFactory,
+                                   reinterpret_cast<void**>(&g_wic_factory))));
 
   if (FAILED(g_direct2d_factory->CreateHwndRenderTarget(
           D2D1::RenderTargetProperties(),
@@ -224,12 +212,12 @@ void CreateDeviceResources() {
   gradient_stops[1].color = ColorToD2DColorF(cs.title_bar_active_outer());
   gradient_stops[1].position = 1.f;
   CHECK(SUCCEEDED(g_render_target->CreateGradientStopCollection(
-                 gradient_stops,
-                 2,
-                 D2D1_GAMMA_2_2,
-                 D2D1_EXTEND_MODE_CLAMP,
-                 &gradient_stop_collection)),
-             "CreateGradientStopCollection active");
+            gradient_stops,
+            2,
+            D2D1_GAMMA_2_2,
+            D2D1_EXTEND_MODE_CLAMP,
+            &gradient_stop_collection)),
+        "CreateGradientStopCollection active");
   CHECK(
       SUCCEEDED(g_render_target->CreateLinearGradientBrush(
           D2D1::LinearGradientBrushProperties(
@@ -395,8 +383,7 @@ void GfxColoredText(Font font,
                  TextFormatForFont(font),
                  std::numeric_limits<float>::max(),
                  std::numeric_limits<float>::max(),
-                 &layout)),
-             "CreateTextLayout");
+                 &layout)));
   for (const auto& rac : colors) {
     DWRITE_TEXT_RANGE range = { rac.start, rac.end - rac.start };
     layout->SetDrawingEffect(SolidBrushForColor(rac.color), range);
@@ -424,22 +411,19 @@ void GfxIconSize(Icon icon, float* width, float* height) {
 TextMeasurements GfxMeasureText(Font font, StringPiece str) {
   IDWriteTextLayout* layout;
   std::wstring wide = UTF8ToUTF16(str);
-  CHECK(SUCCEEDED(g_dwrite_factory->CreateTextLayout(
-                 &wide[0],
-                 wide.size(),
-                 TextFormatForFont(font),
-                 std::numeric_limits<float>::max(),
-                 std::numeric_limits<float>::max(),
-                 &layout)),
-             "CreateTextLayout");
+  CHECK(SUCCEEDED(
+      g_dwrite_factory->CreateTextLayout(&wide[0],
+                                         wide.size(),
+                                         TextFormatForFont(font),
+                                         std::numeric_limits<float>::max(),
+                                         std::numeric_limits<float>::max(),
+                                         &layout)));
   DWRITE_TEXT_METRICS metrics;
-  CHECK(SUCCEEDED(layout->GetMetrics(&metrics)), "GetMetrics");
+  CHECK(SUCCEEDED(layout->GetMetrics(&metrics)));
 
   DWRITE_LINE_SPACING_METHOD method;
   float line_spacing, baseline;
-  CHECK(
-      SUCCEEDED(layout->GetLineSpacing(&method, &line_spacing, &baseline)),
-      "GetLineSpacing");
+  CHECK(SUCCEEDED(layout->GetLineSpacing(&method, &line_spacing, &baseline)));
 
   auto tm = TextMeasurements(metrics.width, metrics.height, metrics.height /* TODO */);
   tm.data_ = reinterpret_cast<void*>(layout);
