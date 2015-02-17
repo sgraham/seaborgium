@@ -8,16 +8,22 @@
 #include <d2d1.h>
 #include <d2d1helper.h>
 #include <dwrite.h>
+#include <wincodec.h>
 
 #include <algorithm>
 #include <limits>
 #include <unordered_map>
 
 #include "core/entry.h"
+#include "core/resource.h"
 #include "ui/skin.h"
 
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "dwrite.lib")
+#pragma comment(lib, "ole32.lib")
+#pragma comment(lib, "windowscodecs.lib")
+
+extern "C" IMAGE_DOS_HEADER __ImageBase;
 
 namespace core {
 
@@ -26,15 +32,17 @@ static uint32_t g_width;
 static uint32_t g_height;
 static float g_dpi_scale = 1.0;
 
+static IWICImagingFactory* g_wic_factory;
 static ID2D1Factory* g_direct2d_factory;
 static ID2D1HwndRenderTarget* g_render_target;
 static IDWriteFactory* g_dwrite_factory;
 static IDWriteTextFormat* g_text_format_mono;
 static IDWriteTextFormat* g_text_format_ui;
 static IDWriteTextFormat* g_text_format_title;
-static IDWriteTextFormat* g_text_format_icon;
 static ID2D1LinearGradientBrush* g_title_bar_active_gradient_brush;
 static ID2D1LinearGradientBrush* g_title_bar_inactive_gradient_brush;
+int operator+(Icon val) { return static_cast<int>(val); }
+static ID2D1Bitmap* g_icons[static_cast<int>(Icon::Count)];
 struct ColorHash {
   size_t operator()(const Color& c) const {
     return (static_cast<size_t>(c.a * 255.f) << 24) +
@@ -79,8 +87,58 @@ template <class T>
 static void SafeRelease(T** ppT) {
   if (*ppT) {
     (*ppT)->Release();
-    *ppT = NULL;
+    *ppT = nullptr;
   }
+}
+
+ID2D1Bitmap* LoadBitmapFromResource(int res) {
+  HINSTANCE self_hinst = reinterpret_cast<HINSTANCE>(&__ImageBase);
+  HRSRC image_res_handle =
+      FindResource(self_hinst, MAKEINTRESOURCE(res), "IMAGE");
+  CORE_CHECK(image_res_handle, "FindResource");
+  HGLOBAL image_res_data_handle = LoadResource(self_hinst, image_res_handle);
+  CORE_CHECK(image_res_data_handle, "LoadResource");
+  void* image_file = LockResource(image_res_data_handle);
+  CORE_CHECK(image_file, "LockResource");
+  DWORD image_file_size = SizeofResource(self_hinst, image_res_handle);
+  CORE_CHECK(image_file_size, "SizeofResource");
+
+  IWICStream* stream;
+  CORE_CHECK(SUCCEEDED(g_wic_factory->CreateStream(&stream)), "CreateStream");
+  CORE_CHECK(SUCCEEDED(stream->InitializeFromMemory(
+                 reinterpret_cast<BYTE*>(image_file), image_file_size)),
+             "InitializeFromMemory");
+
+  IWICBitmapDecoder* decoder;
+  CORE_CHECK(SUCCEEDED(g_wic_factory->CreateDecoderFromStream(
+                 stream, nullptr, WICDecodeMetadataCacheOnLoad, &decoder)),
+             "CreateDecoderFromStream");
+
+  IWICBitmapFrameDecode* source;
+  CORE_CHECK(SUCCEEDED(decoder->GetFrame(0, &source)), "GetFrame");
+
+  IWICFormatConverter* converter;
+  CORE_CHECK(SUCCEEDED(g_wic_factory->CreateFormatConverter(&converter)),
+             "CreateFormatConverter");
+  CORE_CHECK(SUCCEEDED(converter->Initialize(source,
+                                             GUID_WICPixelFormat32bppPBGRA,
+                                             WICBitmapDitherTypeNone,
+                                             nullptr,
+                                             0.f,
+                                             WICBitmapPaletteTypeMedianCut)),
+             "converter Initialize");
+
+  ID2D1Bitmap* bitmap;
+  CORE_CHECK(SUCCEEDED(g_render_target->CreateBitmapFromWicBitmap(
+                 converter, nullptr, &bitmap)),
+             "CreateBitmapFromWicBitmap");
+
+  SafeRelease(&decoder);
+  SafeRelease(&source);
+  SafeRelease(&stream);
+  SafeRelease(&converter);
+
+  return bitmap;
 }
 
 void WinGfxCreateDeviceIndependentResources() {
@@ -133,18 +191,6 @@ void WinGfxCreateDeviceIndependentResources() {
              "CreateTextFormat");
   g_text_format_title->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
   g_text_format_title->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-
-  // TODO(scottmg): Need a custom font collection for this to work.
-  CORE_CHECK(SUCCEEDED(g_dwrite_factory->CreateTextFormat(
-                 L"Entypo",  // Font family name.
-                 nullptr,
-                 DWRITE_FONT_WEIGHT_REGULAR,
-                 DWRITE_FONT_STYLE_NORMAL,
-                 DWRITE_FONT_STRETCH_NORMAL,
-                 26.f,
-                 L"en-us",
-                 &g_text_format_icon)),
-             "CreateTextFormat");
 }
 
 void CreateDeviceResources() {
@@ -152,6 +198,15 @@ void CreateDeviceResources() {
   GetClientRect(g_hwnd, &rc);
 
   D2D1_SIZE_U size = D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top);
+
+  CORE_CHECK(SUCCEEDED(CoInitialize(nullptr)), "CoInitialize");
+  CORE_CHECK(
+      SUCCEEDED(CoCreateInstance(CLSID_WICImagingFactory,
+                                 nullptr,
+                                 CLSCTX_INPROC_SERVER,
+                                 IID_IWICImagingFactory,
+                                 reinterpret_cast<void**>(&g_wic_factory))),
+      "CoCreateInstance WICImagingFactory");
 
   if (FAILED(g_direct2d_factory->CreateHwndRenderTarget(
           D2D1::RenderTargetProperties(),
@@ -202,6 +257,16 @@ void CreateDeviceResources() {
           &g_title_bar_inactive_gradient_brush)),
       "CreateLinearGradientBrush inactive");
   SafeRelease(&gradient_stop_collection);
+
+  g_icons[+Icon::kDockLeft] = LoadBitmapFromResource(RES_DOCK_LEFT);
+  g_icons[+Icon::kDockRight] = LoadBitmapFromResource(RES_DOCK_RIGHT);
+  g_icons[+Icon::kDockTop] = LoadBitmapFromResource(RES_DOCK_TOP);
+  g_icons[+Icon::kDockBottom] = LoadBitmapFromResource(RES_DOCK_BOTTOM);
+  g_icons[+Icon::kTreeCollapsed] = LoadBitmapFromResource(RES_TREE_COLLAPSED);
+  g_icons[+Icon::kTreeExpanded] = LoadBitmapFromResource(RES_TREE_EXPANDED);
+  g_icons[+Icon::kIndicatorPC] = LoadBitmapFromResource(RES_INDICATOR_PC);
+  g_icons[+Icon::kIndicatorBreakpoint] =
+      LoadBitmapFromResource(RES_INDICATOR_BREAKPOINT);
 }
 
 void DiscardDeviceResources() {
@@ -212,6 +277,9 @@ void DiscardDeviceResources() {
   for (auto& brush : g_brush_for_color)
     SafeRelease(&brush.second);
   g_brush_for_color.clear();
+
+  for (auto& icon : g_icons)
+    SafeRelease(&icon);
 }
 
 void BeginFrame() {
@@ -257,7 +325,6 @@ void GfxShutdown() {
   SafeRelease(&g_text_format_mono);
   SafeRelease(&g_text_format_ui);
   SafeRelease(&g_text_format_title);
-  SafeRelease(&g_text_format_icon);
 }
 
 IDWriteTextFormat* TextFormatForFont(Font font) {
@@ -268,8 +335,6 @@ IDWriteTextFormat* TextFormatForFont(Font font) {
       return g_text_format_ui;
     case Font::kTitle:
       return g_text_format_title;
-    case Font::kIcon:
-      return g_text_format_icon;
     default:
       CORE_CHECK(false, "unexpected font");
       return nullptr;
@@ -278,7 +343,7 @@ IDWriteTextFormat* TextFormatForFont(Font font) {
 
 std::wstring UTF8ToUTF16(StringPiece utf8) {
   int wide_len =
-      MultiByteToWideChar(CP_UTF8, 0, utf8.data(), utf8.size(), NULL, 0);
+      MultiByteToWideChar(CP_UTF8, 0, utf8.data(), utf8.size(), nullptr, 0);
   wchar_t* wide =
       reinterpret_cast<wchar_t*>(_alloca(sizeof(wchar_t) * wide_len));
   if (MultiByteToWideChar(
@@ -366,6 +431,19 @@ void GfxColoredText(Font font,
   layout->Release();
 }
 
+void GfxDrawIcon(Icon icon, const Rect& rect, float alpha) {
+  g_render_target->DrawBitmap(
+      g_icons[+icon],
+      D2D1::RectF(rect.x, rect.y, rect.x + rect.w, rect.y + rect.h),
+      alpha);
+}
+
+void GfxIconSize(Icon icon, float* width, float* height) {
+  D2D1_SIZE_F size = g_icons[+icon]->GetSize();
+  *width = size.width;
+  *height = size.height;
+}
+
 TextMeasurements GfxMeasureText(Font font, StringPiece str) {
   IDWriteTextLayout* layout;
   std::wstring wide = UTF8ToUTF16(str);
@@ -428,15 +506,7 @@ void GfxDrawFps() {
   double to_ms = 1000.0 / freq;
   float pos = 1;
 
-    // TODO !
-    /*
-    nvgFontSize(VG, 13.f);
-    nvgFontFace(VG, "mono");
-    nvgFillColor(VG, nvgRGBA(0x00, 0xa0, 0x00, 0x60));
-    //GfxTextf(10, s_height - (16 * pos++), " GL_VERSION: %s", glGetString(GL_VERSION));
-    //GfxTextf(10, s_height - (16 * pos++), "GL_RENDERER: %s", glGetString(GL_RENDERER));
-    //GfxTextf(10, s_height - (16 * pos++), "  GL_VENDOR: %s", glGetString(GL_VENDOR));
-    */
+  // TODO(scottmg): Some info about d2d/dwrite version?
   GfxTextf(Font::kMono,
            Color(0.f, 0.65f, 0.f, 0.375f),
            10,

@@ -212,11 +212,12 @@ void TreeGrid::CalculateLayoutNodes(const std::vector<TreeGridNode*>& nodes,
       float x = last_x;
       if (j == 0) {
         if (node->Nodes()->size() > 0) {
+          float half = kLineHeight / 2.f;
           layout_data->expansion_boxes.push_back(LayoutData::RectAndNode(
-              Rect(current_indent + layout_data->margin.w,
-                   *y_position + layout_data->header.h,
-                   kLineHeight,
-                   kLineHeight),
+              Rect(current_indent + layout_data->margin.w + half/2.f,
+                   *y_position + layout_data->header.h + half/2.f,
+                   half,
+                   half),
               node));
         }
 
@@ -278,17 +279,11 @@ void TreeGrid::Render() {
   for (const auto& cell : ld.cells)
     cell.node->GetValue(cell.index)->Render(cell.rect);
 
-  // Icons.
-  const char* kSquaredPlus = "\xE2\x8A\x9E";
-  const char* kSquaredMinus = "\xE2\x8A\x9F";
-  const float kIconFudgeX = 6.f;
-  const float kIconFudgeY = -10.f;
   for (const auto& button : ld.expansion_boxes) {
-    GfxText(core::Font::kIcon,
-            cs.text(),
-            button.rect.x + kIconFudgeX,
-            button.rect.y + kIconFudgeY,
-            button.node->Expanded() ? kSquaredMinus : kSquaredPlus);
+    GfxDrawIcon(button.node->Expanded() ? core::Icon::kTreeExpanded
+                                        : core::Icon::kTreeCollapsed,
+                button.rect,
+                1.f);
   }
 
 /*

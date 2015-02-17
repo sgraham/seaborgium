@@ -10,7 +10,6 @@
 #include "ui/docking_split_container.h"
 #include "ui/docking_tool_window.h"
 #include "ui/docking_workspace.h"
-#include "ui/drawing_common.h"
 #include "ui/skin.h"
 #pragma message("todo")
 // #include "sg/workspace.h"
@@ -23,46 +22,20 @@ float kHoveringAlpha = 0.75f;
 float kDropTargetAlpha = 0.6f;
 #endif
 
-struct ScopedIcon {
-  ScopedIcon() {
-#if 0
-    nvgSave(core::VG);
-    nvgFontFace(core::VG, "icons");
-    nvgFontSize(core::VG, 72);
-    nvgFillColor(core::VG, Skin::current().GetColorScheme().drop_indicator());
-#endif
-  }
-  ~ScopedIcon() {
-#if 0
-    nvgRestore(core::VG);
-#endif
-  }
-};
-
-float IconWidth(const char* icon) {
-  (void)icon;
-  // XXX !
-  return 10.f;
-#if 0
-  float bounds[4];
-  nvgTextBounds(core::VG, 0, 0, icon, NULL, bounds);
-  return bounds[2] - bounds[0];
-#endif
+float IconWidth(core::Icon icon) {
+  float w, h;
+  GfxIconSize(icon, &w, &h);
+  return w;
 }
 
-float IconHeight(const char* icon) {
-  (void)icon;
-  // XXX !
-  return 10.f;
-#if 0
-  float bounds[4];
-  nvgTextBounds(core::VG, 0, 0, icon, NULL, bounds);
-  return bounds[3] - bounds[1];
-#endif
+float IconHeight(core::Icon icon) {
+  float w, h;
+  GfxIconSize(icon, &w, &h);
+  return h;
 }
 
 DropTargetIndicator IndicatorAt(Widget* dockable,
-                                const char* icon,
+                                core::Icon icon,
                                 float x,
                                 float y,
                                 DockingSplitDirection direction,
@@ -70,75 +43,73 @@ DropTargetIndicator IndicatorAt(Widget* dockable,
   DropTargetIndicator target;
   target.dockable = dockable;
   target.icon = icon;
+  float w, h;
+  GfxIconSize(icon, &w, &h);
   target.rect = Rect(x, y, IconWidth(icon), IconHeight(icon));
   target.direction = direction;
   target.this_dockable_first = this_dockable_first;
   return target;
 }
 
-void PlaceIndicatorsAroundEdge(
-    const Rect& rect,
-    std::vector<DropTargetIndicator>* into,
-    Widget* dockable) {
-  const Skin& skin = Skin::current();
+void PlaceIndicatorsAroundEdge(const Rect& rect,
+                               std::vector<DropTargetIndicator>* into,
+                               Widget* dockable) {
   into->push_back(
       IndicatorAt(dockable,
-                  skin.dock_top_icon(),
-                  rect.x + rect.w / 2 - IconWidth(skin.dock_top_icon()) / 2,
+                  core::Icon::kDockTop,
+                  rect.x + rect.w / 2 - IconWidth(core::Icon::kDockTop) / 2,
                   rect.y,
                   kSplitHorizontal,
                   false));
   into->push_back(
       IndicatorAt(dockable,
-                  skin.dock_left_icon(),
+                  core::Icon::kDockLeft,
                   rect.x,
-                  rect.y + rect.h / 2 - IconHeight(skin.dock_left_icon()) / 2,
+                  rect.y + rect.h / 2 - IconHeight(core::Icon::kDockLeft) / 2,
                   kSplitVertical,
                   false));
   into->push_back(
       IndicatorAt(dockable,
-                  skin.dock_right_icon(),
-                  rect.x + rect.w - IconWidth(skin.dock_right_icon()),
-                  rect.y + rect.h / 2 - IconHeight(skin.dock_right_icon()) / 2,
+                  core::Icon::kDockRight,
+                  rect.x + rect.w - IconWidth(core::Icon::kDockRight),
+                  rect.y + rect.h / 2 - IconHeight(core::Icon::kDockRight) / 2,
                   kSplitVertical,
                   true));
   into->push_back(
       IndicatorAt(dockable,
-                  skin.dock_bottom_icon(),
-                  rect.x + rect.w / 2 - IconWidth(skin.dock_bottom_icon()) / 2,
-                  rect.y + rect.h - IconHeight(skin.dock_bottom_icon()),
+                  core::Icon::kDockBottom,
+                  rect.x + rect.w / 2 - IconWidth(core::Icon::kDockBottom) / 2,
+                  rect.y + rect.h - IconHeight(core::Icon::kDockBottom),
                   kSplitHorizontal,
                   true));
 }
 
-void PlaceIndicatorsAtCenter(
-    const Rect& rect,
-    std::vector<DropTargetIndicator>* into,
-    Widget* dockable) {
-  const Skin& skin = Skin::current();
+void PlaceIndicatorsAtCenter(const Rect& rect,
+                             std::vector<DropTargetIndicator>* into,
+                             Widget* dockable) {
   float cx = rect.x + rect.w / 2;
   float cy = rect.y + rect.h / 2;
-  float offset = IconWidth(skin.dock_top_icon());
+  float offset = IconWidth(core::Icon::kDockTop);
   into->push_back(IndicatorAt(dockable,
-                              skin.dock_top_icon(),
+                              core::Icon::kDockTop,
                               cx - offset / 2,
                               cy - offset * 2,
                               kSplitHorizontal,
                               false));
   into->push_back(IndicatorAt(dockable,
-                              skin.dock_left_icon(),
+                              core::Icon::kDockLeft,
                               cx - offset * 2,
                               cy - offset / 2,
                               kSplitVertical,
                               false));
   into->push_back(IndicatorAt(dockable,
-                              skin.dock_right_icon(),
+                              core::Icon::kDockRight,
                               cx + offset,
                               cy - offset / 2,
                               kSplitVertical,
                               true));
   into->push_back(IndicatorAt(dockable,
-                              skin.dock_bottom_icon(),
+                              core::Icon::kDockBottom,
                               cx - offset / 2,
                               cy + offset,
                               kSplitHorizontal,
@@ -147,18 +118,16 @@ void PlaceIndicatorsAtCenter(
 
 }  // namespace
 
-ToolWindowDragger::ToolWindowDragger(
-    DockingToolWindow* dragging,
-    DragSetup* drag_setup)
-    : on_drop_target_(NULL),
-      docking_workspace_(drag_setup->docking_workspace) {
-  ScopedIcon state;
+ToolWindowDragger::ToolWindowDragger(DockingToolWindow* dragging,
+                                     DragSetup* drag_setup)
+    : on_drop_target_(NULL), docking_workspace_(drag_setup->docking_workspace) {
   pick_up_offset_ = dragging->ScreenToClient(drag_setup->screen_position);
   initial_screen_rect_ = dragging->GetScreenRect();
   current_position_ = drag_setup->screen_position;
 
   // Save sibling, split direction, and fraction for cancel.
-  DockingSplitContainer* dragging_parent_as_container = dragging->parent()->AsDockingSplitContainer();
+  DockingSplitContainer* dragging_parent_as_container =
+      dragging->parent()->AsDockingSplitContainer();
   cancel_sibling_ = dragging_parent_as_container->GetSiblingOf(dragging);
   cancel_direction_ = dragging_parent_as_container->direction();
   cancel_fraction_ = dragging_parent_as_container->fraction();
@@ -239,7 +208,6 @@ void ToolWindowDragger::CancelDrag() {
 }
 
 void ToolWindowDragger::Render() {
-  ScopedIcon state;
   // TODO(scottmg): nanovg doesn't currently support render to texture
   // https://github.com/memononen/nanovg/issues/90 so we just do simple
   // outline box for now.
@@ -253,19 +221,8 @@ void ToolWindowDragger::Render() {
   dragging_->Render(render_to_texture_renderer.get());
 #endif
 
-  // XXX !
-#if 0
-  for (size_t i = 0; i < targets_.size(); ++i) {
-    const DropTargetIndicator& dti = targets_[i];
-    nvgTextAlign(core::VG, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-    nvgTextBox(core::VG,
-               dti.rect.x,
-               dti.rect.y + IconHeight(dti.icon) / 2,
-               dti.rect.w,
-               dti.icon,
-               NULL);
-    //DrawSolidRect(dti.rect, nvgRGBA(255, 255, 0, 64));
-  }
+  for (const auto& dti : targets_)
+    GfxDrawIcon(dti.icon, dti.rect, .5f);
 
   Rect draw_rect;
   if (on_drop_target_) {
@@ -287,8 +244,7 @@ void ToolWindowDragger::Render() {
   renderer->SetDrawColor(Color(0, 128, 128, kHoveringAlpha * 128));
   renderer->DrawFilledRect(draw_rect);
 #else
-  DrawSolidRect(draw_rect, nvgRGBA(255, 255, 255, 64));
-#endif
+  core::DrawSolidRect(draw_rect, core::Color(1, 1, 1, .25f));
 #endif
 
   // TODO(scottmg): Workspace::Invalidate();

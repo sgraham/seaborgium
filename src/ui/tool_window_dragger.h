@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "core/core.h"
+#include "core/gfx.h"
 #include "ui/docking_split_container.h"
 #include "ui/draggable.h"
 
@@ -21,7 +22,7 @@ class Workspace;
 
 struct DropTargetIndicator {
   Widget* dockable;
-  const char* icon;
+  core::Icon icon;
   Rect rect;
   DockingSplitDirection direction;
   bool this_dockable_first;

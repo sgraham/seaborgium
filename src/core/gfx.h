@@ -27,7 +27,6 @@ enum class Font {
   kMono,
   kUI,
   kTitle,
-  kIcon,
 };
 
 struct Color {
@@ -47,6 +46,19 @@ struct Color {
   bool operator==(const Color& rhs) const {
     return r == rhs.r && g == rhs.g && b == rhs.b && a == rhs.a;
   }
+};
+
+enum class Icon : int {
+  kDockLeft,
+  kDockRight,
+  kDockTop,
+  kDockBottom,
+  kTreeCollapsed,
+  kTreeExpanded,
+  kIndicatorPC,
+  kIndicatorBreakpoint,
+
+  Count,
 };
 
 Color Lerp(const Color& x, const Color& y, float frac);
@@ -100,6 +112,8 @@ void GfxColoredText(Font font,
                     float y,
                     StringPiece str,
                     const std::vector<RangeAndColor> colors);
+void GfxDrawIcon(Icon icon, const Rect& rect, float alpha);
+void GfxIconSize(Icon icon, float* width, float* height);
 
 
 TextMeasurements GfxMeasureText(Font font, StringPiece str);
@@ -133,36 +147,6 @@ struct ScopedRenderOffset {
   std::unique_ptr<Data> data_;
   bool scissor_;
 };
-
-struct ScopedTextSetup {
-  ScopedTextSetup(const char* name, float size) {
-    (void)name;
-    (void)size;
-#if 0
-    nvgSave(core::VG);
-    nvgFontSize(core::VG, size);
-    nvgFontFace(core::VG, name);
-#endif
-  }
-  virtual ~ScopedTextSetup() {
-#if 0
-    nvgRestore(core::VG);
-#endif
-  }
-};
-
-struct ScopedMonoSetup : public ScopedTextSetup {
-  ScopedMonoSetup() : ScopedTextSetup("mono", 14.f) {}
-};
-
-struct ScopedSansSetup : public ScopedTextSetup {
-  ScopedSansSetup() : ScopedTextSetup("sans", 16.f) {}
-};
-
-struct ScopedIconsSetup : public ScopedTextSetup {
-  ScopedIconsSetup() : ScopedTextSetup("icons", 28.f) {}
-};
-
 
 // TODO: Not very core.
 void DrawWindow(const char* title,

@@ -8,7 +8,6 @@
 #include "core/gfx.h"
 #include "ui/drawing_common.h"
 #include "ui/docking_resizer.h"
-// #include "ui/skin.h"
 
 namespace {
 

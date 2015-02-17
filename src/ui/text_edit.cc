@@ -38,12 +38,6 @@ float CursorXFromIndex(const core::TextMeasurements& tm, int count, int index) {
 }
 
 void LayoutFunc(StbTexteditRow* row, STB_TEXTEDIT_STRING* str, int start_i) {
-  core::ScopedMonoSetup text_setup;
-
-  (void)row;
-  (void)str;
-  (void)start_i;
-
   int remaining_chars = str->string_len - start_i;
   // Always single line.
   row->num_chars = remaining_chars;

@@ -24,34 +24,19 @@ CREDITS
 
 Nice libraries that Seaborgium uses/referenced in whole or in part:
 
-https://github.com/bkaradzic/bx
-https://github.com/bkaradzic/bgfx
-Copyright 2010-2014 Branimir Karadzic. All rights reserved.
-http://opensource.org/licenses/BSD-2-Clause
-
-
-https://github.com/memononen/nanovg/
-Copyright (c) 2013 Mikko Mononen memon@inside.org
-http://opensource.org/licenses/Zlib
-
-
 https://github.com/nothings/stb/
-stb_image.c
 stb_textedit.h
-Public domain by Sean Barrett (image is via nanovg)
-
-
-http://www.freetype.org/freetype2/
-David Turner, Robert Wilhelm, and Werner Lemberg
-http://git.savannah.gnu.org/cgit/freetype/freetype2.git/tree/docs/FTL.TXT
-
-
-http://glew.sourceforge.net/
-Modified BSD License and MIT License by Milan Ikits, Marcelo Magallon, et al.
+Public domain by Sean Barrett
 
 
 http://code.google.com/p/re2/
 http://opensource.org/licenses/BSD-3-Clause
+
+
+https://github.com/bkaradzic/bx
+https://github.com/bkaradzic/bgfx
+Copyright 2010-2014 Branimir Karadzic. All rights reserved.
+http://opensource.org/licenses/BSD-2-Clause
 
 
 

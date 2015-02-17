@@ -8,6 +8,8 @@
 
 #include "core/entry.h"
 
+#include "core/resource.h"
+
 extern int Main(int argc, char** argv);
 
 namespace core {
@@ -285,10 +287,10 @@ struct Context {
     wnd.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
     wnd.lpfnWndProc = WndProc;
     wnd.hInstance = instance;
-    wnd.hIcon = ::LoadIcon(NULL, IDI_APPLICATION);
-    wnd.hCursor = ::LoadCursor(NULL, IDC_ARROW);
+    wnd.hIcon = ::LoadIcon(instance, MAKEINTRESOURCE(RES_MAIN_ICON));
+    wnd.hCursor = ::LoadCursor(nullptr, IDC_ARROW);
     wnd.lpszClassName = "seaborgium";
-    wnd.hIconSm = ::LoadIcon(NULL, IDI_APPLICATION);
+    wnd.hIconSm = ::LoadIcon(instance, MAKEINTRESOURCE(RES_MAIN_ICON));
     ::RegisterClassExA(&wnd);
 
     WinGfxCreateDeviceIndependentResources();

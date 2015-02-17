@@ -30,6 +30,13 @@ toolchain("win") {
       "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.obj",
     ]
   }
+  tool("rc") {
+    command = "rc.exe /nologo {{defines}} {{include_dirs}} /fo{{output}} {{source}}"
+    outputs = [
+      "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.res",
+    ]
+    description = "RC {{output}}"
+  }
   tool("alink") {
     command = "$ar {{output}} {{inputs}}"
     description = "LIB {{output}}"

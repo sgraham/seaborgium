@@ -1,0 +1,13 @@
+#include <windows.h>
+#include "core/resource.h"
+
+RES_MAIN_ICON ICON "art/sg.ico"
+
+RES_INDICATOR_BREAKPOINT IMAGE "art/breakpoint.png"
+RES_INDICATOR_PC IMAGE "art/pc-location.png"
+RES_DOCK_LEFT IMAGE "art/dock-left.png"
+RES_DOCK_RIGHT IMAGE "art/dock-right.png"
+RES_DOCK_TOP IMAGE "art/dock-top.png"
+RES_DOCK_BOTTOM IMAGE "art/dock-bottom.png"
+RES_TREE_COLLAPSED IMAGE "art/tree-collapsed.png"
+RES_TREE_EXPANDED IMAGE "art/tree-expanded.png"

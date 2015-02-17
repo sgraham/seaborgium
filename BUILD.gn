@@ -96,6 +96,7 @@ group("seaborgium") {
     sources = [
       "src/core/entry.cc",
       "src/main.cc",
+      "src/sg.rc",
     ]
 
     include_dirs = [

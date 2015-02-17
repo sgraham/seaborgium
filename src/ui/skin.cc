@@ -71,36 +71,6 @@ Skin::Skin()
       text_line_height_(17.f) {}
 
 void Skin::Init() {
-  // TODO !
-#if 0
-  CORE_CHECK(nvgCreateFont(core::VG, "sans", "art/Roboto-Regular.ttf") != -1,
-             "font load failed");
-  CORE_CHECK(
-      nvgCreateFont(core::VG, "sans-bold", "art/DejaVuSans-Bold.ttf") != -1,
-      "font load failed");
-  CORE_CHECK(nvgCreateFont(core::VG, "mono", "art/DejaVuSansMono.ttf") != -1,
-             "font load failed");
-  CORE_CHECK(nvgCreateFont(core::VG, "icons", "art/entypo.ttf") != -1,
-             "font load failed");
-#endif
-
-  dock_bottom_icon_ = "\xee\x9d\x98";  // circled-down
-  dock_left_icon_ = "\xee\x9d\x99";  // circled-left
-  dock_right_icon_ = "\xee\x9d\x9a";  // circled-right
-  dock_top_icon_ = "\xee\x9d\x9b";  // circled-up
-#if 0
-  pc_indicator_texture_.name = L"art/pc-location.png";
-  breakpoint_texture_.name = L"art/breakpoint.png";
-  dock_top_texture_.name = L"art/dock-indicator-top.png";
-  dock_left_texture_.name = L"art/dock-indicator-left.png";
-  dock_right_texture_.name = L"art/dock-indicator-right.png";
-  dock_bottom_texture_.name = L"art/dock-indicator-bottom.png";
-  vscrollbar_top_texture_.name = L"art/scrollbar-top.png";
-  vscrollbar_middle_texture_.name = L"art/scrollbar-middle.png";
-  vscrollbar_bottom_texture_.name = L"art/scrollbar-bottom.png";
-  tree_collapsed_texture_.name = L"art/tree-collapsed.png";
-  tree_expanded_texture_.name = L"art/tree-expanded.png";
-#endif
 }
 
 // static

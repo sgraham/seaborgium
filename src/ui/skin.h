@@ -103,10 +103,6 @@ class Skin {
   float status_bar_size() const { return status_bar_size_; }
   float text_line_height() const { return text_line_height_; }
 
-  const char* dock_top_icon() const { return dock_top_icon_; }
-  const char* dock_left_icon() const { return dock_left_icon_; }
-  const char* dock_right_icon() const { return dock_right_icon_; }
-  const char* dock_bottom_icon() const { return dock_bottom_icon_; }
   // TODO(icons): These will all be chars from icons font.
 #if 0
   const Texture* pc_indicator_texture() const { return &pc_indicator_texture_; }
