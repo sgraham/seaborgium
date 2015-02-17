@@ -111,15 +111,6 @@ class Skin {
 #if 0
   const Texture* pc_indicator_texture() const { return &pc_indicator_texture_; }
   const Texture* breakpoint_texture() const { return &breakpoint_texture_; }
-  const Texture* vscrollbar_top_texture() const {
-    return &vscrollbar_top_texture_;
-  }
-  const Texture* vscrollbar_middle_texture() const {
-    return &vscrollbar_middle_texture_;
-  }
-  const Texture* vscrollbar_bottom_texture() const {
-    return &vscrollbar_bottom_texture_;
-  }
   const Texture* tree_collapsed_texture() const {
     return  &tree_collapsed_texture_;
   }

@@ -274,6 +274,7 @@ struct Context {
   }
 
   int32_t Run(int argc, char** argv) {
+    CORE_CHECK(SetProcessDPIAware(), "SetProcessDPIAware");
     HeapSetInformation(nullptr, HeapEnableTerminationOnCorruption, nullptr, 0);
     ::SetDllDirectory(".");
 

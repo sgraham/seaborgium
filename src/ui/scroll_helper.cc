@@ -67,11 +67,10 @@ void ScrollHelper::RenderScrollIndicators() {
         ticks_since_stopped_moving_ - kFadeOutAfterTicks) / kFadeOutOverTicks;
   }
 
-  core::DrawOutlineRoundedRect(
+  core::DrawSolidRoundedRect(
       Rect(screen_rect.w - 13.f, scrollbar_offset, 8.f, scrollbar_height),
-      core::Color(0x808080, alpha),
-      4.f,
-      1.f);
+      core::Color(0x606060, alpha),
+      4.f);
 }
 
 bool ScrollHelper::ClampScrollTarget() {
@@ -155,7 +154,7 @@ void ScrollHelper::CommonMouseWheel(float delta,
                                     bool* invalidate,
                                     bool* handled) {
   CORE_UNUSED(modifiers);
-  ScrollPixels(static_cast<int>(-delta * 20));
+  ScrollPixels(static_cast<int>(-delta * 100));
   *invalidate = true;
   *handled = true;
 }

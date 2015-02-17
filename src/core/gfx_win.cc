@@ -104,7 +104,7 @@ void WinGfxCreateDeviceIndependentResources() {
                  DWRITE_FONT_WEIGHT_REGULAR,
                  DWRITE_FONT_STYLE_NORMAL,
                  DWRITE_FONT_STRETCH_NORMAL,
-                 13.0f,
+                 12.0f,
                  L"en-us",
                  &g_text_format_mono)),
              "CreateTextFormat");
@@ -457,10 +457,13 @@ void DrawOutlineRoundedRect(const Rect& rect,
                             const Color& color,
                             float radius,
                             float width) {
-  (void)rect;
-  (void)color;
-  (void)radius;
-  (void)width;
+  g_render_target->DrawRoundedRectangle(
+      D2D1::RoundedRect(
+          D2D1::RectF(rect.x, rect.y, rect.x + rect.w, rect.y + rect.h),
+          radius,
+          radius),
+      SolidBrushForColor(color),
+      width);
 }
 
 void DrawVerticalLine(const Color& color, float x, float y0, float y1) {

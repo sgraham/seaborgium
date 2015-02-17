@@ -98,15 +98,6 @@ void SourceView::Render() {
   const ColorScheme& cs = skin.GetColorScheme();
   DrawSolidRect(GetClientRect(), cs.background());
 
-#if 0
-  {
-    ScopedRenderOffset scroll_offset(0,
-                                     static_cast<float>(scroll_.GetOffset()));
-    nvgFillColor(core::VG, Skin::current().GetColorScheme().text());
-    nvgText(core::VG, 100, 200, "int main(int argc, char** argv) {", NULL);
-  }
-#endif
-
   int line_height = static_cast<int>(skin.text_line_height());
   int start_line = GetFirstLineInView();
 
@@ -127,9 +118,9 @@ void SourceView::Render() {
       Height()));
 #endif
 
-  int y_pixel_scroll = scroll_.GetOffset() - line_height;
+  int y_pixel_scroll = scroll_.GetOffset();
 
-  for (size_t i = start_line; i < lines_.size(); ++i) {
+  for (int i = start_line; i < lines_.size(); ++i) {
     // Extra |line_height| added to height so that a full line is drawn at
     // the bottom when partial-line pixel scrolled.
     if (!LineInView(i))

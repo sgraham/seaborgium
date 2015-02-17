@@ -54,9 +54,9 @@
 #if defined(_WIN32) || defined(_WIN64)
 #undef CORE_PLATFORM_WINDOWS
 #if !defined(WINVER) && !defined(_WIN32_WINNT)
-// Windows Server 2003 with SP1, Windows XP with SP2 and above
-#define WINVER 0x0502
-#define _WIN32_WINNT 0x0502
+// Vista+.
+#define WINVER 0x0600
+#define _WIN32_WINNT 0x0600
 #endif  // !defined(WINVER) && !defined(_WIN32_WINNT)
 #define CORE_PLATFORM_WINDOWS _WIN32_WINNT
 #elif defined(__linux__)
