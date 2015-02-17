@@ -9,23 +9,22 @@ group("seaborgium") {
     ]
 
     sources = [
-      "src/core/gfx_win.cc",
-      "src/ui/docking_resizer.cc",
-      "src/ui/docking_split_container.cc",
-      "src/ui/docking_tool_window.cc",
-      "src/ui/docking_workspace.cc",
-      "src/ui/drawing_common.cc",
-      "src/ui/focus.cc",
-      "src/ui/scroll_helper.cc",
-      "src/ui/skin.cc",
-      "src/ui/text_edit.cc",
-      "src/ui/tool_window_dragger.cc",
-      "src/ui/tree_grid.cc",
-      "src/ui/widget.cc",
-      "src/ui/source_view/cpp_lexer.cc",
-      "src/ui/source_view/lexer.cc",
-      "src/ui/source_view/lexer_state.cc",
-      "src/ui/source_view/source_view.cc",
+      "src/gfx_win.cc",
+      "src/docking_resizer.cc",
+      "src/docking_split_container.cc",
+      "src/docking_tool_window.cc",
+      "src/docking_workspace.cc",
+      "src/focus.cc",
+      "src/scroll_helper.cc",
+      "src/skin.cc",
+      "src/text_edit.cc",
+      "src/tool_window_dragger.cc",
+      "src/tree_grid.cc",
+      "src/widget.cc",
+      "src/source_view/cpp_lexer.cc",
+      "src/source_view/lexer.cc",
+      "src/source_view/lexer_state.cc",
+      "src/source_view/source_view.cc",
     ]
 
     include_dirs = [
@@ -94,7 +93,7 @@ group("seaborgium") {
     ]
 
     sources = [
-      "src/core/entry.cc",
+      "src/entry.cc",
       "src/main.cc",
       "src/sg.rc",
     ]
@@ -114,10 +113,10 @@ group("seaborgium") {
       ":sglib",
     ]
     sources = [
-      "src/ui/test_stubs.cc",
-      "src/ui/docking_test.cc",
-      "src/ui/source_view/lexer_test.cc",
-      "src/ui/tree_grid_test.cc",
+      "src/test_stubs.cc",
+      "src/docking_test.cc",
+      "src/source_view/lexer_test.cc",
+      "src/tree_grid_test.cc",
 
       "third_party/gtest-1.7.0/src/gtest_main.cc",
       "third_party/gtest-1.7.0/src/gtest-all.cc",

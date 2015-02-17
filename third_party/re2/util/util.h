@@ -29,7 +29,7 @@
 #include <utility>
 #include <set>
 
-#include "core/core.h"
+#include "core.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4018)  // signed/unsigned mismatch

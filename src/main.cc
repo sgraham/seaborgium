@@ -2,19 +2,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "core/core.h"
-#include "core/entry.h"
-#include "core/gfx.h"
-#include "ui/docking_split_container.h"
-#include "ui/docking_tool_window.h"
-#include "ui/docking_workspace.h"
-#include "ui/drawing_common.h"
-#include "ui/focus.h"
-#include "ui/skin.h"
-#include "ui/solid_color.h"
-#include "ui/source_view/source_view.h"
-#include "ui/text_edit.h"
-#include "ui/tree_grid.h"
+#include "core.h"
+#include "docking_split_container.h"
+#include "docking_tool_window.h"
+#include "docking_workspace.h"
+#include "entry.h"
+#include "focus.h"
+#include "gfx.h"
+#include "skin.h"
+#include "solid_color.h"
+#include "source_view/source_view.h"
+#include "text_edit.h"
+#include "tree_grid.h"
 
 #if 0
 #include "clang-c/Index.h"
