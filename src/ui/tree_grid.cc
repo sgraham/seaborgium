@@ -278,18 +278,18 @@ void TreeGrid::Render() {
   for (const auto& cell : ld.cells)
     cell.node->GetValue(cell.index)->Render(cell.rect);
 
-#if 0
   // Icons.
   const char* kSquaredPlus = "\xE2\x8A\x9E";
   const char* kSquaredMinus = "\xE2\x8A\x9F";
+  const float kIconFudgeX = 6.f;
+  const float kIconFudgeY = -10.f;
   for (const auto& button : ld.expansion_boxes) {
     GfxText(core::Font::kIcon,
             cs.text(),
-            button.rect.x,
-            button.rect.y + button.rect.h,
+            button.rect.x + kIconFudgeX,
+            button.rect.y + kIconFudgeY,
             button.node->Expanded() ? kSquaredMinus : kSquaredPlus);
   }
-#endif
 
 /*
   // TODO(scottmg): lost focus should cancel or commit edit

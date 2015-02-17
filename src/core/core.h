@@ -54,9 +54,9 @@
 #if defined(_WIN32) || defined(_WIN64)
 #undef CORE_PLATFORM_WINDOWS
 #if !defined(WINVER) && !defined(_WIN32_WINNT)
-// Vista+.
-#define WINVER 0x0600
-#define _WIN32_WINNT 0x0600
+// Windows 7+.
+#define WINVER 0x0601
+#define _WIN32_WINNT 0x0601
 #endif  // !defined(WINVER) && !defined(_WIN32_WINNT)
 #define CORE_PLATFORM_WINDOWS _WIN32_WINNT
 #elif defined(__linux__)

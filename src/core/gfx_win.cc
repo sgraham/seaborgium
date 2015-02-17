@@ -32,6 +32,7 @@ static IDWriteFactory* g_dwrite_factory;
 static IDWriteTextFormat* g_text_format_mono;
 static IDWriteTextFormat* g_text_format_ui;
 static IDWriteTextFormat* g_text_format_title;
+static IDWriteTextFormat* g_text_format_icon;
 static ID2D1LinearGradientBrush* g_title_bar_active_gradient_brush;
 static ID2D1LinearGradientBrush* g_title_bar_inactive_gradient_brush;
 struct ColorHash {
@@ -132,6 +133,18 @@ void WinGfxCreateDeviceIndependentResources() {
              "CreateTextFormat");
   g_text_format_title->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
   g_text_format_title->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+  // TODO(scottmg): Need a custom font collection for this to work.
+  CORE_CHECK(SUCCEEDED(g_dwrite_factory->CreateTextFormat(
+                 L"Entypo",  // Font family name.
+                 nullptr,
+                 DWRITE_FONT_WEIGHT_REGULAR,
+                 DWRITE_FONT_STYLE_NORMAL,
+                 DWRITE_FONT_STRETCH_NORMAL,
+                 26.f,
+                 L"en-us",
+                 &g_text_format_icon)),
+             "CreateTextFormat");
 }
 
 void CreateDeviceResources() {
@@ -244,6 +257,7 @@ void GfxShutdown() {
   SafeRelease(&g_text_format_mono);
   SafeRelease(&g_text_format_ui);
   SafeRelease(&g_text_format_title);
+  SafeRelease(&g_text_format_icon);
 }
 
 IDWriteTextFormat* TextFormatForFont(Font font) {
@@ -254,6 +268,8 @@ IDWriteTextFormat* TextFormatForFont(Font font) {
       return g_text_format_ui;
     case Font::kTitle:
       return g_text_format_title;
+    case Font::kIcon:
+      return g_text_format_icon;
     default:
       CORE_CHECK(false, "unexpected font");
       return nullptr;
