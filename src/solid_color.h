@@ -10,17 +10,13 @@
 
 class SolidColor : public Widget {
  public:
-  explicit SolidColor(const core::Color& color)
-      : color_(color) {
-  }
+  explicit SolidColor(const Color& color) : color_(color) {}
   virtual ~SolidColor() {}
 
-  virtual void Render() override {
-    core::DrawSolidRect(GetClientRect(), color_);
-  }
+  virtual void Render() override { DrawSolidRect(GetClientRect(), color_); }
 
  private:
-  core::Color color_;
+  Color color_;
 
   CORE_DISALLOW_COPY_AND_ASSIGN(SolidColor);
 };

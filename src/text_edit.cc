@@ -27,7 +27,7 @@ struct TextControl {
   STB_TexteditState state;
 };
 
-float CursorXFromIndex(const core::TextMeasurements& tm, int count, int index) {
+float CursorXFromIndex(const TextMeasurements& tm, int count, int index) {
   CORE_CHECK(index <= count, "index out of range");
   if (index == 0)
     return 0.f;
@@ -41,8 +41,8 @@ void LayoutFunc(StbTexteditRow* row, STB_TEXTEDIT_STRING* str, int start_i) {
   int remaining_chars = str->string_len - start_i;
   // Always single line.
   row->num_chars = remaining_chars;
-  core::TextMeasurements tm = core::GfxMeasureText(
-      core::Font::kMono, StringPiece(str->string, str->string_len));
+  TextMeasurements tm =
+      GfxMeasureText(Font::kMono, StringPiece(str->string, str->string_len));
   row->x0 = 0.f;  // TODO(scottmg): This seems suspect.
   row->x1 = tm.width;
   row->baseline_y_delta = tm.line_height;
@@ -108,26 +108,24 @@ float GetWidth(STB_TEXTEDIT_STRING* str, int n, int i) {
 
 #define STB_TEXTEDIT_K_SHIFT 0x20000000
 #define STB_TEXTEDIT_K_CONTROL 0x10000000
-#define STB_TEXTEDIT_K_LEFT (KEYDOWN_BIT | core::Key::Left)
-#define STB_TEXTEDIT_K_RIGHT (KEYDOWN_BIT | core::Key::Right)
-#define STB_TEXTEDIT_K_UP (KEYDOWN_BIT | core::Key::Up)
-#define STB_TEXTEDIT_K_DOWN (KEYDOWN_BIT | core::Key::Down)
-#define STB_TEXTEDIT_K_LINESTART (KEYDOWN_BIT | core::Key::Home)
-#define STB_TEXTEDIT_K_LINEEND (KEYDOWN_BIT | core::Key::End)
+#define STB_TEXTEDIT_K_LEFT (KEYDOWN_BIT | Key::Left)
+#define STB_TEXTEDIT_K_RIGHT (KEYDOWN_BIT | Key::Right)
+#define STB_TEXTEDIT_K_UP (KEYDOWN_BIT | Key::Up)
+#define STB_TEXTEDIT_K_DOWN (KEYDOWN_BIT | Key::Down)
+#define STB_TEXTEDIT_K_LINESTART (KEYDOWN_BIT | Key::Home)
+#define STB_TEXTEDIT_K_LINEEND (KEYDOWN_BIT | Key::End)
 #define STB_TEXTEDIT_K_TEXTSTART \
   (STB_TEXTEDIT_K_LINESTART | STB_TEXTEDIT_K_CONTROL)
 #define STB_TEXTEDIT_K_TEXTEND (STB_TEXTEDIT_K_LINEEND | STB_TEXTEDIT_K_CONTROL)
-#define STB_TEXTEDIT_K_DELETE (KEYDOWN_BIT | core::Key::Delete)
-#define STB_TEXTEDIT_K_BACKSPACE (KEYDOWN_BIT | core::Key::Backspace)
-#define STB_TEXTEDIT_K_UNDO \
-  (KEYDOWN_BIT | STB_TEXTEDIT_K_CONTROL | core::Key::KeyZ)
-#define STB_TEXTEDIT_K_REDO \
-  (KEYDOWN_BIT | STB_TEXTEDIT_K_CONTROL | core::Key::KeyY)
-#define STB_TEXTEDIT_K_INSERT (KEYDOWN_BIT | core::Key::Insert)
+#define STB_TEXTEDIT_K_DELETE (KEYDOWN_BIT | Key::Delete)
+#define STB_TEXTEDIT_K_BACKSPACE (KEYDOWN_BIT | Key::Backspace)
+#define STB_TEXTEDIT_K_UNDO (KEYDOWN_BIT | STB_TEXTEDIT_K_CONTROL | Key::KeyZ)
+#define STB_TEXTEDIT_K_REDO (KEYDOWN_BIT | STB_TEXTEDIT_K_CONTROL | Key::KeyY)
+#define STB_TEXTEDIT_K_INSERT (KEYDOWN_BIT | Key::Insert)
 #define STB_TEXTEDIT_K_WORDLEFT (STB_TEXTEDIT_K_LEFT | STB_TEXTEDIT_K_CONTROL)
 #define STB_TEXTEDIT_K_WORDRIGHT (STB_TEXTEDIT_K_RIGHT | STB_TEXTEDIT_K_CONTROL)
-#define STB_TEXTEDIT_K_PGUP (KEYDOWN_BIT | core::Key::PageUp)
-#define STB_TEXTEDIT_K_PGDOWN (KEYDOWN_BIT | core::Key::PageDown)
+#define STB_TEXTEDIT_K_PGUP (KEYDOWN_BIT | Key::PageUp)
+#define STB_TEXTEDIT_K_PGDOWN (KEYDOWN_BIT | Key::PageDown)
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -179,7 +177,7 @@ TextEdit::TextEdit()
   control->string = static_cast<char*>(malloc(0));
   stb_textedit_initialize_state(state, 1 /*is_single_line*/);
 
-  line_height_ = GfxMeasureText(core::Font::kMono, "X").line_height;
+  line_height_ = GfxMeasureText(Font::kMono, "X").line_height;
 }
 
 TextEdit::~TextEdit() {
@@ -193,7 +191,7 @@ bool TextEdit::NotifyMouseMoved(int x, int y, uint8_t modifiers) {
   LOCAL_state();
   LOCAL_control();
   if (GetScreenRect().Contains(Point(mouse_x_, mouse_y_)))
-    core::SetMouseCursor(core::MouseCursor::IBeam);
+    SetMouseCursor(MouseCursor::IBeam);
   if (left_mouse_is_down_)
     stb_textedit_drag(control, state, mouse_x_ - X(), mouse_y_ - Y());
   return true;
@@ -209,7 +207,7 @@ bool TextEdit::NotifyMouseWheel(int x, int y, float delta, uint8_t modifiers) {
 
 bool TextEdit::NotifyMouseButton(int x,
                                  int y,
-                                 core::MouseButton::Enum button,
+                                 MouseButton::Enum button,
                                  bool down,
                                  uint8_t modifiers) {
   CORE_UNUSED(x);
@@ -217,29 +215,29 @@ bool TextEdit::NotifyMouseButton(int x,
   ScopedCursorAlphaReset reset(this);
   LOCAL_state();
   LOCAL_control();
-  if (button == core::MouseButton::Left && down && modifiers == 0)
+  if (button == MouseButton::Left && down && modifiers == 0)
     stb_textedit_click(control, state, mouse_x_ - X(), mouse_y_ - Y());
-  if (button == core::MouseButton::Left)
+  if (button == MouseButton::Left)
     left_mouse_is_down_ = down;
   return true;
 }
 
-bool TextEdit::NotifyKey(core::Key::Enum key, bool down, uint8_t modifiers) {
+bool TextEdit::NotifyKey(Key::Enum key, bool down, uint8_t modifiers) {
   // We use NotifyChar for regular characters to attempt to get some semblance
   // of support for VK->character mapping from the host OS.
-  if (key == core::Key::None || key > core::Key::LAST_NON_PRINTABLE || !down)
+  if (key == Key::None || key > Key::LAST_NON_PRINTABLE || !down)
     return false;
   ScopedCursorAlphaReset reset(this);
   LOCAL_state();
   LOCAL_control();
   int stb_key = key;
-  if (modifiers & core::Modifier::LeftCtrl)
+  if (modifiers & Modifier::LeftCtrl)
     stb_key |= STB_TEXTEDIT_K_CONTROL;
-  if (modifiers & core::Modifier::RightCtrl)
+  if (modifiers & Modifier::RightCtrl)
     stb_key |= STB_TEXTEDIT_K_CONTROL;
-  if (modifiers & core::Modifier::LeftShift)
+  if (modifiers & Modifier::LeftShift)
     stb_key |= STB_TEXTEDIT_K_SHIFT;
-  if (modifiers & core::Modifier::RightShift)
+  if (modifiers & Modifier::RightShift)
     stb_key |= STB_TEXTEDIT_K_SHIFT;
   if (down)
     stb_key |= KEYDOWN_BIT;
@@ -281,9 +279,9 @@ void TextEdit::Render() {
   LOCAL_control();
 
   StringPiece str(control->string, control->string_len);
-  core::GfxText(core::Font::kMono, cs.text(), rect.x, rect.y, str);
+  GfxText(Font::kMono, cs.text(), rect.x, rect.y, str);
 
-  core::TextMeasurements tm = GfxMeasureText(core::Font::kMono, str);
+  TextMeasurements tm = GfxMeasureText(Font::kMono, str);
 
   // Caret.
   if (GetFocusedContents() == this) {

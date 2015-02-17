@@ -11,22 +11,22 @@
 // Temp manual config; Solarized Dark
 namespace {
 
-core::Color kBase03(0x002b36, 1.f);
-core::Color kBase02(0x073642, 1.f);
-core::Color kBase01(0x586e75, 1.f);
-core::Color kBase00(0x657b83, 1.f);
-core::Color kBase0(0x839496, 1.f);
-core::Color kBase1(0x93a1a1, 1.f);
-core::Color kBase2(0xeee8d5, 1.f);
-core::Color kBase3(0xfdf6e3, 1.f);
-core::Color kYellow(0xb58900, 1.f);
-core::Color kOrange(0xcb4b16, 1.f);
-core::Color kRed(0xdc322f, 1.f);
-core::Color kMagenta(0xd33682, 1.f);
-core::Color kViolet(0x6c71c4, 1.f);
-core::Color kBlue(0x268bd2, 1.f);
-core::Color kCyan(0x2aa198, 1.f);
-core::Color kGreen(0x859900, 1.f);
+Color kBase03(0x002b36, 1.f);
+Color kBase02(0x073642, 1.f);
+Color kBase01(0x586e75, 1.f);
+Color kBase00(0x657b83, 1.f);
+Color kBase0(0x839496, 1.f);
+Color kBase1(0x93a1a1, 1.f);
+Color kBase2(0xeee8d5, 1.f);
+Color kBase3(0xfdf6e3, 1.f);
+Color kYellow(0xb58900, 1.f);
+Color kOrange(0xcb4b16, 1.f);
+Color kRed(0xdc322f, 1.f);
+Color kMagenta(0xd33682, 1.f);
+Color kViolet(0x6c71c4, 1.f);
+Color kBlue(0x268bd2, 1.f);
+Color kCyan(0x2aa198, 1.f);
+Color kGreen(0x859900, 1.f);
 
 Skin g_skin;
 

@@ -26,11 +26,11 @@ class SourceView : public Widget, public ScrollHelperDataProvider {
 
   void SetFilePath(const std::string& path);
 
-  // Implementation of core::InputHandler:
+  // Implementation of InputHandler:
   bool WantMouseEvents() override { return true; }
   bool WantKeyEvents() override { return true; }
   bool NotifyMouseWheel(int x, int y, float delta, uint8_t modifiers) override;
-  bool NotifyKey(core::Key::Enum key, bool down, uint8_t modifiers) override;
+  bool NotifyKey(Key::Enum key, bool down, uint8_t modifiers) override;
 
   // Widget:
   void Render() override;
@@ -42,7 +42,7 @@ class SourceView : public Widget, public ScrollHelperDataProvider {
  private:
   int GetFirstLineInView();
   bool LineInView(int line_number);
-  const core::Color& ColorForTokenType(const Skin& skin, Lexer::TokenType type);
+  const Color& ColorForTokenType(const Skin& skin, Lexer::TokenType type);
 
   ScrollHelper scroll_;
   std::vector<Line> lines_;

@@ -16,7 +16,7 @@ class TextEdit : public Widget {
   TextEdit();
   virtual ~TextEdit();
 
-  // Implementation of core::InputHandler:
+  // Implementation of InputHandler:
   virtual bool WantMouseEvents() override { return true; }
   virtual bool WantKeyEvents() override { return true; }
 
@@ -25,10 +25,10 @@ class TextEdit : public Widget {
       override;
   virtual bool NotifyMouseButton(int x,
                                  int y,
-                                 core::MouseButton::Enum button,
+                                 MouseButton::Enum button,
                                  bool down,
                                  uint8_t modifiers) override;
-  virtual bool NotifyKey(core::Key::Enum key,
+  virtual bool NotifyKey(Key::Enum key,
                          bool down,
                          uint8_t modifiers) override;
   virtual bool NotifyChar(int character) override;
@@ -44,8 +44,8 @@ class TextEdit : public Widget {
   void* impl_;
   float mouse_x_;
   float mouse_y_;
-  core::Color cursor_color_;
-  core::Color cursor_color_target_;
+  Color cursor_color_;
+  Color cursor_color_target_;
   bool left_mouse_is_down_;
   float line_height_;
 

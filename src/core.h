@@ -155,11 +155,9 @@
 
 #define CORE_ALIGNOF(_type) __alignof(_type)
 
-namespace core {
 template <typename T, size_t N>
 char (&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T (&)[N]))[N];
-#define CORE_COUNTOF(_x) sizeof(::core::COUNTOF_REQUIRES_ARRAY_ARGUMENT(_x))
-}  // namespace core
+#define CORE_COUNTOF(_x) sizeof(::COUNTOF_REQUIRES_ARRAY_ARGUMENT(_x))
 
 #if CORE_COMPILER_GCC || CORE_COMPILER_CLANG
 #define CORE_ALIGN_STRUCT(_align, struct) \
@@ -212,7 +210,7 @@ char (&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T (&)[N]))[N];
   do {                                            \
     if (!(condition)) {                           \
       CORE_TRACE("CHECK " format, ##__VA_ARGS__); \
-      ::core::DebugBreak();                       \
+      ::DebugBreak();                             \
     }                                             \
   } while (0)
 #endif  // CORE_CHECK
@@ -223,7 +221,7 @@ char (&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T (&)[N]))[N];
   do {                                             \
     if (!(condition)) {                            \
       CORE_TRACE("DCHECK " format, ##__VA_ARGS__); \
-      ::core::DebugBreak();                        \
+      ::DebugBreak();                              \
     }                                              \
   } while (0)
 #else  // CORE_CONFIG_DEBUG
@@ -233,9 +231,9 @@ char (&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T (&)[N]))[N];
 
 #ifndef CORE_TRACE
 #if CORE_CONFIG_DEBUG
-#define CORE_TRACE(format, ...)                                             \
-  do {                                                                      \
-    ::core::DebugPrintf(CORE_FILE_LINE_LITERAL format "\n", ##__VA_ARGS__); \
+#define CORE_TRACE(format, ...)                                       \
+  do {                                                                \
+    ::DebugPrintf(CORE_FILE_LINE_LITERAL format "\n", ##__VA_ARGS__); \
   } while (0)
 #else  // CORE_CONFIG_DEBUG
 #define CORE_TRACE(...) do {} while (0)
@@ -274,8 +272,6 @@ extern "C" void _ReadWriteBarrier();
 #pragma intrinsic(_InterlockedDecrement)
 #endif
 
-namespace core {
-
 inline void ReadBarrier() {
 #if CORE_COMPILER_MSVC
   _ReadBarrier();
@@ -300,7 +296,7 @@ inline void ReadWriteBarrier() {
 #endif  // CORE_COMPILER
 }
 
-inline void MemoryBarrier() {
+inline void MemBarrier() {
 #if CORE_COMPILER_MSVC
   _mm_mfence();
 #else
@@ -332,16 +328,12 @@ inline void* AtomicExchangePtr(void** _target, void* ptr) {
 #endif  // CORE_COMPILER
 }
 
-}  // namespace core
-
 
 // --------------------------------------------------------------------------
 //
 // Timer.
 //
 // --------------------------------------------------------------------------
-
-namespace core {
 
 inline int64_t GetHPCounter() {
 #if CORE_PLATFORM_WINDOWS
@@ -368,8 +360,6 @@ inline int64_t GetHPFrequency() {
 #endif  // CORE_PLATFORM_
 }
 
-}  // namespace core
-
 
 // --------------------------------------------------------------------------
 //
@@ -385,8 +375,6 @@ inline int64_t GetHPFrequency() {
 extern "C" void NSLog(CFStringRef format, ...);
 #endif  // defined(__OBJC__)
 #endif
-
-namespace core {
 
 inline void DebugBreak() {
 #if CORE_COMPILER_MSVC
@@ -419,33 +407,35 @@ inline void DebugOutput(const char* out) {
 // Cross platform implementation of vsnprintf that returns number of characters
 // which would have been written to the final string if enough space had been
 // available.
-inline int32_t vsnprintf(char* str,
+inline int32_t Vsnprintf(char* str,
                          size_t count,
                          const char* format,
                          va_list arg_list) {
 #if CORE_COMPILER_MSVC
   int32_t len = ::vsnprintf_s(str, count, count, format, arg_list);
-  return -1 == len ? ::_vscprintf(format, arg_list) : len;
+  return len == -1 ? ::_vscprintf(format, arg_list) : len;
 #else
   return ::vsnprintf(str, count, format, arg_list);
 #endif  // CORE_COMPILER_MSVC
 }
 
+#if CORE_COMPILER_MSVC
 inline int32_t snprintf(char* str, size_t count, const char* format, ...) {
   va_list arg_list;
   va_start(arg_list, format);
-  int32_t len = vsnprintf(str, count, format, arg_list);
+  int32_t len = Vsnprintf(str, count, format, arg_list);
   va_end(arg_list);
   return len;
 }
+#endif  // CORE_COMPILER_MSVC
 
 inline void DebugPrintfVargs(const char* format, va_list arg_list) {
   char temp[8192];
   char* out = temp;
-  int32_t len = core::vsnprintf(out, sizeof(temp), format, arg_list);
+  int32_t len = Vsnprintf(out, sizeof(temp), format, arg_list);
   if ((int32_t)sizeof(temp) < len) {
     out = reinterpret_cast<char*>(_alloca(len + 1));
-    len = core::vsnprintf(out, len, format, arg_list);
+    len = Vsnprintf(out, len, format, arg_list);
   }
   out[len] = '\0';
   DebugOutput(out);
@@ -458,16 +448,12 @@ inline void DebugPrintf(const char* format, ...) {
   va_end(arg_list);
 }
 
-}  // namespace core
-
 
 // --------------------------------------------------------------------------
 //
 // Mutex.
 //
 // --------------------------------------------------------------------------
-
-namespace core {
 
 class Futex {
  public:
@@ -507,16 +493,12 @@ class ScopedFutex {
   Futex* futex_;
 };
 
-}  // namespace core
-
 
 // --------------------------------------------------------------------------
 //
 // Semaphore.
 //
 // --------------------------------------------------------------------------
-
-namespace core {
 
 #if CORE_PLATFORM_OSX
 
@@ -601,16 +583,12 @@ class Semaphore {
 
 #endif  // CORE_PLATFORM_
 
-}  // namespace core
-
 
 // --------------------------------------------------------------------------
 //
 // Thread.
 //
 // --------------------------------------------------------------------------
-
-namespace core {
 
 typedef int32_t (*ThreadFn)(void* user_data);
 
@@ -729,16 +707,12 @@ class Thread {
   CORE_DISALLOW_COPY_AND_ASSIGN(Thread);
 };
 
-}  // namespace core
-
 
 // --------------------------------------------------------------------------
 //
 // Single producer, single consumer queue.
 //
 // --------------------------------------------------------------------------
-
-namespace core {
 
 // http://drdobbs.com/article/print?articleId=210604448&siteSectionName=
 template <typename Ty>
@@ -828,7 +802,5 @@ class SpScBlockingQueue {
 
   CORE_DISALLOW_COPY_AND_ASSIGN(SpScBlockingQueue);
 };
-
-}  // namespace core
 
 #endif  // CORE_H_

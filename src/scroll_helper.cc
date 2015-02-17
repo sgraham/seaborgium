@@ -66,9 +66,9 @@ void ScrollHelper::RenderScrollIndicators() {
         ticks_since_stopped_moving_ - kFadeOutAfterTicks) / kFadeOutOverTicks;
   }
 
-  core::DrawSolidRoundedRect(
+  DrawSolidRoundedRect(
       Rect(screen_rect.w - 13.f, scrollbar_offset, 8.f, scrollbar_height),
-      core::Color(0x606060, alpha),
+      Color(0x606060, alpha),
       4.f);
 }
 
@@ -112,7 +112,7 @@ bool ScrollHelper::ScrollToEnd() {
   return ClampScrollTarget();
 }
 
-void ScrollHelper::CommonNotifyKey(core::Key::Enum key,
+void ScrollHelper::CommonNotifyKey(Key::Enum key,
                                    bool down,
                                    uint8_t modifiers,
                                    bool* invalidate,
@@ -120,28 +120,28 @@ void ScrollHelper::CommonNotifyKey(core::Key::Enum key,
   *invalidate = false;
   *handled = false;
   if (down) {
-    if (key == core::Key::Down) {
+    if (key == Key::Down) {
       *invalidate = ScrollLines(1);
       *handled = true;
-    } else if (key == core::Key::Up) {
+    } else if (key == Key::Up) {
       *invalidate = ScrollLines(-1);
       *handled = true;
-    } else if (key == core::Key::PageUp ||
-               (key == core::Key::Space &&
-                (modifiers & (core::Modifier::LeftShift |
-                              core::Modifier::RightShift)) != 0)) {
+    } else if (key == Key::PageUp ||
+               (key == Key::Space &&
+                (modifiers & (Modifier::LeftShift |
+                              Modifier::RightShift)) != 0)) {
       *invalidate = ScrollPages(-1);
       *handled = true;
-    } else if (key == core::Key::PageDown ||
-               (key == core::Key::Space &&
-                (modifiers & (core::Modifier::LeftShift |
-                              core::Modifier::RightShift)) == 0)) {
+    } else if (key == Key::PageDown ||
+               (key == Key::Space &&
+                (modifiers & (Modifier::LeftShift |
+                              Modifier::RightShift)) == 0)) {
       *invalidate = ScrollPages(1);
       *handled = true;
-    } else if (key == core::Key::Home) {
+    } else if (key == Key::Home) {
       *invalidate = ScrollToBeginning();
       *handled = true;
-    } else if (key == core::Key::End) {
+    } else if (key == Key::End) {
       *invalidate = ScrollToEnd();
       *handled = true;
     }

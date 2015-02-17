@@ -22,20 +22,20 @@ float kHoveringAlpha = 0.75f;
 float kDropTargetAlpha = 0.6f;
 #endif
 
-float IconWidth(core::Icon icon) {
+float IconWidth(Icon icon) {
   float w, h;
   GfxIconSize(icon, &w, &h);
   return w;
 }
 
-float IconHeight(core::Icon icon) {
+float IconHeight(Icon icon) {
   float w, h;
   GfxIconSize(icon, &w, &h);
   return h;
 }
 
 DropTargetIndicator IndicatorAt(Widget* dockable,
-                                core::Icon icon,
+                                Icon icon,
                                 float x,
                                 float y,
                                 DockingSplitDirection direction,
@@ -56,30 +56,30 @@ void PlaceIndicatorsAroundEdge(const Rect& rect,
                                Widget* dockable) {
   into->push_back(
       IndicatorAt(dockable,
-                  core::Icon::kDockTop,
-                  rect.x + rect.w / 2 - IconWidth(core::Icon::kDockTop) / 2,
+                  Icon::kDockTop,
+                  rect.x + rect.w / 2 - IconWidth(Icon::kDockTop) / 2,
                   rect.y,
                   kSplitHorizontal,
                   false));
   into->push_back(
       IndicatorAt(dockable,
-                  core::Icon::kDockLeft,
+                  Icon::kDockLeft,
                   rect.x,
-                  rect.y + rect.h / 2 - IconHeight(core::Icon::kDockLeft) / 2,
+                  rect.y + rect.h / 2 - IconHeight(Icon::kDockLeft) / 2,
                   kSplitVertical,
                   false));
   into->push_back(
       IndicatorAt(dockable,
-                  core::Icon::kDockRight,
-                  rect.x + rect.w - IconWidth(core::Icon::kDockRight),
-                  rect.y + rect.h / 2 - IconHeight(core::Icon::kDockRight) / 2,
+                  Icon::kDockRight,
+                  rect.x + rect.w - IconWidth(Icon::kDockRight),
+                  rect.y + rect.h / 2 - IconHeight(Icon::kDockRight) / 2,
                   kSplitVertical,
                   true));
   into->push_back(
       IndicatorAt(dockable,
-                  core::Icon::kDockBottom,
-                  rect.x + rect.w / 2 - IconWidth(core::Icon::kDockBottom) / 2,
-                  rect.y + rect.h - IconHeight(core::Icon::kDockBottom),
+                  Icon::kDockBottom,
+                  rect.x + rect.w / 2 - IconWidth(Icon::kDockBottom) / 2,
+                  rect.y + rect.h - IconHeight(Icon::kDockBottom),
                   kSplitHorizontal,
                   true));
 }
@@ -89,27 +89,27 @@ void PlaceIndicatorsAtCenter(const Rect& rect,
                              Widget* dockable) {
   float cx = rect.x + rect.w / 2;
   float cy = rect.y + rect.h / 2;
-  float offset = IconWidth(core::Icon::kDockTop);
+  float offset = IconWidth(Icon::kDockTop);
   into->push_back(IndicatorAt(dockable,
-                              core::Icon::kDockTop,
+                              Icon::kDockTop,
                               cx - offset / 2,
                               cy - offset * 2,
                               kSplitHorizontal,
                               false));
   into->push_back(IndicatorAt(dockable,
-                              core::Icon::kDockLeft,
+                              Icon::kDockLeft,
                               cx - offset * 2,
                               cy - offset / 2,
                               kSplitVertical,
                               false));
   into->push_back(IndicatorAt(dockable,
-                              core::Icon::kDockRight,
+                              Icon::kDockRight,
                               cx + offset,
                               cy - offset / 2,
                               kSplitVertical,
                               true));
   into->push_back(IndicatorAt(dockable,
-                              core::Icon::kDockBottom,
+                              Icon::kDockBottom,
                               cx - offset / 2,
                               cy + offset,
                               kSplitHorizontal,
@@ -244,7 +244,7 @@ void ToolWindowDragger::Render() {
   renderer->SetDrawColor(Color(0, 128, 128, kHoveringAlpha * 128));
   renderer->DrawFilledRect(draw_rect);
 #else
-  core::DrawSolidRect(draw_rect, core::Color(1, 1, 1, .25f));
+  DrawSolidRect(draw_rect, Color(1, 1, 1, .25f));
 #endif
 
   // TODO(scottmg): Workspace::Invalidate();

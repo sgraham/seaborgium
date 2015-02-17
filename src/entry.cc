@@ -12,8 +12,6 @@
 
 extern int Main(int argc, char** argv);
 
-namespace core {
-
 struct Event {
   enum Enum { Exit, Key, Char, Mouse, Size, };
   Event::Enum type;
@@ -147,9 +145,7 @@ struct MainThreadEntry {
 
 #if CORE_PLATFORM_WINDOWS
 
-}  // namespace core
 #include <windowsx.h>
-namespace core {
 
 #pragma comment(lib, "user32.lib")
 
@@ -628,8 +624,6 @@ bool ProcessEvents(uint32_t* width, uint32_t* height, InputHandler* handler) {
   return false;
 }
 
-}  // namespace core
-
 int main(int argc, char** argv) {
-  return core::s_ctx.Run(argc, argv);
+  return s_ctx.Run(argc, argv);
 }

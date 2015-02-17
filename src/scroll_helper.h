@@ -40,7 +40,7 @@ class ScrollHelper {
 
   // Optional, standard handling of keys/mouse for scrolling.
   void CommonNotifyKey(
-      core::Key::Enum key,
+      Key::Enum key,
       bool down,
       uint8_t modifers,
       bool* invalidate,

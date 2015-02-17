@@ -8,12 +8,8 @@
 // main code can call these functions without adding another layer of
 // interface to the main binary.
 
-namespace core {
-
 void SetWindowSize(uint32_t /*width*/, uint32_t /*height*/) {
 }
 
 void SetMouseCursor(MouseCursor::Enum /*cursor*/) {
 }
-
-}  // namespace core

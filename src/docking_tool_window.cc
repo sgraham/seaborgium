@@ -31,9 +31,9 @@ Rect DockingToolWindow::RectForTitleBar() {
 
 void DockingToolWindow::Render() {
   bool focused = GetFocusedContents() == contents_;
-  core::DrawWindow(title_.c_str(), focused, 0, 0, Width(), Height());
+  DrawWindow(title_.c_str(), focused, 0, 0, Width(), Height());
 
-  core::ScopedRenderOffset offset(
+  ScopedRenderOffset offset(
       contents_->GetScreenRect().RelativeTo(GetScreenRect()), true);
   contents_->Render();
 }

@@ -8,6 +8,7 @@
 #include <d2d1.h>
 #include <d2d1helper.h>
 #include <dwrite.h>
+#include <stdio.h>
 #include <wincodec.h>
 
 #include <algorithm>
@@ -24,8 +25,6 @@
 #pragma comment(lib, "windowscodecs.lib")
 
 extern "C" IMAGE_DOS_HEADER __ImageBase;
-
-namespace core {
 
 static HWND g_hwnd;
 static uint32_t g_width;
@@ -382,28 +381,6 @@ void GfxText(Font font,
                              SolidBrushForColor(color));
 }
 
-void GfxTextf(Font font,
-              const Color& color,
-              float x,
-              float y,
-              const char* format,
-              ...) {
-  va_list arg_list;
-  va_start(arg_list, format);
-
-  char temp[1024];
-  char* out = temp;
-  int32_t len = core::vsnprintf(out, sizeof(temp), format, arg_list);
-  if ((int32_t)sizeof(temp) < len) {
-    out = reinterpret_cast<char*>(_alloca(len + 1));
-    len = core::vsnprintf(out, len, format, arg_list);
-  }
-  out[len] = '\0';
-  va_end(arg_list);
-
-  GfxText(font, color, x, y, StringPiece(out, len));
-}
-
 void GfxColoredText(Font font,
                     const Color& default_color,
                     float x,
@@ -493,7 +470,7 @@ void TextMeasurements::GetCaretPosition(int index,
 }
 
 void GfxDrawFps() {
-  int64_t now = core::GetHPCounter();
+  int64_t now = GetHPCounter();
   static int64_t last = now;
   int64_t frame_time = now - last;
   last = now;
@@ -502,22 +479,21 @@ void GfxDrawFps() {
   min = min > frame_time ? frame_time : min;
   max = max < frame_time ? frame_time : max;
 
-  double freq = static_cast<double>(core::GetHPFrequency());
+  double freq = static_cast<double>(GetHPFrequency());
   double to_ms = 1000.0 / freq;
   float pos = 1;
 
-  // TODO(scottmg): Some info about d2d/dwrite version?
-  GfxTextf(Font::kMono,
-           Color(0.f, 0.65f, 0.f, 0.375f),
-           10,
-           16 * pos++,
+  char buf[256];
+  snprintf(buf,
+           sizeof(buf),
            // utf-8 sequences are UPWARDS ARROW and DOWNWARDS ARROW.
-           "Frame: %7.3f, % 7.3f \xe2\x86\x91, % 7.3f \xe2\x86\x93 [ms] / % "
-           "6.2f FPS ",
+           "Frame: %7.3f, % 7.3f \xe2\x86\x91, % 7.3f \xe2\x86\x93 [ms] / "
+           "%6.2f FPS ",
            static_cast<double>(frame_time) * to_ms,
            static_cast<double>(min) * to_ms,
            static_cast<double>(max) * to_ms,
            freq / frame_time);
+  GfxText(Font::kMono, Color(0.f, 0.65f, 0.f, 0.375f), 10, 16 * pos++, buf);
 }
 
 float GetDpiScale() {
@@ -567,7 +543,7 @@ void DrawHorizontalLine(const Color& color, float x0, float x1, float y) {
 void DrawTextInRect(Font font,
                     const Rect& rect,
                     StringPiece str,
-                    const core::Color& color,
+                    const Color& color,
                     float x_padding) {
   ScopedRenderOffset offset(rect, true);
   GfxText(font, color, x_padding, 0.f, str);
@@ -646,5 +622,3 @@ ScopedRenderOffset::~ScopedRenderOffset() {
   if (scissor_)
     g_render_target->PopAxisAlignedClip();
 }
-
-}  // namespace core

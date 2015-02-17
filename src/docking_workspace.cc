@@ -23,7 +23,7 @@ DockingWorkspace::~DockingWorkspace() {
 void DockingWorkspace::Render() {
   if (root_->left()) {
     const Rect& rect = GetScreenRect();
-    core::ScopedRenderOffset offset(rect.x, rect.y);
+    ScopedRenderOffset offset(rect.x, rect.y);
     root_->left()->Render();
   }
   if (draggable_.get())
@@ -92,23 +92,23 @@ bool DockingWorkspace::NotifyMouseWheel(int x,
 
 bool DockingWorkspace::NotifyMouseButton(int x,
                                          int y,
-                                         core::MouseButton::Enum button,
+                                         MouseButton::Enum button,
                                          bool down,
                                          uint8_t modifiers) {
   CORE_UNUSED(x);
   CORE_UNUSED(y);
   DragSetup drag_setup(mouse_position_, this);
   drag_setup.draggable = &draggable_;
-  if (draggable_.get() && button == core::MouseButton::Left && !down) {
+  if (draggable_.get() && button == MouseButton::Left && !down) {
     draggable_.reset();
     UpdateCursorForLocation();
     // TODO(scottmg): Invalidate();
     return true;
-  } else if (button == core::MouseButton::Left && down &&
+  } else if (button == MouseButton::Left && down &&
              root_->left()->CouldStartDrag(&drag_setup)) {
     // TODO(scottmg): Invalidate();
     return true;
-  } else if (button == core::MouseButton::Left) {
+  } else if (button == MouseButton::Left) {
     Widget* target = root_->left()->FindTopMostUnderPoint(mouse_position_);
     if (target) {
       if (down)
@@ -129,7 +129,7 @@ bool DockingWorkspace::NotifyMouseButton(int x,
   return false;
 }
 
-bool DockingWorkspace::NotifyKey(core::Key::Enum key,
+bool DockingWorkspace::NotifyKey(Key::Enum key,
                                  bool down,
                                  uint8_t modifiers) {
   Widget* focused = GetFocusedContents();
@@ -169,12 +169,12 @@ void DockingWorkspace::UpdateCursorForLocation() {
   DragSetup drag_setup(mouse_position_, this);
   if (root_->left()->CouldStartDrag(&drag_setup)) {
     if (drag_setup.drag_direction == kDragDirectionLeftRight)
-      core::SetMouseCursor(core::MouseCursor::DragLeftRight);
+      SetMouseCursor(MouseCursor::DragLeftRight);
     else if (drag_setup.drag_direction == kDragDirectionUpDown)
-      core::SetMouseCursor(core::MouseCursor::DragUpDown);
+      SetMouseCursor(MouseCursor::DragUpDown);
     else if (drag_setup.drag_direction == kDragDirectionAll)
-      core::SetMouseCursor(core::MouseCursor::DragAll);
+      SetMouseCursor(MouseCursor::DragAll);
   } else {
-    core::SetMouseCursor(core::MouseCursor::Default);
+    SetMouseCursor(MouseCursor::Default);
   }
 }

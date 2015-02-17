@@ -22,7 +22,7 @@ class Workspace;
 
 struct DropTargetIndicator {
   Widget* dockable;
-  core::Icon icon;
+  Icon icon;
   Rect rect;
   DockingSplitDirection direction;
   bool this_dockable_first;

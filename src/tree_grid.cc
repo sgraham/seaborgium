@@ -25,8 +25,8 @@ TreeGridNodeValueString::TreeGridNodeValueString(const std::string& value)
 
 void TreeGridNodeValueString::Render(const Rect& rect) const {
   const ColorScheme& cs = Skin::current().GetColorScheme();
-  core::DrawTextInRect(
-      core::Font::kUI, rect, value_.c_str(), cs.text(), kTextPadding);
+  DrawTextInRect(
+      Font::kUI, rect, value_.c_str(), cs.text(), kTextPadding);
 }
 
 // --------------------------------------------------------------------
@@ -262,7 +262,7 @@ void TreeGrid::Render() {
   DrawVerticalLine(cs.border(), ld.header.x, ld.header.y, client_rect.h);
 
   for (size_t i = 0; i < columns_.size(); ++i) {
-    DrawTextInRect(core::Font::kUI,
+    DrawTextInRect(Font::kUI,
                    ld.header_columns[i],
                    columns_[i]->GetCaption(),
                    cs.margin_text(),
@@ -279,10 +279,10 @@ void TreeGrid::Render() {
     cell.node->GetValue(cell.index)->Render(cell.rect);
 
   for (const auto& button : ld.expansion_boxes) {
-    GfxDrawIcon(button.node->Expanded() ? core::Icon::kTreeExpanded
-                                        : core::Icon::kTreeCollapsed,
-                button.rect,
-                1.f);
+    GfxDrawIcon(
+        button.node->Expanded() ? Icon::kTreeExpanded : Icon::kTreeCollapsed,
+        button.rect,
+        1.f);
   }
 
 /*
@@ -365,15 +365,15 @@ bool TreeGrid::CouldStartDrag(DragSetup* drag_setup) {
   return false;
 }
 
-bool TreeGrid::NotifyKey(core::Key::Enum key, bool down, uint8_t modifiers) {
+bool TreeGrid::NotifyKey(Key::Enum key, bool down, uint8_t modifiers) {
   static struct {
-    core::Key::Enum key;
+    Key::Enum key;
     FocusDirection direction;
   } mappings[] = {
-    { core::Key::Up, kFocusUp },
-    { core::Key::Down, kFocusDown },
-    { core::Key::Left, kFocusLeft },
-    { core::Key::Right, kFocusRight },
+      {Key::Up, kFocusUp},
+      {Key::Down, kFocusDown},
+      {Key::Left, kFocusLeft},
+      {Key::Right, kFocusRight},
   };
   if (down && modifiers == 0) {  // TODO(scottmg): Shift-move for selection.
     for (const auto& mapping : mappings) {
@@ -382,7 +382,7 @@ bool TreeGrid::NotifyKey(core::Key::Enum key, bool down, uint8_t modifiers) {
         return true;
       }
     }
-    if (key == core::Key::F2) {
+    if (key == Key::F2) {
       TryStartEdit();
       return true;
     }
@@ -392,7 +392,7 @@ bool TreeGrid::NotifyKey(core::Key::Enum key, bool down, uint8_t modifiers) {
 
 bool TreeGrid::NotifyMouseButton(int x,
                                  int y,
-                                 core::MouseButton::Enum button,
+                                 MouseButton::Enum button,
                                  bool down,
                                  uint8_t modifiers) {
   // See CouldStartDrag (this could be cached).
@@ -400,7 +400,7 @@ bool TreeGrid::NotifyMouseButton(int x,
   CORE_UNUSED(modifiers);
   Point client_point = Point(static_cast<float>(x), static_cast<float>(y))
                            .RelativeTo(GetScreenRect());
-  if (down && button == core::MouseButton::Left) {
+  if (down && button == MouseButton::Left) {
     for (const auto& eb : layout_data.expansion_boxes) {
       if (eb.rect.Contains(client_point)) {
         eb.node->SetExpanded(!eb.node->Expanded());

@@ -15,7 +15,7 @@ class Draggable;
 class Renderer;
 class Workspace;
 
-class Widget : public core::InputHandler {
+class Widget : public InputHandler {
  public:
   Widget();
   virtual ~Widget();
@@ -49,7 +49,7 @@ class Widget : public core::InputHandler {
   // equivalently lowest in the tree).
   virtual Widget* FindTopMostUnderPoint(const Point& point);
 
-  // Default implementation of core::InputHandler.
+  // Default implementation of InputHandler.
   virtual bool NotifyMouseMoved(int /*x*/,
                                 int /*y*/,
                                 uint8_t /*modifiers*/) override {
@@ -63,12 +63,12 @@ class Widget : public core::InputHandler {
   }
   virtual bool NotifyMouseButton(int /*x*/,
                                  int /*y*/,
-                                 core::MouseButton::Enum /*button*/,
+                                 MouseButton::Enum /*button*/,
                                  bool /*down*/,
                                  uint8_t /*modifiers*/) override {
     return false;
   }
-  virtual bool NotifyKey(core::Key::Enum /*key*/,
+  virtual bool NotifyKey(Key::Enum /*key*/,
                          bool /*down*/,
                          uint8_t /*modifiers*/) override {
     return false;

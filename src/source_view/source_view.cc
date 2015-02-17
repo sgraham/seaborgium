@@ -84,7 +84,7 @@ bool SourceView::NotifyMouseWheel(int x,
   return handled;
 }
 
-bool SourceView::NotifyKey(core::Key::Enum key, bool down, uint8_t modifiers) {
+bool SourceView::NotifyKey(Key::Enum key, bool down, uint8_t modifiers) {
   bool invalidate = false;
   bool handled = false;
   scroll_.CommonNotifyKey(key, down, modifiers, &invalidate, &handled);
@@ -144,17 +144,17 @@ void SourceView::Render() {
     // - Different abstraction to allow dwrite to cache Layout across frames --
     // it's completely static in our case anyway.
     // - etc.
-    std::vector<core::RangeAndColor> ranges;
+    std::vector<RangeAndColor> ranges;
     std::string current_line;
     for (size_t j = 0; j < lines_[i].size(); ++j) {
-      core::RangeAndColor rac(
+      RangeAndColor rac(
           static_cast<int>(current_line.size()),
           static_cast<int>(current_line.size() + lines_[i][j].text.size()),
           ColorForTokenType(skin, lines_[i][j].type));
       ranges.push_back(rac);
       current_line += lines_[i][j].text;
     }
-    GfxColoredText(core::Font::kMono,
+    GfxColoredText(Font::kMono,
                    cs.text(),
                    static_cast<float>(x),
                    static_cast<float>(i * line_height - y_pixel_scroll),
@@ -200,8 +200,8 @@ bool SourceView::LineInView(int line_number) {
   return true;
 }
 
-const core::Color& SourceView::ColorForTokenType(const Skin& skin,
-                                                 Lexer::TokenType type) {
+const Color& SourceView::ColorForTokenType(const Skin& skin,
+                                           Lexer::TokenType type) {
   // TODO(config): More customizability with fallbacks.
   const ColorScheme& cs = skin.GetColorScheme();
   switch (type) {

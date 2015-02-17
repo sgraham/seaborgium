@@ -157,7 +157,7 @@ void FillWatchWithSampleData(TreeGrid* watch) {
 
   TreeGridNode* child0 = new TreeGridNode(watch, root0);
   root0->Nodes()->push_back(child0);
-  FillColumns(child0, "core::InputHandler", "{...}", "core::InputHandler");
+  FillColumns(child0, "InputHandler", "{...}", "InputHandler");
 
   TreeGridNode* child1 = new TreeGridNode(watch, root0);
   root0->Nodes()->push_back(child1);

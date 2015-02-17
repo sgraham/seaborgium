@@ -54,7 +54,7 @@ void FillWatchWithSampleData(TreeGrid* watch) {
 
   TreeGridNode* child0 = new TreeGridNode(watch, root0);
   root0->Nodes()->push_back(child0);
-  FillColumns(child0, "core::InputHandler", "{...}", "core::InputHandler");
+  FillColumns(child0, "InputHandler", "{...}", "InputHandler");
 
   TreeGridNode* child1 = new TreeGridNode(watch, root0);
   root0->Nodes()->push_back(child1);
@@ -96,7 +96,7 @@ void FillWatchWithSampleData(TreeGrid* watch) {
 }
 
 int Main(int argc, char** argv) {
-  core::GfxInit();
+  GfxInit();
   Skin::LoadData();
 
   CORE_UNUSED(argc);
@@ -196,24 +196,24 @@ int Main(int argc, char** argv) {
 
   uint32_t prev_width = 0, prev_height = 0;
   uint32_t width, height;
-  while (!core::ProcessEvents(&width, &height, &main_area)) {
+  while (!ProcessEvents(&width, &height, &main_area)) {
     if (prev_width != width || prev_height != height) {
       main_area.SetScreenRect(
-          Rect(skin.border_size() / core::GetDpiScale(),
-               skin.border_size() / core::GetDpiScale(),
-               (width - skin.border_size() * 2) / core::GetDpiScale(),
-               (height - skin.border_size() * 2) / core::GetDpiScale()));
-      core::GfxResize(width, height);
+          Rect(skin.border_size() / GetDpiScale(),
+               skin.border_size() / GetDpiScale(),
+               (width - skin.border_size() * 2) / GetDpiScale(),
+               (height - skin.border_size() * 2) / GetDpiScale()));
+      GfxResize(width, height);
       prev_width = width;
       prev_height = height;
     }
 
     main_area.Render();
-    core::GfxDrawFps();
-    core::GfxFrame();
+    GfxDrawFps();
+    GfxFrame();
   }
 
-  core::GfxShutdown();
+  GfxShutdown();
 
   return 0;
 }

@@ -11,8 +11,6 @@
 
 #include "core.h"
 
-namespace core {
-
 struct MouseButton {
   enum Enum { None, Left, Middle, Right, Count };
 };
@@ -157,7 +155,5 @@ struct MouseCursor {
 };
 
 void SetMouseCursor(MouseCursor::Enum cursor);
-
-}  // namespace core
 
 #endif  // ENTRY_H_

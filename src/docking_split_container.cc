@@ -139,13 +139,13 @@ Rect DockingSplitContainer::GetRectForSplitter() {
 
 void DockingSplitContainer::Render() {
   {
-    core::ScopedRenderOffset left_offset(
+    ScopedRenderOffset left_offset(
         left_->GetScreenRect().RelativeTo(GetScreenRect()), true);
     left_->Render();
   }
 
   if (right_.get()) {
-    core::ScopedRenderOffset right_offset(
+    ScopedRenderOffset right_offset(
         right_->GetScreenRect().RelativeTo(GetScreenRect()), true);
     right_->Render();
   } else {

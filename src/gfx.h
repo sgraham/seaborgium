@@ -15,8 +15,6 @@
 
 class Widget;
 
-namespace core {
-
 void GfxInit();
 void GfxResize(uint32_t width, uint32_t height);
 void GfxFrame();
@@ -100,12 +98,6 @@ void GfxText(Font font,
              const Color& color,
              const Rect& rect,
              const char* string);
-void GfxTextf(Font font,
-              const Color& color,
-              float x,
-              float y,
-              const char* format,
-              ...);
 void GfxColoredText(Font font,
                     const Color& default_color,
                     float x,
@@ -134,7 +126,7 @@ void DrawHorizontalLine(const Color& color, float x0, float x1, float y);
 void DrawTextInRect(Font font,
                     const Rect& rect,
                     StringPiece str,
-                    const core::Color& color,
+                    const Color& color,
                     float x_padding = 0.f);
 
 struct ScopedRenderOffset {
@@ -155,7 +147,5 @@ void DrawWindow(const char* title,
                 float y,
                 float w,
                 float h);
-
-}  // namespace core
 
 #endif  // GFX_H_

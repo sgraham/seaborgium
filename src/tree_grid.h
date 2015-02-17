@@ -122,12 +122,10 @@ class TreeGrid : public Widget {
 
   virtual bool WantMouseEvents() override { return true; }
   virtual bool WantKeyEvents() override { return true; }
-  virtual bool NotifyKey(core::Key::Enum key,
-                         bool down,
-                         uint8_t modifiers) override;
+  virtual bool NotifyKey(Key::Enum key, bool down, uint8_t modifiers) override;
   virtual bool NotifyMouseButton(int x,
                                  int y,
-                                 core::MouseButton::Enum button,
+                                 MouseButton::Enum button,
                                  bool down,
                                  uint8_t modifiers) override;
 

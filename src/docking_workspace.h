@@ -16,7 +16,7 @@
 class DockingSplitContainer;
 
 // Top level container holding a tree of |Widget|s.
-class DockingWorkspace : public core::InputHandler {
+class DockingWorkspace : public InputHandler {
  public:
   DockingWorkspace();
   virtual ~DockingWorkspace();
@@ -37,7 +37,7 @@ class DockingWorkspace : public core::InputHandler {
 
   Widget* FindTopMostUnderPoint(const Point& point);
 
-  // Implementation of core::InputHandler:
+  // Implementation of InputHandler:
   virtual bool WantMouseEvents() override { return true; }
   virtual bool WantKeyEvents() override { return true; }
   virtual bool NotifyMouseMoved(int x, int y, uint8_t modifiers) override;
@@ -45,10 +45,10 @@ class DockingWorkspace : public core::InputHandler {
       override;
   virtual bool NotifyMouseButton(int x,
                                  int y,
-                                 core::MouseButton::Enum button,
+                                 MouseButton::Enum button,
                                  bool down,
                                  uint8_t modifiers) override;
-  virtual bool NotifyKey(core::Key::Enum key,
+  virtual bool NotifyKey(Key::Enum key,
                          bool down,
                          uint8_t modifiers) override;
   virtual bool NotifyChar(int character) override;
