@@ -100,7 +100,8 @@ Lexer* MakeCppLexer() {
                 Lexer::KeywordPseudo);  // NOLINT
   root_defs.Add("(true|false)\\b", Lexer::KeywordConstant);
   root_defs.Add("NULL\\b", Lexer::NameBuiltin);
-  // TODO: ?!: : root_defs.Add("[a-zA-Z_][a-zA-Z0-9_]*:(?!:)",
+  // TODO(<type 'function'>): ?!: :
+  // root_defs.Add("[a-zA-Z_][a-zA-Z0-9_]*:(?!:)",
   // Lexer::NameLabel); // NOLINT
   root_defs.Add("[a-zA-Z_][a-zA-Z0-9_]*", Lexer::Name);
   root->SetTokenDefinitions(root_defs);

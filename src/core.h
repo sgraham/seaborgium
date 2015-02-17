@@ -154,7 +154,7 @@
 #define ALIGNOF(_type) __alignof(_type)
 
 template <typename T, size_t N>
-char(&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T(&)[N]))[N];
+char(&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T(&)[N]))[N];  // NOLINT
 #define COUNTOF(_x) sizeof(::COUNTOF_REQUIRES_ARRAY_ARGUMENT(_x))
 
 #if COMPILER_GCC || COMPILER_CLANG
