@@ -207,7 +207,7 @@ char(&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T(&)[N]))[N];  // NOLINT
   do {                                \
     if (!(condition)) {               \
       TRACE("CHECK ", ##__VA_ARGS__); \
-      ::DebugBreak();                 \
+      ::DbgBreak();                   \
     }                                 \
   } while (0)
 #endif  // CHECK
@@ -218,7 +218,7 @@ char(&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T(&)[N]))[N];  // NOLINT
   do {                                 \
     if (!(condition)) {                \
       TRACE("DCHECK ", ##__VA_ARGS__); \
-      ::DebugBreak();                  \
+      ::DbgBreak();                    \
     }                                  \
   } while (0)
 #else  // CONFIG_DEBUG
@@ -374,7 +374,7 @@ extern "C" void NSLog(CFStringRef format, ...);
 #endif  // defined(__OBJC__)
 #endif
 
-inline void DebugBreak() {
+inline void DbgBreak() {
 #if COMPILER_MSVC
   __debugbreak();
 #elif CPU_X86 && (COMPILER_GCC || COMPILER_CLANG)

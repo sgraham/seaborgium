@@ -121,7 +121,7 @@ void SourceView::Render() {
 
   int y_pixel_scroll = scroll_.GetOffset();
 
-  for (int i = start_line; i < lines_.size(); ++i) {
+  for (size_t i = start_line; i < lines_.size(); ++i) {
     // Extra |line_height| added to height so that a full line is drawn at
     // the bottom when partial-line pixel scrolled.
     if (!LineInView(i))

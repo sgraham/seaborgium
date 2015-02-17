@@ -5,10 +5,10 @@
 #ar = "C:/Program Files (x86)/LLVM/bin/clang-cl.exe"
 #cc = "C:/Program Files (x86)/LLVM/bin/clang-cl.exe"
 #cxx = "C:/Program Files (x86)/LLVM/bin/clang-cl.exe"
-ar = "C:/Program Files (x86)/Microsoft Visual Studio 12.0/VC/bin/amd64/cl.exe"
-cc = "C:/Program Files (x86)/Microsoft Visual Studio 12.0/VC/bin/amd64/cl.exe"
-cxx = "C:/Program Files (x86)/Microsoft Visual Studio 12.0/VC/bin/amd64/cl.exe"
-ld = "C:/Program Files (x86)/Microsoft Visual Studio 12.0/VC/bin/amd64/link.exe"
+ar = "cl.exe"
+cc = "cl.exe"
+cxx = "cl.exe"
+ld = "link.exe"
 helper_path = rebase_path("helper.py")
 
 toolchain("win") {
