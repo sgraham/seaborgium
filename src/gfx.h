@@ -140,7 +140,6 @@ struct ScopedRenderOffset {
   bool scissor_;
 };
 
-// TODO: Not very core.
 void DrawWindow(const char* title,
                 bool active,
                 float x,

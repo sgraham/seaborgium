@@ -272,7 +272,7 @@ void DiscardDeviceResources() {
 void BeginFrame() {
   g_render_target->BeginDraw();
   g_render_target->SetTransform(D2D1::Matrix3x2F::Identity());
-  g_render_target->Clear(D2D1::ColorF(D2D1::ColorF::White));
+  g_render_target->Clear(D2D1::ColorF(D2D1::ColorF::DarkSlateGray));
 }
 
 void GfxInit() {

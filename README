@@ -44,36 +44,22 @@ Copyright 2003-2013 University of Illinois at Urbana-Champaign. All Rights Reser
 http://opensource.org/licenses/UoI-NCSA.php
 
 
-PENDING
--------
+
+
+RANDOM MUTTERINGS
+-----------------
+
+figure out best way of pulling in lldb. need python from source.
+
 tree grid:
   selection (multiple for deleting, etc.)
   insert/delete top level items
   remove item at top level w/ delete
   edit items
 
-
-RANDOM MUTTERINGS
------------------
-
-bx is great except for the casing of function names, want a bunch of it:
-- platform macros
-- simple os functionality (dlopen, etc.)
-- thread, mutex, semaphore, spscqueue
-
-entry point gunk: ~1w
-- create a window
-- spin up main thread and call int Main(argc, argv).
-- handle/post system events to messageloop
-
 messageloop: ~1w
 - blocking processor
 - post into it from anywhere
-
-simple 2d renderer, look at what gwen does for basic abstraction ~2w
-- opengl everywhere is probably simplest: rect, line, texture, etc.
-- font rendering: simple monospace bitmap font, maybe a few sizes
-- nanovg is nice, needs render to texture
 
 ui widgets:
 - docking panes ~1w
@@ -99,22 +85,18 @@ actual ui
 - set, edit, update breakpoints
 - step in, out, over
 
-
 thread 0: SYSTEM: window create, post system events to UI
 thread 1: UI: handles events, draws UI, sends control events to DEBUGGER
 thread 2: RENDER: double buffered renderer processing UI draws
 thread 3: DEBUGGER: interacts with debugger engine and target process
                     posts updates back to UI
 
-don't really need RENDER thread, GL drivers are just shims to another thread
-these days anyway.
-
 workspace:
 - get default windows up/draggable
 - source view as main
-- figure out non-gamey-render loop (invalidates as nececessary, probably only
-  full repaint w/o dirty rects)
-- command line via esc or ` with text editor widget
+- non-gamey-render loop (invalidates as nececessary, probably only full repaint
+  w/o dirty rects)
+- command line gets focus with esc
 - theming
 
 widgets:
