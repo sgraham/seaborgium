@@ -76,8 +76,8 @@ bool SourceView::NotifyMouseWheel(int x,
                                   int y,
                                   float delta,
                                   uint8_t modifiers) {
-  CORE_UNUSED(x);
-  CORE_UNUSED(y);
+  UNUSED(x);
+  UNUSED(y);
   bool invalidate = false;
   bool handled = false;
   scroll_.CommonMouseWheel(delta, modifiers, &invalidate, &handled);

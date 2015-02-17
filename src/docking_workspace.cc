@@ -95,8 +95,8 @@ bool DockingWorkspace::NotifyMouseButton(int x,
                                          MouseButton::Enum button,
                                          bool down,
                                          uint8_t modifiers) {
-  CORE_UNUSED(x);
-  CORE_UNUSED(y);
+  UNUSED(x);
+  UNUSED(y);
   DragSetup drag_setup(mouse_position_, this);
   drag_setup.draggable = &draggable_;
   if (draggable_.get() && button == MouseButton::Left && !down) {

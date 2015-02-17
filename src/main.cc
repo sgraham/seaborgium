@@ -99,8 +99,8 @@ int Main(int argc, char** argv) {
   GfxInit();
   Skin::LoadData();
 
-  CORE_UNUSED(argc);
-  CORE_UNUSED(argv);
+  UNUSED(argc);
+  UNUSED(argv);
 
   /*
   uint32_t test_texture_data[4] = {

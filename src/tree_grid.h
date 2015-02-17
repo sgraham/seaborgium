@@ -198,7 +198,7 @@ class TreeGrid : public Widget {
   std::vector<TreeGridNode*> nodes_;
   std::vector<TreeGridColumn*> columns_;
 
-  CORE_DISALLOW_COPY_AND_ASSIGN(TreeGrid);
+  DISALLOW_COPY_AND_ASSIGN(TreeGrid);
 };
 
 #endif  // TREE_GRID_H_

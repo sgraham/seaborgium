@@ -28,7 +28,7 @@ struct TextControl {
 };
 
 float CursorXFromIndex(const TextMeasurements& tm, int count, int index) {
-  CORE_CHECK(index <= count, "index out of range");
+  CHECK(index <= count, "index out of range");
   if (index == 0)
     return 0.f;
   bool trailing = index == count;
@@ -70,7 +70,7 @@ int InsertChars(STB_TEXTEDIT_STRING* str,
 }
 
 float GetWidth(STB_TEXTEDIT_STRING* str, int n, int i) {
-  CORE_UNUSED(n);  // Single line only.
+  UNUSED(n);  // Single line only.
   (void)str;
   (void)n;
   (void)i;
@@ -86,7 +86,7 @@ float GetWidth(STB_TEXTEDIT_STRING* str, int n, int i) {
                         str->string + str->string_len,
                         positions.get(),
                         str->string_len);
-  CORE_CHECK(i < str->string_len, "out of bounds request");
+  CHECK(i < str->string_len, "out of bounds request");
   return CursorXFromIndex(positions.get(), str->string_len, i + 1) -
          CursorXFromIndex(positions.get(), str->string_len, i);
 #endif
@@ -187,7 +187,7 @@ TextEdit::~TextEdit() {
 bool TextEdit::NotifyMouseMoved(int x, int y, uint8_t modifiers) {
   mouse_x_ = static_cast<float>(x);
   mouse_y_ = static_cast<float>(y);
-  CORE_UNUSED(modifiers);
+  UNUSED(modifiers);
   LOCAL_state();
   LOCAL_control();
   if (GetScreenRect().Contains(Point(mouse_x_, mouse_y_)))
@@ -198,10 +198,10 @@ bool TextEdit::NotifyMouseMoved(int x, int y, uint8_t modifiers) {
 }
 
 bool TextEdit::NotifyMouseWheel(int x, int y, float delta, uint8_t modifiers) {
-  CORE_UNUSED(x);
-  CORE_UNUSED(y);
-  CORE_UNUSED(delta);
-  CORE_UNUSED(modifiers);
+  UNUSED(x);
+  UNUSED(y);
+  UNUSED(delta);
+  UNUSED(modifiers);
   return true;
 }
 
@@ -210,8 +210,8 @@ bool TextEdit::NotifyMouseButton(int x,
                                  MouseButton::Enum button,
                                  bool down,
                                  uint8_t modifiers) {
-  CORE_UNUSED(x);
-  CORE_UNUSED(y);
+  UNUSED(x);
+  UNUSED(y);
   ScopedCursorAlphaReset reset(this);
   LOCAL_state();
   LOCAL_control();
@@ -242,8 +242,8 @@ bool TextEdit::NotifyKey(Key::Enum key, bool down, uint8_t modifiers) {
   if (down)
     stb_key |= KEYDOWN_BIT;
   // TODO(scottmg): Cut, copy, paste shortcuts.
-  CORE_UNUSED(&stb_textedit_cut);
-  CORE_UNUSED(&stb_textedit_paste);
+  UNUSED(&stb_textedit_cut);
+  UNUSED(&stb_textedit_paste);
   // TODO(scottmg): Catch others in subclass (up/down for history, etc.)
   stb_textedit_key(control, state, stb_key);
   return true;

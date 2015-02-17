@@ -18,7 +18,7 @@ class SolidColor : public Widget {
  private:
   Color color_;
 
-  CORE_DISALLOW_COPY_AND_ASSIGN(SolidColor);
+  DISALLOW_COPY_AND_ASSIGN(SolidColor);
 };
 
 #endif  // SOLID_COLOR_H_

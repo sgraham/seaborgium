@@ -16,7 +16,6 @@
 #endif
 
 // Debug-only checking.
-#define DCHECK(condition) assert(condition)
 #define DCHECK_EQ(val1, val2) assert((val1) == (val2))
 #define DCHECK_NE(val1, val2) assert((val1) != (val2))
 #define DCHECK_LE(val1, val2) assert((val1) <= (val2))
@@ -25,7 +24,6 @@
 #define DCHECK_GT(val1, val2) assert((val1) > (val2))
 
 // Always-on checking
-#define CHECK(x)	if(x){}else LogMessageFatal(__FILE__, __LINE__).stream() << "Check failed: " #x
 #define CHECK_LT(x, y)	CHECK((x) < (y))
 #define CHECK_GT(x, y)	CHECK((x) > (y))
 #define CHECK_LE(x, y)	CHECK((x) <= (y))

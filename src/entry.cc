@@ -133,7 +133,7 @@ class EventQueue {
  private:
   SpScQueue<Event> queue_;
 
-  CORE_DISALLOW_COPY_AND_ASSIGN(EventQueue);
+  DISALLOW_COPY_AND_ASSIGN(EventQueue);
 };
 
 struct MainThreadEntry {
@@ -143,7 +143,7 @@ struct MainThreadEntry {
   static int32_t ThreadFunc(void* user_data);
 };
 
-#if CORE_PLATFORM_WINDOWS
+#if PLATFORM_WINDOWS
 
 #include <windowsx.h>
 
@@ -152,8 +152,8 @@ struct MainThreadEntry {
 #define WM_USER_SET_WINDOW_SIZE (WM_USER + 0)
 #define WM_USER_SET_MOUSE_CURSOR (WM_USER + 1)
 
-#define CORE_DEFAULT_WIDTH 1024
-#define CORE_DEFAULT_HEIGHT 768
+#define DEFAULT_WIDTH 1024
+#define DEFAULT_HEIGHT 768
 
 struct TranslateKeyModifiers_t {
   int vk;
@@ -172,7 +172,7 @@ static const TranslateKeyModifiers_t s_translateKeyModifiers[8] = {
 
 static uint8_t TranslateKeyModifiers() {
   uint8_t modifiers = 0;
-  for (uint32_t i = 0; i < CORE_COUNTOF(s_translateKeyModifiers); ++i) {
+  for (uint32_t i = 0; i < COUNTOF(s_translateKeyModifiers); ++i) {
     const TranslateKeyModifiers_t& tkm = s_translateKeyModifiers[i];
     modifiers |= 0 > GetKeyState(tkm.vk) ? tkm.modifier : Modifier::None;
   }
@@ -272,7 +272,7 @@ struct Context {
   }
 
   int32_t Run(int argc, char** argv) {
-    CORE_CHECK(SetProcessDPIAware(), "SetProcessDPIAware");
+    CHECK(SetProcessDPIAware(), "SetProcessDPIAware");
     HeapSetInformation(nullptr, HeapEnableTerminationOnCorruption, nullptr, 0);
     ::SetDllDirectory(".");
 
@@ -297,8 +297,8 @@ struct Context {
                         WS_OVERLAPPEDWINDOW | WS_VISIBLE,
                         50,
                         50,
-                        static_cast<int>(CORE_DEFAULT_WIDTH * GetDpiScale()),
-                        static_cast<int>(CORE_DEFAULT_HEIGHT * GetDpiScale()),
+                        static_cast<int>(DEFAULT_WIDTH * GetDpiScale()),
+                        static_cast<int>(DEFAULT_HEIGHT * GetDpiScale()),
                         NULL,
                         NULL,
                         instance,
@@ -306,8 +306,8 @@ struct Context {
 
     WinGfxSetHwnd(hwnd_);
 
-    Adjust(static_cast<int>(CORE_DEFAULT_WIDTH * GetDpiScale()),
-           static_cast<int>(CORE_DEFAULT_HEIGHT * GetDpiScale()));
+    Adjust(static_cast<int>(DEFAULT_WIDTH * GetDpiScale()),
+           static_cast<int>(DEFAULT_HEIGHT * GetDpiScale()));
 
     MainThreadEntry mte;
     mte.argc_ = argc;
@@ -318,8 +318,8 @@ struct Context {
     init_ = true;
 
     event_queue_.PostSizeEvent(
-        static_cast<int>(CORE_DEFAULT_WIDTH * GetDpiScale()),
-        static_cast<int>(CORE_DEFAULT_HEIGHT * GetDpiScale()));
+        static_cast<int>(DEFAULT_WIDTH * GetDpiScale()),
+        static_cast<int>(DEFAULT_HEIGHT * GetDpiScale()));
 
     ::ShowWindow(hwnd_, SW_MAXIMIZE);
 
@@ -544,13 +544,7 @@ int32_t MainThreadEntry::ThreadFunc(void* user_data) {
 }
 
 
-#endif  // CORE_PLATFORM_WINDOWS
-
-
-#if CORE_PLATFORM_LINUX
-
-
-#endif  // CORE_PLATFORM_LINUX
+#endif  // PLATFORM_WINDOWS
 
 bool ProcessEvents(uint32_t* width, uint32_t* height, InputHandler* handler) {
   const Event* ev;

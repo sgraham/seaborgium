@@ -9,20 +9,20 @@
 
 #include "core.h"
 
-#if CORE_PLATFORM_WINDOWS && CORE_CONFIG_DEBUG
+#if PLATFORM_WINDOWS && CONFIG_DEBUG
 #include <crtdbg.h>  // NOLINT
 #endif
 
 class LeakCheckTest : public testing::Test {
  public:
   LeakCheckTest() {
-#if CORE_PLATFORM_WINDOWS && CORE_CONFIG_DEBUG
+#if PLATFORM_WINDOWS && CONFIG_DEBUG
     _CrtMemCheckpoint(&initial_memory_state_);
 #endif
   }
 
   virtual ~LeakCheckTest() {
-#if CORE_PLATFORM_WINDOWS && CORE_CONFIG_DEBUG
+#if PLATFORM_WINDOWS && CONFIG_DEBUG
     if (!HasFailure()) {
       _CrtMemState final_memory_state;
       _CrtMemState difference;
@@ -38,7 +38,7 @@ class LeakCheckTest : public testing::Test {
   }
 
  private:
-#if CORE_PLATFORM_WINDOWS && CORE_CONFIG_DEBUG
+#if PLATFORM_WINDOWS && CONFIG_DEBUG
   _CrtMemState initial_memory_state_;
 #endif
   void FailTest() {

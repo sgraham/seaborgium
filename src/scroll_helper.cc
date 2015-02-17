@@ -152,7 +152,7 @@ void ScrollHelper::CommonMouseWheel(float delta,
                                     uint8_t modifiers,
                                     bool* invalidate,
                                     bool* handled) {
-  CORE_UNUSED(modifiers);
+  UNUSED(modifiers);
   ScrollPixels(static_cast<int>(-delta * 100));
   *invalidate = true;
   *handled = true;

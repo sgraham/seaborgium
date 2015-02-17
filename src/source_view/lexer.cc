@@ -60,7 +60,7 @@ LexerState* Lexer::AddState(const std::string& name) {
 void Lexer::GetTokensUnprocessed(const std::string& text,
                                  std::vector<Token>* output_tokens) {
   std::vector<LexerState*> state_stack;
-  CORE_CHECK(states_.find("root") != states_.end(), "expected root");
+  CHECK(states_.find("root") != states_.end(), "expected root");
   state_stack.push_back(states_["root"]);
 
   re2::StringPiece input(text);
@@ -95,13 +95,13 @@ void Lexer::GetTokensUnprocessed(const std::string& text,
         break;
       // No match, if at EOL, reset to root state.
       if (input[0] == '\n') {
-        CORE_CHECK(false, "todo; untested");
+        CHECK(false, "todo; untested");
         state_stack.clear();
         state_stack.push_back(states_["root"]);
         output_tokens->push_back(Token(GetOffset(input, text), Text, "\n"));
         input = re2::StringPiece(input.data() + 1, input.size() - 1);
       } else {
-        CORE_CHECK(false, "todo; untested, should add Error token");
+        CHECK(false, "todo; untested, should add Error token");
       }
     }
   }

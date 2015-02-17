@@ -15,7 +15,7 @@ Widget::~Widget() {
 }
 
 DockingSplitContainer* Widget::AsDockingSplitContainer() {
-  CORE_CHECK(IsDockingSplitContainer(), "Expected DockingSplitContainer");
+  CHECK(IsDockingSplitContainer(), "Expected DockingSplitContainer");
   return reinterpret_cast<DockingSplitContainer*>(this);
 }
 
@@ -28,7 +28,7 @@ const Rect& Widget::GetScreenRect() const {
 }
 
 Rect Widget::ClientToScreen(const Rect& rect) {
-  CORE_CHECK(parent(), "can't convert unparented to screen");
+  CHECK(parent(), "can't convert unparented to screen");
   return Rect(rect.x + parent()->GetScreenRect().x,
               rect.y + parent()->GetScreenRect().y,
               rect.w,

@@ -49,7 +49,7 @@ class TextEdit : public Widget {
   bool left_mouse_is_down_;
   float line_height_;
 
-  CORE_DISALLOW_COPY_AND_ASSIGN(TextEdit);
+  DISALLOW_COPY_AND_ASSIGN(TextEdit);
 };
 
 #endif  // TEXT_EDIT_H_

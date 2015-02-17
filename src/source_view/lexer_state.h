@@ -38,7 +38,7 @@ class TokenDefinitions {
   };
   std::vector<TokenData> token_data_;
 
-  CORE_DISALLOW_COPY_AND_ASSIGN(TokenDefinitions);
+  DISALLOW_COPY_AND_ASSIGN(TokenDefinitions);
 };
 
 class LexerState {
@@ -61,7 +61,7 @@ class LexerState {
 
   std::string name_;
 
-  CORE_DISALLOW_COPY_AND_ASSIGN(LexerState);
+  DISALLOW_COPY_AND_ASSIGN(LexerState);
 };
 
 #endif  // UI_SOURCE_VIEW_LEXER_STATE_H_

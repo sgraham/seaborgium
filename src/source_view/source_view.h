@@ -47,7 +47,7 @@ class SourceView : public Widget, public ScrollHelperDataProvider {
   ScrollHelper scroll_;
   std::vector<Line> lines_;
 
-  CORE_DISALLOW_COPY_AND_ASSIGN(SourceView);
+  DISALLOW_COPY_AND_ASSIGN(SourceView);
 };
 
 #endif  // UI_SOURCE_VIEW_SOURCE_VIEW_H_

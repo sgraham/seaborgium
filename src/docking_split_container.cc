@@ -84,7 +84,7 @@ void DockingSplitContainer::Replace(Widget* target, Widget* with) {
     right_.reset(with);
     right_->set_parent(this);
   } else {
-    CORE_NOTREACHED();
+    NOTREACHED();
   }
   SetScreenRect(GetScreenRect());
 }
@@ -95,7 +95,7 @@ Widget* DockingSplitContainer::GetSiblingOf(Widget* child) {
   else if (right_.get() == child)
     return left_.get();
   else
-    CORE_NOTREACHED();
+    NOTREACHED();
   return NULL;
 }
 
@@ -118,7 +118,7 @@ void DockingSplitContainer::SetScreenRect(const Rect& rect) {
         Rect(rect.x, rect.y + height_for_left + gSplitterWidth,
              rect.w, height_for_right));
   } else {
-    CORE_DCHECK(direction_ == kSplitNoneRoot, "unexpected case");
+    DCHECK(direction_ == kSplitNoneRoot, "unexpected case");
     if (left_.get())
       left_->SetScreenRect(GetScreenRect());
   }
@@ -149,7 +149,7 @@ void DockingSplitContainer::Render() {
         right_->GetScreenRect().RelativeTo(GetScreenRect()), true);
     right_->Render();
   } else {
-    CORE_DCHECK(direction_ == kSplitNoneRoot, "split direction error");
+    DCHECK(direction_ == kSplitNoneRoot, "split direction error");
   }
 
   if (direction_ == kSplitVertical || direction_ == kSplitHorizontal) {
@@ -188,7 +188,7 @@ void DockingSplitContainer::SetFraction(float fraction) {
 }
 
 void DockingSplitContainer::ReplaceLeft(Widget* left) {
-  CORE_CHECK(direction_ == kSplitNoneRoot && !right_.get(),
+  CHECK(direction_ == kSplitNoneRoot && !right_.get(),
              "Can only use on root");
   left_.reset(left);
   left->SetScreenRect(Widget::GetScreenRect());
@@ -203,6 +203,6 @@ Widget* DockingSplitContainer::FindTopMostUnderPoint(const Point& point) {
   Widget* right_contains = right_->FindTopMostUnderPoint(point);
   if (right_contains)
     return right_contains;
-  CORE_NOTREACHED();
+  NOTREACHED();
   return NULL;
 }

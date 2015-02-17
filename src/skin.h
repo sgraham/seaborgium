@@ -141,7 +141,7 @@ class Skin {
   Texture tree_expanded_texture_;
 #endif
 
-  CORE_DISALLOW_COPY_AND_ASSIGN(Skin);
+  DISALLOW_COPY_AND_ASSIGN(Skin);
 };
 
 #endif  // SKIN_H_

@@ -81,9 +81,9 @@ void TreeGridColumn::SetPercentageToMatchWidth(float width, float whole_width) {
     return;
   std::vector<TreeGridColumn*>::iterator self = std::find(
       tree_grid_->Columns()->begin(), tree_grid_->Columns()->end(), this);
-  CORE_CHECK(self != tree_grid_->Columns()->end(), "couldn't find column");
+  CHECK(self != tree_grid_->Columns()->end(), "couldn't find column");
   size_t self_index = self - tree_grid_->Columns()->begin();
-  CORE_CHECK(self_index < tree_grid_->Columns()->size() - 1,
+  CHECK(self_index < tree_grid_->Columns()->size() - 1,
              "shouldn't be used on the last column");
   std::vector<float> column_widths = tree_grid_->GetColumnWidths(whole_width);
 
@@ -110,9 +110,9 @@ void TreeGridColumn::SetPercentageToMatchPosition(float splitter_position,
                                                   float whole_width) {
   std::vector<TreeGridColumn*>::iterator self = std::find(
       tree_grid_->Columns()->begin(), tree_grid_->Columns()->end(), this);
-  CORE_CHECK(self != tree_grid_->Columns()->end(), "couldn't find column");
+  CHECK(self != tree_grid_->Columns()->end(), "couldn't find column");
   size_t self_index = self - tree_grid_->Columns()->begin();
-  CORE_CHECK(self_index < tree_grid_->Columns()->size() - 1,
+  CHECK(self_index < tree_grid_->Columns()->size() - 1,
              "shouldn't be used on the last column");
   std::vector<float> column_widths = tree_grid_->GetColumnWidths(whole_width);
 
@@ -175,7 +175,7 @@ TreeGrid::LayoutData TreeGrid::CalculateLayout(const Rect& client_rect) {
                   client_rect.h - kHeaderHeight);
 
   ret.column_widths = GetColumnWidths(ret.body.w);
-  CORE_DCHECK(columns_.size() == ret.column_widths.size(),
+  DCHECK(columns_.size() == ret.column_widths.size(),
               "num columns broken");
 
   float last_x = 0;
@@ -339,7 +339,7 @@ class ColumnDragHelper : public Draggable {
   float initial_position_;
   Rect body_;
 
-  CORE_DISALLOW_COPY_AND_ASSIGN(ColumnDragHelper);
+  DISALLOW_COPY_AND_ASSIGN(ColumnDragHelper);
 };
 
 bool TreeGrid::CouldStartDrag(DragSetup* drag_setup) {
@@ -397,7 +397,7 @@ bool TreeGrid::NotifyMouseButton(int x,
                                  uint8_t modifiers) {
   // See CouldStartDrag (this could be cached).
   const LayoutData& layout_data = CalculateLayout(GetClientRect());
-  CORE_UNUSED(modifiers);
+  UNUSED(modifiers);
   Point client_point = Point(static_cast<float>(x), static_cast<float>(y))
                            .RelativeTo(GetScreenRect());
   if (down && button == MouseButton::Left) {
@@ -442,7 +442,7 @@ std::vector<float> TreeGrid::GetColumnWidths(float layout_in_width) const {
 TreeGridNode* TreeGrid::GetSibling(TreeGridNode* node, int direction) {
   // This is kind of ugly. Maybe a dummy TreeGridNode at the root would be
   // nicer.
-  CORE_DCHECK(direction == -1 || direction == 1, "bad direction");
+  DCHECK(direction == -1 || direction == 1, "bad direction");
   std::vector<TreeGridNode*>* parent_nodes;
   if (!node->Parent())
     parent_nodes = Nodes();
@@ -500,7 +500,7 @@ TreeGridNode* TreeGrid::GetNextVisibleInDirection(TreeGridNode* node,
     }
     return GetLastVisibleChild(prev_sibling);
   }
-  CORE_CHECK(direction == kFocusDown || direction == kFocusUp,
+  CHECK(direction == kFocusDown || direction == kFocusUp,
              "should only be used for up and down");
   return NULL;
 }

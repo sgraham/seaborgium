@@ -69,7 +69,7 @@ class Lexer {
   std::string name_;
   std::map<std::string, LexerState*> states_;
 
-  CORE_DISALLOW_COPY_AND_ASSIGN(Lexer);
+  DISALLOW_COPY_AND_ASSIGN(Lexer);
 };
 
 class Token {

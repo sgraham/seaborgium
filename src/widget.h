@@ -29,7 +29,7 @@ class Widget : public InputHandler {
   virtual void Render() {}
   virtual void Invalidate();
   virtual bool CouldStartDrag(DragSetup* drag_setup) {
-    CORE_UNUSED(drag_setup);
+    UNUSED(drag_setup);
     return false;
   }
 
@@ -88,7 +88,7 @@ class Widget : public InputHandler {
   Widget* parent_;
   Rect rect_;
 
-  CORE_DISALLOW_COPY_AND_ASSIGN(Widget);
+  DISALLOW_COPY_AND_ASSIGN(Widget);
 };
 
 #endif  // WIDGET_H_
