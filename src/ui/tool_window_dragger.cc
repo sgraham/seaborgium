@@ -222,7 +222,7 @@ void ToolWindowDragger::Render() {
 #endif
 
   for (const auto& dti : targets_)
-    GfxDrawIcon(dti.icon, dti.rect, .5f);
+    GfxDrawIcon(dti.icon, dti.rect, .7f);
 
   Rect draw_rect;
   if (on_drop_target_) {
