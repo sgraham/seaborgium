@@ -23,7 +23,7 @@ class DockingSplitContainer : public Widget {
   static void SetSplitterWidth(float width);
   static float GetSplitterWidth();
 
-  virtual bool IsDockingSplitContainer() const override { return true; }
+  bool IsDockingSplitContainer() const override { return true; }
 
   // Finds left or right in its children, and replaces that child with a new
   // container split in |direction| containing |left| and |right| in that
@@ -57,7 +57,7 @@ class DockingSplitContainer : public Widget {
   // Hokey method only used for DockingWorkspace that uses left as root.
   void ReplaceLeft(Widget* left);
 
-  virtual Widget* FindTopMostUnderPoint(const Point& point) override;
+  Widget* FindTopMostUnderPoint(const Point& point) override;
 
  private:
   Rect GetRectForSplitter();

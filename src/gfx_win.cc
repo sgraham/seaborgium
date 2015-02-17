@@ -425,7 +425,8 @@ TextMeasurements GfxMeasureText(Font font, StringPiece str) {
   float line_spacing, baseline;
   CHECK(SUCCEEDED(layout->GetLineSpacing(&method, &line_spacing, &baseline)));
 
-  auto tm = TextMeasurements(metrics.width, metrics.height, metrics.height /* TODO */);
+  auto tm = TextMeasurements(
+      metrics.width, metrics.height, metrics.height /* TODO */);
   tm.data_ = reinterpret_cast<void*>(layout);
   return tm;
 }

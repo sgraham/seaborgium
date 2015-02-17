@@ -64,7 +64,7 @@ void SourceView::SetFilePath(const std::string& path) {
   FILE* f = fopen(path.c_str(), "rb");
   if (!f) return;
   fseek(f, 0, SEEK_END);
-  long len = ftell(f);
+  int len = ftell(f);
   std::unique_ptr<char[]> file_contents(new char[len]);
   fseek(f, 0, SEEK_SET);
   fread(file_contents.get(), 1, len, f);

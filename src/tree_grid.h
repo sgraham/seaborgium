@@ -23,10 +23,8 @@ class TreeGridNodeValue {
 class TreeGridNodeValueString : public TreeGridNodeValue {
  public:
   explicit TreeGridNodeValueString(const std::string& value);
-  virtual void Render(const Rect& rect) const override;
-  virtual std::string AsString() const override {
-    return value_;
-  }
+  void Render(const Rect& rect) const override;
+  std::string AsString() const override { return value_; }
 
  private:
   std::string value_;
@@ -116,18 +114,18 @@ class TreeGrid : public Widget {
   std::vector<TreeGridNode*>* Nodes();
   std::vector<TreeGridColumn*>* Columns();
 
-  virtual void Render() override;
+  void Render() override;
 
-  virtual bool CouldStartDrag(DragSetup* drag_setup) override;
+  bool CouldStartDrag(DragSetup* drag_setup) override;
 
-  virtual bool WantMouseEvents() override { return true; }
-  virtual bool WantKeyEvents() override { return true; }
-  virtual bool NotifyKey(Key::Enum key, bool down, uint8_t modifiers) override;
-  virtual bool NotifyMouseButton(int x,
-                                 int y,
-                                 MouseButton::Enum button,
-                                 bool down,
-                                 uint8_t modifiers) override;
+  bool WantMouseEvents() override { return true; }
+  bool WantKeyEvents() override { return true; }
+  bool NotifyKey(Key::Enum key, bool down, uint8_t modifiers) override;
+  bool NotifyMouseButton(int x,
+                         int y,
+                         MouseButton::Enum button,
+                         bool down,
+                         uint8_t modifiers) override;
 
   std::vector<float> GetColumnWidths(float layout_in_width) const;
 

@@ -50,34 +50,30 @@ class Widget : public InputHandler {
   virtual Widget* FindTopMostUnderPoint(const Point& point);
 
   // Default implementation of InputHandler.
-  virtual bool NotifyMouseMoved(int /*x*/,
-                                int /*y*/,
-                                uint8_t /*modifiers*/) override {
+  bool NotifyMouseMoved(int /*x*/, int /*y*/, uint8_t /*modifiers*/) override {
     return false;
   }
-  virtual bool NotifyMouseWheel(int /*x*/,
-                                int /*y*/,
-                                float /*delta*/,
-                                uint8_t /*modifiers*/) override {
+  bool NotifyMouseWheel(int /*x*/,
+                        int /*y*/,
+                        float /*delta*/,
+                        uint8_t /*modifiers*/) override {
     return false;
   }
-  virtual bool NotifyMouseButton(int /*x*/,
-                                 int /*y*/,
-                                 MouseButton::Enum /*button*/,
-                                 bool /*down*/,
-                                 uint8_t /*modifiers*/) override {
-    return false;
-  }
-  virtual bool NotifyKey(Key::Enum /*key*/,
+  bool NotifyMouseButton(int /*x*/,
+                         int /*y*/,
+                         MouseButton::Enum /*button*/,
                          bool /*down*/,
                          uint8_t /*modifiers*/) override {
     return false;
   }
-  virtual bool NotifyChar(int /*character*/) override {
+  bool NotifyKey(Key::Enum /*key*/,
+                 bool /*down*/,
+                 uint8_t /*modifiers*/) override {
     return false;
   }
-  virtual bool WantMouseEvents() { return false; }
-  virtual bool WantKeyEvents() { return false; }
+  bool NotifyChar(int /*character*/) override { return false; }
+  bool WantMouseEvents() override { return false; }
+  bool WantKeyEvents() override { return false; }
 
   // TODO(scottmg): This kind of sucks, but so does inventing some sort of
   // RTTI just for this.

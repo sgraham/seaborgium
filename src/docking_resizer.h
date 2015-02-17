@@ -14,11 +14,11 @@ class DockingSplitContainer;
 class DockingResizer : public Draggable {
  public:
   explicit DockingResizer(DockingSplitContainer* resizing);
-  virtual ~DockingResizer();
+  ~DockingResizer() override;
 
-  virtual void Drag(const Point& screen_point) override;
-  virtual void CancelDrag() override;
-  virtual void Render() override;
+  void Drag(const Point& screen_point) override;
+  void CancelDrag() override;
+  void Render() override;
 
   const Point& GetInitialLocationForTest() const { return initial_location_; }
 

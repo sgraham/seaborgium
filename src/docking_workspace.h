@@ -38,20 +38,17 @@ class DockingWorkspace : public InputHandler {
   Widget* FindTopMostUnderPoint(const Point& point);
 
   // Implementation of InputHandler:
-  virtual bool WantMouseEvents() override { return true; }
-  virtual bool WantKeyEvents() override { return true; }
-  virtual bool NotifyMouseMoved(int x, int y, uint8_t modifiers) override;
-  virtual bool NotifyMouseWheel(int x, int y, float delta, uint8_t modifiers)
-      override;
-  virtual bool NotifyMouseButton(int x,
-                                 int y,
-                                 MouseButton::Enum button,
-                                 bool down,
-                                 uint8_t modifiers) override;
-  virtual bool NotifyKey(Key::Enum key,
+  bool WantMouseEvents() override { return true; }
+  bool WantKeyEvents() override { return true; }
+  bool NotifyMouseMoved(int x, int y, uint8_t modifiers) override;
+  bool NotifyMouseWheel(int x, int y, float delta, uint8_t modifiers) override;
+  bool NotifyMouseButton(int x,
+                         int y,
+                         MouseButton::Enum button,
                          bool down,
                          uint8_t modifiers) override;
-  virtual bool NotifyChar(int character) override;
+  bool NotifyKey(Key::Enum key, bool down, uint8_t modifiers) override;
+  bool NotifyChar(int character) override;
 
  private:
   void GetDockTargets(Widget* root, std::vector<Widget*>* into);

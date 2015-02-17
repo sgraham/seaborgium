@@ -130,15 +130,11 @@ void TreeGridColumn::SetPercentageToMatchPosition(float splitter_position,
 
 class ReadOnlyTreeGridEditObserver : public TreeGridEditObserver {
  public:
-  virtual bool NodeWillRemove(TreeGridNode* /*node*/) override { return false; }
-  virtual bool NodeWillStartEdit(TreeGridNode* /*node*/) override {
-    return true;
-  }
-  virtual bool NodeWillCompleteEdit(TreeGridNode* /*node*/) override {
-    return false;
-  }
-  virtual bool NodeWillInsert(TreeGridNode* /*node*/) override { return false; }
-  virtual void NodeInserted(TreeGridNode* /*node*/) override {}
+  bool NodeWillRemove(TreeGridNode* /*node*/) override { return false; }
+  bool NodeWillStartEdit(TreeGridNode* /*node*/) override { return true; }
+  bool NodeWillCompleteEdit(TreeGridNode* /*node*/) override { return false; }
+  bool NodeWillInsert(TreeGridNode* /*node*/) override { return false; }
+  void NodeInserted(TreeGridNode* /*node*/) override {}
 };
 
 
@@ -313,7 +309,7 @@ class ColumnDragHelper : public Draggable {
         initial_position_(initial_position),
         body_(body) {}
 
-  virtual void Drag(const Point& screen_position) override {
+  void Drag(const Point& screen_position) override {
     Point client_point =
         screen_position.RelativeTo(tree_grid_->GetScreenRect());
     Point body_point = client_point.RelativeTo(body_);
@@ -327,10 +323,10 @@ class ColumnDragHelper : public Draggable {
         body_point.x, body_.w);
   }
 
-  virtual void CancelDrag() override {
+  void CancelDrag() override {
   }
 
-  virtual void Render() override {
+  void Render() override {
   }
 
  private:
@@ -473,9 +469,9 @@ TreeGridNode* TreeGrid::GetNextVisibleInDirection(TreeGridNode* node,
     // If we have children, and we're expanded, go to the first child.
     // Otherwise, to our sibling. If we have no next sibling, check to see if
     // our parent does, recursively.
-    if (node->Expanded() && !node->Nodes()->empty())
+    if (node->Expanded() && !node->Nodes()->empty()) {
       return node->Nodes()->at(0);
-    else {
+    } else {
       TreeGridNode* next_sibling = GetSibling(node, 1);
       if (next_sibling == node) {
         TreeGridNode* cur = node->Parent();

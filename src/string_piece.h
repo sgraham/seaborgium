@@ -13,9 +13,12 @@ class StringPiece {
  public:
   StringPiece() : str_(nullptr), len_(0) {}
 
-  // Intentionally not explicit.
-  StringPiece(const std::string& str) : str_(str.data()), len_(str.size()) {}
-  StringPiece(const char* str) : str_(str), len_(strlen(str)) {}
+  StringPiece(const std::string& str)  // NOLINT(runtime/explicit)
+      : str_(str.data()),
+        len_(str.size()) {}
+  StringPiece(const char* str)  // NOLINT(runtime/explicit)
+      : str_(str),
+        len_(strlen(str)) {}
   StringPiece(const char* str, size_t len) : str_(str), len_(len) {}
 
   bool operator==(const StringPiece& other) const {

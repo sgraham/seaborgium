@@ -133,28 +133,28 @@ float GetWidth(STB_TEXTEDIT_STRING* str, int n, int i) {
 #endif
 
 #define STB_TEXTEDIT_IMPLEMENTATION
-#include "../third_party/stb/stb_textedit.h"  // NOLINT(build/include)
+#include "../third_party/stb/stb_textedit.h"
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 
 #define LOCAL_state() \
-  STB_TexteditState* state = &static_cast<STB_TEXTEDIT_STRING*>(impl_)->state
+  STB_TexteditState* state = &(static_cast<STB_TEXTEDIT_STRING*>(impl_)->state)
 #define LOCAL_control() \
   STB_TEXTEDIT_STRING* control = static_cast<STB_TEXTEDIT_STRING*>(impl_);
 
 // Reset the cursor to fully visible, but only if it moves during the scope.
 struct ScopedCursorAlphaReset {
-  ScopedCursorAlphaReset(TextEdit* parent) : parent_(parent) {
+  explicit ScopedCursorAlphaReset(TextEdit* parent) : parent_(parent) {
     STB_TexteditState* state =
-        &static_cast<STB_TEXTEDIT_STRING*>(parent_->impl_)->state;
+        &(static_cast<STB_TEXTEDIT_STRING*>(parent_->impl_)->state);
     cursor_orig_ = state->cursor;
   }
 
   ~ScopedCursorAlphaReset() {
     STB_TexteditState* state =
-        &static_cast<STB_TEXTEDIT_STRING*>(parent_->impl_)->state;
+        &(static_cast<STB_TEXTEDIT_STRING*>(parent_->impl_)->state);
     if (cursor_orig_ != state->cursor) {
       parent_->cursor_color_.a = 1.f;
       parent_->cursor_color_target_.a = 0.f;
@@ -310,5 +310,4 @@ void TextEdit::Render() {
         cs.text_selection(),
         3.f);
   }
-
 }

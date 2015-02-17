@@ -402,7 +402,7 @@ struct Context {
           int32_t mx, my;
           MouseFromLparam(lparam, &mx, &my);
           uint8_t modifiers = TranslateKeyModifiers();
-          short delta = HIWORD(wparam);
+          int16_t delta = HIWORD(wparam);
           event_queue_.PostMouseWheelEvent(
               mx,
               my,

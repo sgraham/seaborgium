@@ -13,7 +13,7 @@ class SolidColor : public Widget {
   explicit SolidColor(const Color& color) : color_(color) {}
   virtual ~SolidColor() {}
 
-  virtual void Render() override { DrawSolidRect(GetClientRect(), color_); }
+  void Render() override { DrawSolidRect(GetClientRect(), color_); }
 
  private:
   Color color_;

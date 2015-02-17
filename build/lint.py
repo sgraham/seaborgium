@@ -20,5 +20,9 @@ args = [
     'third_party',
     'cpplint',
     'cpplint.py'),
-  '--root=src' ] + matches
+  '--root=src',
+  # We don't have any include tree.
+  # We don't have the _EQ variants it wants.
+  '--filter=-build/include,-readability/check',
+  ] + matches
 os.system(' '.join(args))

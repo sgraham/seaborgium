@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef UI_SOURCE_VIEW_SOURCE_VIEW_H_
-#define UI_SOURCE_VIEW_SOURCE_VIEW_H_
+#ifndef SOURCE_VIEW_SOURCE_VIEW_H_
+#define SOURCE_VIEW_SOURCE_VIEW_H_
 
 #include <string>
 
@@ -50,4 +50,4 @@ class SourceView : public Widget, public ScrollHelperDataProvider {
   DISALLOW_COPY_AND_ASSIGN(SourceView);
 };
 
-#endif  // UI_SOURCE_VIEW_SOURCE_VIEW_H_
+#endif  // SOURCE_VIEW_SOURCE_VIEW_H_

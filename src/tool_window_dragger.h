@@ -35,9 +35,9 @@ class ToolWindowDragger : public Draggable {
       DragSetup* drag_setup);
   virtual ~ToolWindowDragger();
 
-  virtual void Drag(const Point& screen_point) override;
-  virtual void CancelDrag() override;
-  virtual void Render() override;
+  void Drag(const Point& screen_point) override;
+  void CancelDrag() override;
+  void Render() override;
 
  private:
   void RefreshTargets();

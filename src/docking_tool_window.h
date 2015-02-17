@@ -16,10 +16,10 @@ class DockingToolWindow : public Widget {
   DockingToolWindow(Widget* dockable, const std::string& title);
   virtual ~DockingToolWindow();
 
-  virtual void Render() override;
-  virtual void SetScreenRect(const Rect& rect) override;
-  virtual bool CouldStartDrag(DragSetup* drag_setup) override;
-  virtual Widget* FindTopMostUnderPoint(const Point& point) override;
+  void Render() override;
+  void SetScreenRect(const Rect& rect) override;
+  bool CouldStartDrag(DragSetup* drag_setup) override;
+  Widget* FindTopMostUnderPoint(const Point& point) override;
 
  private:
   Rect RectForTitleBar();

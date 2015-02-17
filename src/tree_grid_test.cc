@@ -337,15 +337,11 @@ TEST(TreeGridTest, FocusMovementRight) {
 namespace {
 
 class AllowAllEditObserver : public TreeGridEditObserver {
-  virtual bool NodeWillRemove(TreeGridNode* /*node*/) override { return true; }
-  virtual bool NodeWillStartEdit(TreeGridNode* /*node*/) override {
-    return true;
-  }
-  virtual bool NodeWillCompleteEdit(TreeGridNode* /*node*/) override {
-    return true;
-  }
-  virtual bool NodeWillInsert(TreeGridNode* /*node*/) override { return true; }
-  virtual void NodeInserted(TreeGridNode* /*node*/) override {}
+  bool NodeWillRemove(TreeGridNode* /*node*/) override { return true; }
+  bool NodeWillStartEdit(TreeGridNode* /*node*/) override { return true; }
+  bool NodeWillCompleteEdit(TreeGridNode* /*node*/) override { return true; }
+  bool NodeWillInsert(TreeGridNode* /*node*/) override { return true; }
+  void NodeInserted(TreeGridNode* /*node*/) override {}
 };
 
 }  // namespace
@@ -357,4 +353,4 @@ TEST(TreeGridTest, RemoveNode) {
 }
 */
 
-// TODO: Leakiness test.
+// TODO(scottmg): Leakiness test.
