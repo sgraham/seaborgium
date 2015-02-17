@@ -51,9 +51,8 @@ void LayoutFunc(StbTexteditRow* row, STB_TEXTEDIT_STRING* str, int start_i) {
 }
 
 int DeleteChars(STB_TEXTEDIT_STRING* str, int pos, int num) {
-  memmove(&str->string[pos],
-          &str->string[pos + num],
-          str->string_len - pos - num);
+  memmove(
+      &str->string[pos], &str->string[pos + num], str->string_len - pos - num);
   str->string_len -= num;
   return 1;
 }
@@ -92,14 +91,13 @@ float GetWidth(STB_TEXTEDIT_STRING* str, int n, int i) {
 #endif
 }
 
-
 // Define all the #defines needed for stb_textedit's implementation.
 
 #define KEYDOWN_BIT 0x40000000
 #define STB_TEXTEDIT_STRINGLEN(tc) ((tc)->string_len)
 #define STB_TEXTEDIT_LAYOUTROW LayoutFunc
 #define STB_TEXTEDIT_GETWIDTH(tc, n, i) GetWidth(tc, n, i)
-#define STB_TEXTEDIT_KEYTOTEXT(key) (((key) & KEYDOWN_BIT) ? 0 : (key))
+#define STB_TEXTEDIT_KEYTOTEXT(key) (((key)&KEYDOWN_BIT) ? 0 : (key))
 #define STB_TEXTEDIT_GETCHAR(tc, i) ((tc)->string[i])
 #define STB_TEXTEDIT_NEWLINE '\n'
 #define STB_TEXTEDIT_IS_SPACE(ch) isspace(ch)
@@ -129,7 +127,7 @@ float GetWidth(STB_TEXTEDIT_STRING* str, int n, int i) {
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable: 4100)  // unreferenced formal parameter
+#pragma warning(disable : 4100)  // unreferenced formal parameter
 #endif
 
 #define STB_TEXTEDIT_IMPLEMENTATION
@@ -295,8 +293,7 @@ void TextEdit::Render() {
     }
     float cursor_x = CursorXFromIndex(tm, control->string_len, state->cursor);
 
-    DrawSolidRect(Rect(cursor_x, rect.y, 1.5f, line_height_),
-                  cursor_color_);
+    DrawSolidRect(Rect(cursor_x, rect.y, 1.5f, line_height_), cursor_color_);
   }
 
   // Selection.

@@ -40,7 +40,9 @@ static IDWriteTextFormat* g_text_format_ui;
 static IDWriteTextFormat* g_text_format_title;
 static ID2D1LinearGradientBrush* g_title_bar_active_gradient_brush;
 static ID2D1LinearGradientBrush* g_title_bar_inactive_gradient_brush;
-int operator+(Icon val) { return static_cast<int>(val); }
+int operator+(Icon val) {
+  return static_cast<int>(val);
+}
 static ID2D1Bitmap* g_icons[static_cast<int>(Icon::Count)];
 struct ColorHash {
   size_t operator()(const Color& c) const {
@@ -59,7 +61,7 @@ ID2D1SolidColorBrush* SolidBrushForColor(const Color& color) {
     return it->second;
   ID2D1SolidColorBrush* brush;
   CHECK(SUCCEEDED(g_render_target->CreateSolidColorBrush(
-            D2D1::ColorF(color.r, color.g, color.b, color.a), &brush)));
+      D2D1::ColorF(color.r, color.g, color.b, color.a), &brush)));
   g_brush_for_color[color] = brush;
   return brush;
 }
@@ -104,7 +106,7 @@ ID2D1Bitmap* LoadBitmapFromResource(int res) {
   IWICStream* stream;
   CHECK(SUCCEEDED(g_wic_factory->CreateStream(&stream)));
   CHECK(SUCCEEDED(stream->InitializeFromMemory(
-                 reinterpret_cast<BYTE*>(image_file), image_file_size)));
+      reinterpret_cast<BYTE*>(image_file), image_file_size)));
 
   IWICBitmapDecoder* decoder;
   CHECK(SUCCEEDED(g_wic_factory->CreateDecoderFromStream(
@@ -116,15 +118,15 @@ ID2D1Bitmap* LoadBitmapFromResource(int res) {
   IWICFormatConverter* converter;
   CHECK(SUCCEEDED(g_wic_factory->CreateFormatConverter(&converter)));
   CHECK(SUCCEEDED(converter->Initialize(source,
-                                             GUID_WICPixelFormat32bppPBGRA,
-                                             WICBitmapDitherTypeNone,
-                                             nullptr,
-                                             0.f,
-                                             WICBitmapPaletteTypeMedianCut)));
+                                        GUID_WICPixelFormat32bppPBGRA,
+                                        WICBitmapDitherTypeNone,
+                                        nullptr,
+                                        0.f,
+                                        WICBitmapPaletteTypeMedianCut)));
 
   ID2D1Bitmap* bitmap;
-  CHECK(SUCCEEDED(g_render_target->CreateBitmapFromWicBitmap(
-                 converter, nullptr, &bitmap)));
+  CHECK(SUCCEEDED(
+      g_render_target->CreateBitmapFromWicBitmap(converter, nullptr, &bitmap)));
 
   SafeRelease(&decoder);
   SafeRelease(&source);
@@ -144,40 +146,40 @@ void WinGfxCreateDeviceIndependentResources() {
   CHECK(dpi_x == dpi_y, "non-uniform dpi");
   g_dpi_scale = dpi_x / 96.f;
 
-  CHECK(SUCCEEDED(DWriteCreateFactory(
-                 DWRITE_FACTORY_TYPE_SHARED,
-                 __uuidof(IDWriteFactory),
-                 reinterpret_cast<IUnknown**>(&g_dwrite_factory))));
+  CHECK(SUCCEEDED(
+      DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED,
+                          __uuidof(IDWriteFactory),
+                          reinterpret_cast<IUnknown**>(&g_dwrite_factory))));
 
-  CHECK(SUCCEEDED(g_dwrite_factory->CreateTextFormat(
-                 L"Consolas",  // Font family name.
-                 nullptr,
-                 DWRITE_FONT_WEIGHT_REGULAR,
-                 DWRITE_FONT_STYLE_NORMAL,
-                 DWRITE_FONT_STRETCH_NORMAL,
-                 12.0f,
-                 L"en-us",
-                 &g_text_format_mono)));
+  CHECK(SUCCEEDED(
+      g_dwrite_factory->CreateTextFormat(L"Consolas",  // Font family name.
+                                         nullptr,
+                                         DWRITE_FONT_WEIGHT_REGULAR,
+                                         DWRITE_FONT_STYLE_NORMAL,
+                                         DWRITE_FONT_STRETCH_NORMAL,
+                                         12.0f,
+                                         L"en-us",
+                                         &g_text_format_mono)));
 
-  CHECK(SUCCEEDED(g_dwrite_factory->CreateTextFormat(
-                 L"Segoe UI",  // Font family name.
-                 nullptr,
-                 DWRITE_FONT_WEIGHT_REGULAR,
-                 DWRITE_FONT_STYLE_NORMAL,
-                 DWRITE_FONT_STRETCH_NORMAL,
-                 13.0f,
-                 L"en-us",
-                 &g_text_format_ui)));
+  CHECK(SUCCEEDED(
+      g_dwrite_factory->CreateTextFormat(L"Segoe UI",  // Font family name.
+                                         nullptr,
+                                         DWRITE_FONT_WEIGHT_REGULAR,
+                                         DWRITE_FONT_STYLE_NORMAL,
+                                         DWRITE_FONT_STRETCH_NORMAL,
+                                         13.0f,
+                                         L"en-us",
+                                         &g_text_format_ui)));
 
-  CHECK(SUCCEEDED(g_dwrite_factory->CreateTextFormat(
-                 L"Segoe UI",  // Font family name.
-                 nullptr,
-                 DWRITE_FONT_WEIGHT_BOLD,
-                 DWRITE_FONT_STYLE_NORMAL,
-                 DWRITE_FONT_STRETCH_NORMAL,
-                 15.0f,
-                 L"en-us",
-                 &g_text_format_title)));
+  CHECK(SUCCEEDED(
+      g_dwrite_factory->CreateTextFormat(L"Segoe UI",  // Font family name.
+                                         nullptr,
+                                         DWRITE_FONT_WEIGHT_BOLD,
+                                         DWRITE_FONT_STYLE_NORMAL,
+                                         DWRITE_FONT_STRETCH_NORMAL,
+                                         15.0f,
+                                         L"en-us",
+                                         &g_text_format_title)));
   g_text_format_title->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
   g_text_format_title->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 }
@@ -230,12 +232,12 @@ void CreateDeviceResources() {
   gradient_stops[0].color = ColorToD2DColorF(cs.title_bar_inactive_inner());
   gradient_stops[1].color = ColorToD2DColorF(cs.title_bar_inactive_outer());
   CHECK(SUCCEEDED(g_render_target->CreateGradientStopCollection(
-                 gradient_stops,
-                 2,
-                 D2D1_GAMMA_2_2,
-                 D2D1_EXTEND_MODE_CLAMP,
-                 &gradient_stop_collection)),
-             "CreateGradientStopCollection inactive");
+            gradient_stops,
+            2,
+            D2D1_GAMMA_2_2,
+            D2D1_EXTEND_MODE_CLAMP,
+            &gradient_stop_collection)),
+        "CreateGradientStopCollection inactive");
   CHECK(
       SUCCEEDED(g_render_target->CreateLinearGradientBrush(
           D2D1::LinearGradientBrushProperties(
@@ -377,15 +379,15 @@ void GfxColoredText(Font font,
                     const std::vector<RangeAndColor> colors) {
   IDWriteTextLayout* layout;
   std::wstring wide = UTF8ToUTF16(str);
-  CHECK(SUCCEEDED(g_dwrite_factory->CreateTextLayout(
-                 &wide[0],
-                 wide.size(),
-                 TextFormatForFont(font),
-                 std::numeric_limits<float>::max(),
-                 std::numeric_limits<float>::max(),
-                 &layout)));
+  CHECK(SUCCEEDED(
+      g_dwrite_factory->CreateTextLayout(&wide[0],
+                                         wide.size(),
+                                         TextFormatForFont(font),
+                                         std::numeric_limits<float>::max(),
+                                         std::numeric_limits<float>::max(),
+                                         &layout)));
   for (const auto& rac : colors) {
-    DWRITE_TEXT_RANGE range = { rac.start, rac.end - rac.start };
+    DWRITE_TEXT_RANGE range = {rac.start, rac.end - rac.start};
     layout->SetDrawingEffect(SolidBrushForColor(rac.color), range);
   }
 
@@ -449,9 +451,8 @@ void TextMeasurements::GetCaretPosition(int index,
                                         float* y) const {
   auto layout = reinterpret_cast<IDWriteTextLayout*>(data_);
   DWRITE_HIT_TEST_METRICS metrics;
-  CHECK(
-      SUCCEEDED(layout->HitTestTextPosition(index, trailing, x, y, &metrics)),
-      "HitTestTextPosition");
+  CHECK(SUCCEEDED(layout->HitTestTextPosition(index, trailing, x, y, &metrics)),
+        "HitTestTextPosition");
 }
 
 void GfxDrawFps() {
@@ -514,15 +515,13 @@ void DrawOutlineRoundedRect(const Rect& rect,
 }
 
 void DrawVerticalLine(const Color& color, float x, float y0, float y1) {
-  g_render_target->DrawLine(D2D1::Point2F(x, y0),
-                            D2D1::Point2F(x, y1),
-                            SolidBrushForColor(color));
+  g_render_target->DrawLine(
+      D2D1::Point2F(x, y0), D2D1::Point2F(x, y1), SolidBrushForColor(color));
 }
 
 void DrawHorizontalLine(const Color& color, float x0, float x1, float y) {
-  g_render_target->DrawLine(D2D1::Point2F(x0, y),
-                            D2D1::Point2F(x1, y),
-                            SolidBrushForColor(color));
+  g_render_target->DrawLine(
+      D2D1::Point2F(x0, y), D2D1::Point2F(x1, y), SolidBrushForColor(color));
 }
 
 void DrawTextInRect(Font font,
@@ -566,23 +565,19 @@ void DrawWindow(const char* title,
   // Title.
   const float kTextFudge = -4;
   GfxText(Font::kTitle,
-           cs.title_bar_text_drop_shadow(),
-           Rect(x + 1, y + 1 + kTextFudge, w, sk.title_bar_size()),
-           title);
+          cs.title_bar_text_drop_shadow(),
+          Rect(x + 1, y + 1 + kTextFudge, w, sk.title_bar_size()),
+          title);
   GfxText(Font::kTitle,
-           active ? cs.title_bar_text_active() : cs.title_bar_text_inactive(),
-           Rect(x, y + kTextFudge, w, sk.title_bar_size()),
-           title);
+          active ? cs.title_bar_text_active() : cs.title_bar_text_inactive(),
+          Rect(x, y + kTextFudge, w, sk.title_bar_size()),
+          title);
 }
 
 class ScopedRenderOffset::Data {
  public:
-  Data() {
-    g_render_target->GetTransform(&transform_);
-  }
-  ~Data() {
-    g_render_target->SetTransform(transform_);
-  }
+  Data() { g_render_target->GetTransform(&transform_); }
+  ~Data() { g_render_target->SetTransform(transform_); }
 
   D2D1_MATRIX_3X2_F transform_;
 };

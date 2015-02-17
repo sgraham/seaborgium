@@ -101,9 +101,8 @@ TEST(Lexer, CppNumbers) {
   std::unique_ptr<Lexer> lexer(MakeCppLexer());
 
   std::vector<Token> tokens;
-  lexer->GetTokensUnprocessed(
-      "42 23.42 23. .42 023 0xdeadbeef 23e+42 42e-23",
-      &tokens);
+  lexer->GetTokensUnprocessed("42 23.42 23. .42 023 0xdeadbeef 23e+42 42e-23",
+                              &tokens);
 
   EXPECT_EQ(15, tokens.size());
   EXPECT_EQ(Lexer::LiteralNumberInteger, tokens[0].token);

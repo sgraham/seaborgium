@@ -26,11 +26,8 @@ class TokenDefinitions {
     TokenData() {}
     TokenData(const std::string& regex,
               Lexer::TokenType action,
-              LexerState* new_state) :
-        regex(regex),
-        action(action),
-        new_state(new_state) {
-    }
+              LexerState* new_state)
+        : regex(regex), action(action), new_state(new_state) {}
 
     std::string regex;
     Lexer::TokenType action;

@@ -30,9 +30,7 @@ struct DropTargetIndicator {
 
 class ToolWindowDragger : public Draggable {
  public:
-  ToolWindowDragger(
-      DockingToolWindow* dragging,
-      DragSetup* drag_setup);
+  ToolWindowDragger(DockingToolWindow* dragging, DragSetup* drag_setup);
   virtual ~ToolWindowDragger();
 
   void Drag(const Point& screen_point) override;

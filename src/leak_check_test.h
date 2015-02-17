@@ -28,7 +28,7 @@ class LeakCheckTest : public testing::Test {
       _CrtMemState difference;
       _CrtMemCheckpoint(&final_memory_state);
       if (_CrtMemDifference(
-          &difference, &initial_memory_state_, &final_memory_state)) {
+              &difference, &initial_memory_state_, &final_memory_state)) {
         _CrtMemDumpAllObjectsSince(&difference);
         _CrtMemDumpStatistics(&difference);
         FailTest();
@@ -41,9 +41,7 @@ class LeakCheckTest : public testing::Test {
 #if PLATFORM_WINDOWS && CONFIG_DEBUG
   _CrtMemState initial_memory_state_;
 #endif
-  void FailTest() {
-    FAIL() << "Memory leaks detected.";
-  }
+  void FailTest() { FAIL() << "Memory leaks detected."; }
 };
 
 #endif  // LEAK_CHECK_TEST_H_

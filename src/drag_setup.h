@@ -19,8 +19,7 @@ class DragSetup {
       : screen_position(screen_position),
         docking_workspace(docking_workspace),
         drag_direction(kDragDirectionNone),
-        draggable(NULL) {
-  }
+        draggable(NULL) {}
 
   // Provided by query:
   Point screen_position;

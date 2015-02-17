@@ -129,9 +129,7 @@ bool DockingWorkspace::NotifyMouseButton(int x,
   return false;
 }
 
-bool DockingWorkspace::NotifyKey(Key::Enum key,
-                                 bool down,
-                                 uint8_t modifiers) {
+bool DockingWorkspace::NotifyKey(Key::Enum key, bool down, uint8_t modifiers) {
   Widget* focused = GetFocusedContents();
   if (!focused)
     return false;

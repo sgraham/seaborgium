@@ -11,9 +11,8 @@ namespace {
 
 // Get the result of a parse from a initial and final StringPiece representing
 // the current parse locations.
-std::string GetResult(
-    const re2::StringPiece& initial,
-    const re2::StringPiece final) {
+std::string GetResult(const re2::StringPiece& initial,
+                      const re2::StringPiece final) {
   size_t length = final.data() - initial.data();
   return std::string(initial.data(), length);
 }
@@ -46,7 +45,8 @@ Lexer::Lexer(const std::string& name) : name_(name) {
 
 Lexer::~Lexer() {
   for (std::map<std::string, LexerState*>::iterator i(states_.begin());
-       i != states_.end(); ++i) {
+       i != states_.end();
+       ++i) {
     delete i->second;
   }
 }
@@ -74,9 +74,8 @@ void Lexer::GetTokensUnprocessed(const std::string& text,
       re2::StringPiece from = input;
       const LexerState::TokenDef* token_def = &token_defs[i];
       if (RE2::Consume(&input, *token_def->regex)) {
-        output_tokens->push_back(Token(GetOffset(from, text),
-                                       token_def->action,
-                                       GetResult(from, input)));
+        output_tokens->push_back(Token(
+            GetOffset(from, text), token_def->action, GetResult(from, input)));
         if (token_def->new_state) {
           if (token_def->new_state == Push) {
             state_stack.push_back(current_state);

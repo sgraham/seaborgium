@@ -62,8 +62,10 @@ void ScrollHelper::RenderScrollIndicators() {
 
   float alpha = 1.0;
   if (ticks_since_stopped_moving_ >= kFadeOutAfterTicks) {
-    alpha = 1.f - static_cast<float>(
-        ticks_since_stopped_moving_ - kFadeOutAfterTicks) / kFadeOutOverTicks;
+    alpha =
+        1.f -
+        static_cast<float>(ticks_since_stopped_moving_ - kFadeOutAfterTicks) /
+            kFadeOutOverTicks;
   }
 
   DrawSolidRoundedRect(
@@ -74,8 +76,7 @@ void ScrollHelper::RenderScrollIndicators() {
 
 bool ScrollHelper::ClampScrollTarget() {
   y_pixel_scroll_target_ = std::max(0, y_pixel_scroll_target_);
-  int largest_possible =
-      data_provider_->GetContentSize() - num_pixels_in_line_;
+  int largest_possible = data_provider_->GetContentSize() - num_pixels_in_line_;
   y_pixel_scroll_target_ = std::min(largest_possible, y_pixel_scroll_target_);
   // Not this, if we want the scrollbar to re-appear if, e.g. you press up
   // while at the top of the document.
@@ -128,14 +129,14 @@ void ScrollHelper::CommonNotifyKey(Key::Enum key,
       *handled = true;
     } else if (key == Key::PageUp ||
                (key == Key::Space &&
-                (modifiers & (Modifier::LeftShift |
-                              Modifier::RightShift)) != 0)) {
+                (modifiers & (Modifier::LeftShift | Modifier::RightShift)) !=
+                    0)) {
       *invalidate = ScrollPages(-1);
       *handled = true;
     } else if (key == Key::PageDown ||
                (key == Key::Space &&
-                (modifiers & (Modifier::LeftShift |
-                              Modifier::RightShift)) == 0)) {
+                (modifiers & (Modifier::LeftShift | Modifier::RightShift)) ==
+                    0)) {
       *invalidate = ScrollPages(1);
       *handled = true;
     } else if (key == Key::Home) {
@@ -157,4 +158,3 @@ void ScrollHelper::CommonMouseWheel(float delta,
   *invalidate = true;
   *handled = true;
 }
-

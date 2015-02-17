@@ -121,9 +121,7 @@ class InputHandler {
   virtual bool WantMouseEvents() = 0;
   virtual bool WantKeyEvents() = 0;
 
-  virtual bool NotifyMouseMoved(int x,
-                                int y,
-                                uint8_t modifiers) = 0;
+  virtual bool NotifyMouseMoved(int x, int y, uint8_t modifiers) = 0;
   virtual bool NotifyMouseWheel(int x,
                                 int y,
                                 float delta,

@@ -147,8 +147,7 @@ void ToolWindowDragger::RefreshTargets() {
   Rect workspace_rect = docking_workspace_->GetScreenRect();
   PlaceIndicatorsAroundEdge(
       workspace_rect, &targets_, docking_workspace_->GetRoot());
-  std::vector<Widget*> dock_targets =
-      docking_workspace_->GetAllDockTargets();
+  std::vector<Widget*> dock_targets = docking_workspace_->GetAllDockTargets();
   for (size_t i = 0; i < dock_targets.size(); ++i) {
     if (dock_targets[i] != dragging_.get()) {
       PlaceIndicatorsAtCenter(
@@ -208,9 +207,9 @@ void ToolWindowDragger::CancelDrag() {
 }
 
 void ToolWindowDragger::Render() {
-  // TODO(scottmg): nanovg doesn't currently support render to texture
-  // https://github.com/memononen/nanovg/issues/90 so we just do simple
-  // outline box for now.
+// TODO(scottmg): nanovg doesn't currently support render to texture
+// https://github.com/memononen/nanovg/issues/90 so we just do simple
+// outline box for now.
 #if 0  // R-T-T
   // TODO(rendering): Not much practical reason to re-render this every frame
   // during drag. Investigate if it makes anything snappier if it's cached
@@ -228,8 +227,8 @@ void ToolWindowDragger::Render() {
   if (on_drop_target_) {
     draw_rect = dragging_->GetScreenRect();
   } else {
-    Point draw_at = current_position_.Subtract(
-        pick_up_offset_.Scale(kDetachedScale));
+    Point draw_at =
+        current_position_.Subtract(pick_up_offset_.Scale(kDetachedScale));
     draw_rect = Rect(draw_at.x,
                      draw_at.y,
                      dragging_->GetClientRect().w * kDetachedScale,

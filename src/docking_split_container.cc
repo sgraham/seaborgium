@@ -22,19 +22,18 @@ float DockingSplitContainer::GetSplitterWidth() {
   return gSplitterWidth;
 }
 
-DockingSplitContainer::DockingSplitContainer(
-    DockingSplitDirection direction, Widget* left, Widget* right)
-    : direction_(direction),
-      fraction_(0.5),
-      left_(left),
-      right_(right) {
+DockingSplitContainer::DockingSplitContainer(DockingSplitDirection direction,
+                                             Widget* left,
+                                             Widget* right)
+    : direction_(direction), fraction_(0.5), left_(left), right_(right) {
 }
 
 DockingSplitContainer::~DockingSplitContainer() {
 }
 
-void DockingSplitContainer::SplitChild(
-    DockingSplitDirection direction, Widget* left, Widget* right) {
+void DockingSplitContainer::SplitChild(DockingSplitDirection direction,
+                                       Widget* left,
+                                       Widget* right) {
   std::unique_ptr<Widget>* to_replace;
   if (left_.get() == left || left_.get() == right)
     to_replace = &left_;
@@ -45,7 +44,7 @@ void DockingSplitContainer::SplitChild(
   Rect previous_rect = (*to_replace)->GetScreenRect();
   to_replace->release();  // We're going re-own this pointer on the next line.
   DockingSplitContainer* replacement =
-    new DockingSplitContainer(direction, left, right);
+      new DockingSplitContainer(direction, left, right);
   replacement->set_parent(previous_parent);
   to_replace->reset(replacement);
   left->set_parent(replacement);
@@ -106,17 +105,19 @@ void DockingSplitContainer::SetScreenRect(const Rect& rect) {
     float width_for_left = width * fraction_;
     float width_for_right = width - width_for_left;
     left_->SetScreenRect(Rect(rect.x, rect.y, width_for_left, rect.h));
-    right_->SetScreenRect(
-        Rect(rect.x + width_for_left + gSplitterWidth, rect.y,
-             width_for_right, rect.h));
+    right_->SetScreenRect(Rect(rect.x + width_for_left + gSplitterWidth,
+                               rect.y,
+                               width_for_right,
+                               rect.h));
   } else if (direction_ == kSplitHorizontal) {
     float height = GetScreenRect().h - gSplitterWidth;
     float height_for_left = height * fraction_;
     float height_for_right = height - height_for_left;
     left_->SetScreenRect(Rect(rect.x, rect.y, rect.w, height_for_left));
-    right_->SetScreenRect(
-        Rect(rect.x, rect.y + height_for_left + gSplitterWidth,
-             rect.w, height_for_right));
+    right_->SetScreenRect(Rect(rect.x,
+                               rect.y + height_for_left + gSplitterWidth,
+                               rect.w,
+                               height_for_right));
   } else {
     DCHECK(direction_ == kSplitNoneRoot, "unexpected case");
     if (left_.get())
@@ -188,8 +189,7 @@ void DockingSplitContainer::SetFraction(float fraction) {
 }
 
 void DockingSplitContainer::ReplaceLeft(Widget* left) {
-  CHECK(direction_ == kSplitNoneRoot && !right_.get(),
-             "Can only use on root");
+  CHECK(direction_ == kSplitNoneRoot && !right_.get(), "Can only use on root");
   left_.reset(left);
   left->SetScreenRect(Widget::GetScreenRect());
 }

@@ -107,7 +107,6 @@ void GfxColoredText(Font font,
 void GfxDrawIcon(Icon icon, const Rect& rect, float alpha);
 void GfxIconSize(Icon icon, float* width, float* height);
 
-
 TextMeasurements GfxMeasureText(Font font, StringPiece str);
 
 void GfxDrawFps();

@@ -74,19 +74,14 @@ class Lexer {
 
 class Token {
  public:
-  Token() : index(std::numeric_limits<size_t>::max()), token(Lexer::Invalid) {
-  }
+  Token() : index(std::numeric_limits<size_t>::max()), token(Lexer::Invalid) {}
 
-  Token(size_t index, Lexer::TokenType token, const std::string& value) :
-      index(index),
-      token(token),
-      value(value) {
-  }
+  Token(size_t index, Lexer::TokenType token, const std::string& value)
+      : index(index), token(token), value(value) {}
 
   size_t index;
   Lexer::TokenType token;
   std::string value;
 };
-
 
 #endif  // SOURCE_VIEW_LEXER_H_

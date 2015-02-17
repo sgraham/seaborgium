@@ -33,33 +33,33 @@ Skin g_skin;
 }  // namespace
 
 ColorScheme::ColorScheme()
-  : border_(0, 0, 0),
-    background_(kBase03),
-    text_(kBase0),
-    text_selection_(kYellow),
-    cursor_(kBase1),
-    title_bar_active_inner_(0.5f, 1.f, 1.f, .75f),
-    title_bar_active_outer_(0.5f, 1.f, 1.f, 0.125f),
-    title_bar_inactive_inner_(0.5f, 0.5f, 0.5f, 0.03f),
-    title_bar_inactive_outer_(0.f, 0.f, 0.f, 0.06f),
-    title_bar_text_active_(kBase2),
-    title_bar_text_inactive_(kBase00),
-    title_bar_text_drop_shadow_(0, 0, 0, 0.5f),
-    drop_shadow_inner_(0, 0, 0, 0.5f),
-    drop_shadow_outer_(0, 0, 0, 0),
-    drop_indicator_(kBase1),
-    comment_(kBase01),
-    comment_preprocessor_(kOrange),
-    error_(kRed),
-    keyword_(kGreen),
-    keyword_type_(kYellow),
-    literal_number_(kCyan),
-    literal_string_(kViolet),
-    klass_(kBlue),
-    op_(kGreen),
-    margin_(kBase02),
-    margin_text_(kBase0),
-    pc_indicator_(kYellow) {
+    : border_(0, 0, 0),
+      background_(kBase03),
+      text_(kBase0),
+      text_selection_(kYellow),
+      cursor_(kBase1),
+      title_bar_active_inner_(0.5f, 1.f, 1.f, .75f),
+      title_bar_active_outer_(0.5f, 1.f, 1.f, 0.125f),
+      title_bar_inactive_inner_(0.5f, 0.5f, 0.5f, 0.03f),
+      title_bar_inactive_outer_(0.f, 0.f, 0.f, 0.06f),
+      title_bar_text_active_(kBase2),
+      title_bar_text_inactive_(kBase00),
+      title_bar_text_drop_shadow_(0, 0, 0, 0.5f),
+      drop_shadow_inner_(0, 0, 0, 0.5f),
+      drop_shadow_outer_(0, 0, 0, 0),
+      drop_indicator_(kBase1),
+      comment_(kBase01),
+      comment_preprocessor_(kOrange),
+      error_(kRed),
+      keyword_(kGreen),
+      keyword_type_(kYellow),
+      literal_number_(kCyan),
+      literal_string_(kViolet),
+      klass_(kBlue),
+      op_(kGreen),
+      margin_(kBase02),
+      margin_text_(kBase0),
+      pc_indicator_(kYellow) {
   text_selection_.a = .3f;
 }
 
@@ -68,7 +68,8 @@ Skin::Skin()
       title_bar_text_size_(14.f),
       border_size_(3.f),
       status_bar_size_(26.f),
-      text_line_height_(17.f) {}
+      text_line_height_(17.f) {
+}
 
 void Skin::Init() {
 }
@@ -79,4 +80,6 @@ const Skin& Skin::current() {
 }
 
 // static
-void Skin::LoadData() { g_skin.Init(); }
+void Skin::LoadData() {
+  g_skin.Init();
+}

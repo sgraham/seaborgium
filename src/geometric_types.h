@@ -32,18 +32,13 @@ class Point {
   Point Subtract(const Point& other) const {
     return Point(x - other.x, y - other.y);
   }
-  Point Scale(float scale) const {
-    return Point(x * scale, y * scale);
-  }
+  Point Scale(float scale) const { return Point(x * scale, y * scale); }
   Point RelativeTo(const Rect& rect) const;
   float x, y;
 };
 
 inline bool Rect::Contains(const Point& point) const {
-  return point.x >= x &&
-         point.x < x + w &&
-         point.y >= y &&
-         point.y < y + h;
+  return point.x >= x && point.x < x + w && point.y >= y && point.y < y + h;
 }
 
 inline Point Point::RelativeTo(const Rect& rect) const {

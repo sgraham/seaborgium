@@ -13,7 +13,13 @@
 extern int Main(int argc, char** argv);
 
 struct Event {
-  enum Enum { Exit, Key, Char, Mouse, Size, };
+  enum Enum {
+    Exit,
+    Key,
+    Char,
+    Mouse,
+    Size,
+  };
   Event::Enum type;
 };
 
@@ -168,7 +174,8 @@ static const TranslateKeyModifiers_t s_translateKeyModifiers[8] = {
     {VK_LSHIFT, Modifier::LeftShift},
     {VK_RSHIFT, Modifier::RightShift},
     {VK_LWIN, Modifier::LeftMeta},
-    {VK_RWIN, Modifier::RightMeta}, };
+    {VK_RWIN, Modifier::RightMeta},
+};
 
 static uint8_t TranslateKeyModifiers() {
   uint8_t modifiers = 0;
@@ -291,18 +298,17 @@ struct Context {
 
     WinGfxCreateDeviceIndependentResources();
 
-    hwnd_ =
-        ::CreateWindowA("seaborgium",
-                        "Seaborgium",
-                        WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-                        50,
-                        50,
-                        static_cast<int>(DEFAULT_WIDTH * GetDpiScale()),
-                        static_cast<int>(DEFAULT_HEIGHT * GetDpiScale()),
-                        NULL,
-                        NULL,
-                        instance,
-                        0);
+    hwnd_ = ::CreateWindowA("seaborgium",
+                            "Seaborgium",
+                            WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+                            50,
+                            50,
+                            static_cast<int>(DEFAULT_WIDTH * GetDpiScale()),
+                            static_cast<int>(DEFAULT_HEIGHT * GetDpiScale()),
+                            NULL,
+                            NULL,
+                            instance,
+                            0);
 
     WinGfxSetHwnd(hwnd_);
 
@@ -465,7 +471,6 @@ struct Context {
           event_queue_.PostCharEvent(character);
         } break;
 
-
         case WM_ERASEBKGND:
           return TRUE;
 
@@ -505,7 +510,7 @@ struct Context {
   }
 
   static LRESULT CALLBACK
-      WndProc(HWND hwnd, UINT id, WPARAM wparam, LPARAM lparam);
+  WndProc(HWND hwnd, UINT id, WPARAM wparam, LPARAM lparam);
 
   EventQueue event_queue_;
 
@@ -521,9 +526,13 @@ Context::WndProc(HWND hwnd, UINT id, WPARAM wparam, LPARAM lparam) {
   return s_ctx.Process(hwnd, id, wparam, lparam);
 }
 
-const Event* Poll() { return s_ctx.event_queue_.Poll(); }
+const Event* Poll() {
+  return s_ctx.event_queue_.Poll();
+}
 
-void Release(const Event* event) { s_ctx.event_queue_.Release(event); }
+void Release(const Event* event) {
+  s_ctx.event_queue_.Release(event);
+}
 
 void SetWindowSize(uint32_t width, uint32_t height) {
   ::PostMessage(s_ctx.hwnd_,
@@ -542,7 +551,6 @@ int32_t MainThreadEntry::ThreadFunc(void* user_data) {
   ::PostMessage(s_ctx.hwnd_, WM_QUIT, 0, 0);
   return result;
 }
-
 
 #endif  // PLATFORM_WINDOWS
 

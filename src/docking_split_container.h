@@ -17,7 +17,8 @@ enum DockingSplitDirection {
 class DockingSplitContainer : public Widget {
  public:
   DockingSplitContainer(DockingSplitDirection direction,
-                        Widget* left, Widget* right);
+                        Widget* left,
+                        Widget* right);
   virtual ~DockingSplitContainer();
 
   static void SetSplitterWidth(float width);
@@ -28,9 +29,7 @@ class DockingSplitContainer : public Widget {
   // Finds left or right in its children, and replaces that child with a new
   // container split in |direction| containing |left| and |right| in that
   // order.
-  void SplitChild(DockingSplitDirection direction,
-                  Widget* left,
-                  Widget* right);
+  void SplitChild(DockingSplitDirection direction, Widget* left, Widget* right);
 
   // Both of these remove |child| and replace |this| with the sibling of
   // |child|. Delete cleans the child up, Release gives ownership to the

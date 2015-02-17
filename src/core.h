@@ -132,7 +132,6 @@
 #undef DrawText
 #undef GetObject
 
-
 // --------------------------------------------------------------------------
 //
 // Helper macros.
@@ -147,8 +146,7 @@
 
 #define FILE_LINE_LITERAL "" __FILE__ "(" STRINGIZE(__LINE__) "): "
 
-#define ALIGN_MASK(_value, _mask) \
-  (((_value) + (_mask)) & ((~0) & (~(_mask))))
+#define ALIGN_MASK(_value, _mask) (((_value) + (_mask)) & ((~0) & (~(_mask))))
 #define ALIGN_16(_value) ALIGN_MASK(_value, 0xf)
 #define ALIGN_256(_value) ALIGN_MASK(_value, 0xff)
 #define ALIGN_4096(_value) ALIGN_MASK(_value, 0xfff)
@@ -156,12 +154,11 @@
 #define ALIGNOF(_type) __alignof(_type)
 
 template <typename T, size_t N>
-char (&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T (&)[N]))[N];
+char(&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T(&)[N]))[N];
 #define COUNTOF(_x) sizeof(::COUNTOF_REQUIRES_ARRAY_ARGUMENT(_x))
 
 #if COMPILER_GCC || COMPILER_CLANG
-#define ALIGN_STRUCT(_align, struct) \
-  struct __attribute__((aligned(_align)))
+#define ALIGN_STRUCT(_align, struct) struct __attribute__((aligned(_align)))
 #define ALLOW_UNUSED __attribute__((unused))
 #define FORCE_INLINE \
   __extension__ static __inline __attribute__((__always_inline__))
@@ -206,23 +203,23 @@ char (&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T (&)[N]))[N];
 #endif
 
 #ifndef CHECK
-#define CHECK(condition, ...)            \
-  do {                                   \
-    if (!(condition)) {                  \
+#define CHECK(condition, ...)         \
+  do {                                \
+    if (!(condition)) {               \
       TRACE("CHECK ", ##__VA_ARGS__); \
-      ::DebugBreak();                    \
-    }                                    \
+      ::DebugBreak();                 \
+    }                                 \
   } while (0)
 #endif  // CHECK
 
 #ifndef DCHECK
 #if CONFIG_DEBUG
-#define DCHECK(condition, ...)              \
-  do {                                      \
-    if (!(condition)) {                     \
+#define DCHECK(condition, ...)         \
+  do {                                 \
+    if (!(condition)) {                \
       TRACE("DCHECK ", ##__VA_ARGS__); \
-      ::DebugBreak();                       \
-    }                                       \
+      ::DebugBreak();                  \
+    }                                  \
   } while (0)
 #else  // CONFIG_DEBUG
 #define DCHECK(condition, ...) \
@@ -233,12 +230,14 @@ char (&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T (&)[N]))[N];
 
 #ifndef TRACE
 #if CONFIG_DEBUG
-#define TRACE(format, ...)                                            \
-  do {                                                                \
+#define TRACE(format, ...)                                       \
+  do {                                                           \
     ::DebugPrintf(FILE_LINE_LITERAL format "\n", ##__VA_ARGS__); \
   } while (0)
 #else  // CONFIG_DEBUG
-#define TRACE(...) do {} while (0)
+#define TRACE(...) \
+  do {             \
+  } while (0)
 #endif  // CONFIG_DEBUG
 #endif  // TRACE
 
@@ -253,9 +252,8 @@ char (&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T (&)[N]))[N];
   void operator=(const TypeName&)
 
 #if COMPILER_MSVC
-#pragma warning(disable: 4127)  // Conditional expression is constant.
-#endif  // COMPILER_MSVC
-
+#pragma warning(disable : 4127)  // Conditional expression is constant.
+#endif                           // COMPILER_MSVC
 
 // --------------------------------------------------------------------------
 //
@@ -278,7 +276,7 @@ inline void ReadBarrier() {
 #if COMPILER_MSVC
   _ReadBarrier();
 #elif COMPILER_GCC || COMPILER_CLANG
-  asm volatile("" :: : "memory");
+  asm volatile("" ::: "memory");
 #endif
 }
 
@@ -286,7 +284,7 @@ inline void WriteBarrier() {
 #if COMPILER_MSVC
   _WriteBarrier();
 #elif COMPILER_GCC || COMPILER_CLANG
-  asm volatile("" :: : "memory");
+  asm volatile("" ::: "memory");
 #endif
 }
 
@@ -294,7 +292,7 @@ inline void ReadWriteBarrier() {
 #if COMPILER_MSVC
   _ReadWriteBarrier();
 #elif COMPILER_GCC || COMPILER_CLANG
-  asm volatile("" :: : "memory");
+  asm volatile("" ::: "memory");
 #endif
 }
 
@@ -330,7 +328,6 @@ inline void* AtomicExchangePtr(void** _target, void* ptr) {
 #endif
 }
 
-
 // --------------------------------------------------------------------------
 //
 // Timer.
@@ -361,7 +358,6 @@ inline int64_t GetHPFrequency() {
   return INT64_C(1000000);
 #endif
 }
-
 
 // --------------------------------------------------------------------------
 //
@@ -450,7 +446,6 @@ inline void DebugPrintf(const char* format, ...) {
   va_end(arg_list);
 }
 
-
 // --------------------------------------------------------------------------
 //
 // Mutex.
@@ -488,13 +483,12 @@ class ScopedFutex {
   ~ScopedFutex() { futex_->Unlock(); }
 
  private:
-  ScopedFutex();                              // no default constructor
+  ScopedFutex();                               // no default constructor
   ScopedFutex(const ScopedFutex&);             // no copy constructor
   ScopedFutex& operator=(const ScopedFutex&);  // no assignment operator
 
   Futex* futex_;
 };
-
 
 // --------------------------------------------------------------------------
 //
@@ -584,7 +578,6 @@ class Semaphore {
 };
 
 #endif
-
 
 // --------------------------------------------------------------------------
 //
@@ -708,7 +701,6 @@ class Thread {
 
   DISALLOW_COPY_AND_ASSIGN(Thread);
 };
-
 
 // --------------------------------------------------------------------------
 //

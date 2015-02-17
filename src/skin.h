@@ -29,9 +29,7 @@ class ColorScheme {
   const Color& title_bar_inactive_outer() const {
     return title_bar_inactive_outer_;
   }
-  const Color& title_bar_text_active() const {
-    return title_bar_text_active_;
-  }
+  const Color& title_bar_text_active() const { return title_bar_text_active_; }
   const Color& title_bar_text_inactive() const {
     return title_bar_text_inactive_;
   }
@@ -103,7 +101,7 @@ class Skin {
   float status_bar_size() const { return status_bar_size_; }
   float text_line_height() const { return text_line_height_; }
 
-  // TODO(icons): These will all be chars from icons font.
+// TODO(icons): These will all be chars from icons font.
 #if 0
   const Texture* pc_indicator_texture() const { return &pc_indicator_texture_; }
   const Texture* breakpoint_texture() const { return &breakpoint_texture_; }

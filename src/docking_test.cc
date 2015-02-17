@@ -11,13 +11,11 @@
 
 namespace {
 
-class MainDocument : public Widget {
-};
+class MainDocument : public Widget {};
 
-class ContentPane : public Widget {
-};
+class ContentPane : public Widget {};
 
-std::string RectAsString(const Rect &r) {
+std::string RectAsString(const Rect& r) {
   char buf[256];
   snprintf(buf, sizeof(buf), "%.0f,%.0f %.0fx%.0f", r.x, r.y, r.w, r.h);
   return buf;
@@ -30,8 +28,7 @@ Point CalculateDragPoint(const DockingResizer& resizer, int dx, int dy) {
 
 }  // namespace
 
-class DockingTest : public LeakCheckTest {
-};
+class DockingTest : public LeakCheckTest {};
 
 TEST_F(DockingTest, Creation) {
   DockingWorkspace workspace;

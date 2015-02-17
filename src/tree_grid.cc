@@ -21,12 +21,12 @@ TreeGridNodeValue::~TreeGridNodeValue() {
 
 // --------------------------------------------------------------------
 TreeGridNodeValueString::TreeGridNodeValueString(const std::string& value)
-    : value_(value) {}
+    : value_(value) {
+}
 
 void TreeGridNodeValueString::Render(const Rect& rect) const {
   const ColorScheme& cs = Skin::current().GetColorScheme();
-  DrawTextInRect(
-      Font::kUI, rect, value_.c_str(), cs.text(), kTextPadding);
+  DrawTextInRect(Font::kUI, rect, value_.c_str(), cs.text(), kTextPadding);
 }
 
 // --------------------------------------------------------------------
@@ -34,7 +34,8 @@ TreeGridNode::TreeGridNode(TreeGrid* tree_grid, TreeGridNode* parent)
     : tree_grid_(tree_grid),
       parent_(parent),
       expanded_(false),
-      selected_(false) {}
+      selected_(false) {
+}
 
 TreeGridNode::~TreeGridNode() {
   for (std::map<int, TreeGridNodeValue*>::iterator i(items_.begin());
@@ -69,7 +70,8 @@ const TreeGridNodeValue* TreeGridNode::GetValue(int column) const {
 
 // --------------------------------------------------------------------
 TreeGridColumn::TreeGridColumn(TreeGrid* tree_grid, const std::string& caption)
-    : tree_grid_(tree_grid), caption_(caption) {}
+    : tree_grid_(tree_grid), caption_(caption) {
+}
 
 void TreeGridColumn::SetWidthPercentage(float fraction) {
   width_fraction_ = fraction;
@@ -84,7 +86,7 @@ void TreeGridColumn::SetPercentageToMatchWidth(float width, float whole_width) {
   CHECK(self != tree_grid_->Columns()->end(), "couldn't find column");
   size_t self_index = self - tree_grid_->Columns()->begin();
   CHECK(self_index < tree_grid_->Columns()->size() - 1,
-             "shouldn't be used on the last column");
+        "shouldn't be used on the last column");
   std::vector<float> column_widths = tree_grid_->GetColumnWidths(whole_width);
 
   // Add/remove the width to our neighbour.
@@ -113,7 +115,7 @@ void TreeGridColumn::SetPercentageToMatchPosition(float splitter_position,
   CHECK(self != tree_grid_->Columns()->end(), "couldn't find column");
   size_t self_index = self - tree_grid_->Columns()->begin();
   CHECK(self_index < tree_grid_->Columns()->size() - 1,
-             "shouldn't be used on the last column");
+        "shouldn't be used on the last column");
   std::vector<float> column_widths = tree_grid_->GetColumnWidths(whole_width);
 
   float last_x = 0.f;
@@ -137,10 +139,10 @@ class ReadOnlyTreeGridEditObserver : public TreeGridEditObserver {
   void NodeInserted(TreeGridNode* /*node*/) override {}
 };
 
-
 // --------------------------------------------------------------------
 TreeGrid::TreeGrid()
-    : focused_node_(NULL), edit_observer_(new ReadOnlyTreeGridEditObserver) {}
+    : focused_node_(NULL), edit_observer_(new ReadOnlyTreeGridEditObserver) {
+}
 
 TreeGrid::~TreeGrid() {
 }
@@ -171,8 +173,7 @@ TreeGrid::LayoutData TreeGrid::CalculateLayout(const Rect& client_rect) {
                   client_rect.h - kHeaderHeight);
 
   ret.column_widths = GetColumnWidths(ret.body.w);
-  DCHECK(columns_.size() == ret.column_widths.size(),
-              "num columns broken");
+  DCHECK(columns_.size() == ret.column_widths.size(), "num columns broken");
 
   float last_x = 0;
   for (size_t i = 0; i < columns_.size(); ++i) {
@@ -209,8 +210,8 @@ void TreeGrid::CalculateLayoutNodes(const std::vector<TreeGridNode*>& nodes,
         if (node->Nodes()->size() > 0) {
           float half = kLineHeight / 2.f;
           layout_data->expansion_boxes.push_back(LayoutData::RectAndNode(
-              Rect(current_indent + layout_data->margin.w + half/2.f,
-                   *y_position + layout_data->header.h + half/2.f,
+              Rect(current_indent + layout_data->margin.w + half / 2.f,
+                   *y_position + layout_data->header.h + half / 2.f,
                    half,
                    half),
               node));
@@ -281,21 +282,21 @@ void TreeGrid::Render() {
         1.f);
   }
 
-/*
-  // TODO(scottmg): lost focus should cancel or commit edit
-  if (ld.focus.IsValid()) {
-    if (GetFocusedContents() == inline_edit_.get()) {
-      DrawOutlineRoundedRect(ld.focus, cs.text_selection(), 3.f, 1.f);
-      inline_edit_->SetScreenRect(ClientToScreen(ld.focus));
-      ScopedRenderOffset text_edit_offset(this, inline_edit_.get(), false);
-      inline_edit_->Render();
-    } else if (GetFocusedContents() == this) {
-      DrawSolidRoundedRect(ld.focus, cs.text_selection(), 3.f);
-    } else {
-      DrawOutlineRoundedRect(ld.focus, cs.text_selection(), 3.f, 1.f);
+  /*
+    // TODO(scottmg): lost focus should cancel or commit edit
+    if (ld.focus.IsValid()) {
+      if (GetFocusedContents() == inline_edit_.get()) {
+        DrawOutlineRoundedRect(ld.focus, cs.text_selection(), 3.f, 1.f);
+        inline_edit_->SetScreenRect(ClientToScreen(ld.focus));
+        ScopedRenderOffset text_edit_offset(this, inline_edit_.get(), false);
+        inline_edit_->Render();
+      } else if (GetFocusedContents() == this) {
+        DrawSolidRoundedRect(ld.focus, cs.text_selection(), 3.f);
+      } else {
+        DrawOutlineRoundedRect(ld.focus, cs.text_selection(), 3.f, 1.f);
+      }
     }
-  }
-  */
+    */
 }
 
 class ColumnDragHelper : public Draggable {
@@ -323,11 +324,9 @@ class ColumnDragHelper : public Draggable {
         body_point.x, body_.w);
   }
 
-  void CancelDrag() override {
-  }
+  void CancelDrag() override {}
 
-  void Render() override {
-  }
+  void Render() override {}
 
  private:
   TreeGrid* tree_grid_;
@@ -497,7 +496,7 @@ TreeGridNode* TreeGrid::GetNextVisibleInDirection(TreeGridNode* node,
     return GetLastVisibleChild(prev_sibling);
   }
   CHECK(direction == kFocusDown || direction == kFocusUp,
-             "should only be used for up and down");
+        "should only be used for up and down");
   return NULL;
 }
 

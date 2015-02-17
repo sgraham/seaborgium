@@ -39,17 +39,15 @@ class ScrollHelper {
   bool ScrollToEnd();
 
   // Optional, standard handling of keys/mouse for scrolling.
-  void CommonNotifyKey(
-      Key::Enum key,
-      bool down,
-      uint8_t modifers,
-      bool* invalidate,
-      bool* handled);
-  void CommonMouseWheel(
-      float delta,
-      uint8_t modifiers,
-      bool* invalidate,
-      bool* handled);
+  void CommonNotifyKey(Key::Enum key,
+                       bool down,
+                       uint8_t modifers,
+                       bool* invalidate,
+                       bool* handled);
+  void CommonMouseWheel(float delta,
+                        uint8_t modifiers,
+                        bool* invalidate,
+                        bool* handled);
 
  private:
   // Returns whether invalidation is required.

@@ -102,12 +102,12 @@ int Main(int argc, char** argv) {
   UNUSED(argc);
   UNUSED(argv);
 
-  /*
-  uint32_t test_texture_data[4] = {
-    0xff0000ff, 0xff00ffff,
-    0xff00ff00, 0xffff0000,
-  };
-  */
+/*
+uint32_t test_texture_data[4] = {
+  0xff0000ff, 0xff00ffff,
+  0xff00ff00, 0xffff0000,
+};
+*/
 
 #if 0  // Works fine, but tokenizing at this level isn't really enough for
        // syntax highlighting.

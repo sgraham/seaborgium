@@ -13,7 +13,8 @@ SourceView::SourceView() : scroll_(this, Skin::current().text_line_height()) {
 SourceView::~SourceView() {
 }
 
-static void SplitString(const std::string& str, char delimiter,
+static void SplitString(const std::string& str,
+                        char delimiter,
                         std::vector<std::string>* into) {
   std::vector<std::string> parsed;
   std::string::size_type pos = 0;
@@ -62,7 +63,8 @@ void SyntaxHighlight(const std::string& input, std::vector<Line>* lines) {
 void SourceView::SetFilePath(const std::string& path) {
   // TODO(scottmg): On background thread.
   FILE* f = fopen(path.c_str(), "rb");
-  if (!f) return;
+  if (!f)
+    return;
   fseek(f, 0, SEEK_END);
   int len = ftell(f);
   std::unique_ptr<char[]> file_contents(new char[len]);
@@ -125,7 +127,7 @@ void SourceView::Render() {
     if (!LineInView(i))
       break;
 
-    // Line numbers.
+// Line numbers.
 #if 0
     renderer->SetDrawColor(skin.GetColorScheme().margin_text());
     renderer->RenderText(
