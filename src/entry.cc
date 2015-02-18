@@ -9,6 +9,8 @@
 #include "entry.h"
 
 #include "resource.h"
+#include "spscqueue.h"
+#include "threading.h"
 
 extern int Main(int argc, char** argv);
 
